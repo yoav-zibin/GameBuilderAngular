@@ -1,0 +1,8 @@
+<div style="text-align:center">
+  <h1>
+    Welcome to {{title}}!
+  </h1>
+</div>
+
+<button (click)="login()" *ngIf="!(user | async)?.uid">Google Login</button>
+<button (click)="logout()" *ngIf="(user | async)?.uid">Logout</button>
