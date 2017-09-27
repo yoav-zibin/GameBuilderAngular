@@ -22,6 +22,10 @@ export class AppComponent {
     	this.afAuth.auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
 	}
 
+	loginAnonymously() {
+		this.afAuth.auth.signInAnonymously();
+	}
+
 	logout() {
     	this.afAuth.auth.signOut();
 	}

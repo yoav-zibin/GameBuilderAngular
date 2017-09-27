@@ -9,3 +9,4 @@
 <button (click)="loginWithGoogle()" *ngIf="!(user | async)?.uid">Login with Google</button>
 <button (click)="logout()" *ngIf="(user | async)?.uid">Logout</button>
 <button [routerLink]="['phonelogin']" routerLinkActive='active' *ngIf="!(user | async)?.uid">Login with Phone Number</button>
+<button (click)="loginAnonymously()" *ngIf="!(user | async)?.uid">Login Anonymously</button>
