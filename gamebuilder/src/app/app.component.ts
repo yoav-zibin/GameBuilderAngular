@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
 import { AngularFireAuth } from 'angularfire2/auth';
 import { Observable } from 'rxjs/Observable';
+import { Router } from '@angular/router';
 import * as firebase from 'firebase/app';
 
 @Component({
@@ -13,11 +14,11 @@ export class AppComponent {
 	title = 'GameBuilder';
 	user: Observable<firebase.User>;
 
-	constructor(public afAuth: AngularFireAuth, public af: AngularFireDatabase) {
+	constructor(public afAuth: AngularFireAuth, public af: AngularFireDatabase, private router: Router) {
 		this.user = this.afAuth.authState;
 	}
 
-	login() {
+	loginWithGoogle() {
     	this.afAuth.auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
 	}
 
