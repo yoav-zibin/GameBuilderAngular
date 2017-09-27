@@ -1,2 +1,0 @@
-# GameBuilderAngular
-GameBuilderAngular
