@@ -1,5 +1,5 @@
 {
-  "name": "gamebuilder",
+  "name": "GameBuilderAngular",
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
@@ -25,7 +25,7 @@
     "core-js": "^2.4.1",
     "firebase": "^4.4.0",
     "rxjs": "^5.4.2",
-    "typescript": "^2.3.4",
+    "typescript": "^2.5.3",
     "typings": "^2.1.1",
     "zone.js": "^0.8.14"
   },
