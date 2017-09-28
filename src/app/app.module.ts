@@ -21,6 +21,7 @@ export const firebaseConfig = {
 }; 
 
 export const appRoutes: Routes = [
+  {path: '', redirectTo: '/', pathMatch: 'full'},
   {path: 'app', component: AppComponent},
 	{path: 'phonelogin', component: PhoneloginComponent}
 ];

@@ -4,9 +4,11 @@
   <h1>
     Welcome to {{title}}!
   </h1>
-</div>
 
-<button (click)="loginWithGoogle()" *ngIf="!(user | async)?.uid">Login with Google</button>
-<button (click)="logout()" *ngIf="(user | async)?.uid">Logout</button>
-<button [routerLink]="['phonelogin']" routerLinkActive='active' *ngIf="!(user | async)?.uid">Login with Phone Number</button>
-<button (click)="loginAnonymously()" *ngIf="!(user | async)?.uid">Login Anonymously</button>
+  <button (click)="loginWithGoogle()" *ngIf="!(user | async)?.uid">Login with Google</button>
+  <button (click)="logout()" *ngIf="(user | async)?.uid">Logout</button>
+  <button (click)="loginWithPhoneNumber()" *ngIf="!(user | async)?.uid">Login with Phone Number</button>
+  <button (click)="loginAnonymously()" *ngIf="!(user | async)?.uid">Login Anonymously</button>
+  <router-outlet></router-outlet>
+
+</div>

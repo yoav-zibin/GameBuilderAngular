@@ -3,6 +3,7 @@ import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/databa
 import { AngularFireAuth } from 'angularfire2/auth';
 import { Observable } from 'rxjs/Observable';
 import { Router } from '@angular/router';
+import { WindowService } from './window.service';
 import * as firebase from 'firebase/app';
 
 @Component({
@@ -14,7 +15,11 @@ export class AppComponent {
 	title = 'GameBuilder';
 	user: Observable<firebase.User>;
 
-	constructor(public afAuth: AngularFireAuth, public af: AngularFireDatabase, private router: Router) {
+	constructor(
+		public afAuth: AngularFireAuth, 
+		public af: AngularFireDatabase, 
+		private router: Router,
+		){
 		this.user = this.afAuth.authState;
 	}
 
@@ -22,11 +27,16 @@ export class AppComponent {
     	this.afAuth.auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
 	}
 
+	loginWithPhoneNumber() {
+		this.router.navigate(['/phonelogin']);
+	}
+
 	loginAnonymously() {
 		this.afAuth.auth.signInAnonymously();
 	}
 
 	logout() {
-    	this.afAuth.auth.signOut();
+		this.afAuth.auth.signOut();
+		this.router.navigate(['']);
 	}
 }
