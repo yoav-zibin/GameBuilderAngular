@@ -15,6 +15,7 @@ import { AppComponent } from './app.component';
 import { PhoneloginComponent } from './phonelogin/phonelogin.component';
 import { UserInfoComponent } from './user-info/user-info.component';
 import { UserLoginComponent } from './user-login/user-login.component';
+import { GoogleLoginComponent } from './google-login/google-login.component';
 
 
 export const firebaseConfig = { 
@@ -32,6 +33,7 @@ export const appRoutes: Routes = [
   {path: 'phonelogin', component: PhoneloginComponent},
   {path: 'login', component: UserLoginComponent},
   {path: 'user', component: UserInfoComponent},
+  {path: 'googleLogin', component: GoogleLoginComponent},
 ];
 
 @NgModule({
@@ -40,6 +42,7 @@ export const appRoutes: Routes = [
     PhoneloginComponent,
     UserInfoComponent,
     UserLoginComponent
+    GoogleLoginComponent,
   ],
   exports: [
   	AppComponent
