@@ -1,3 +1,4 @@
+import {environment} from '../environments/environment';
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgModule } from '@angular/core';
@@ -5,11 +6,16 @@ import { AngularFireModule} from 'angularfire2';
 import { AngularFireDatabaseModule } from 'angularfire2/database';
 import { AngularFireAuthModule } from 'angularfire2/auth';
 import { RouterModule, Routes } from '@angular/router';
+import {AppRoutingModule} from './app-routing.module';
+import {AuthService} from './auth.service';
 
 //import * as firebase from 'firebase/app';
 
 import { AppComponent } from './app.component';
 import { PhoneloginComponent } from './phonelogin/phonelogin.component';
+import { UserInfoComponent } from './user-info/user-info.component';
+import { UserLoginComponent } from './user-login/user-login.component';
+
 
 export const firebaseConfig = { 
 	apiKey: "AIzaSyDA5tCzxNzykHgaSv1640GanShQze3UK-M",
@@ -23,13 +29,17 @@ export const firebaseConfig = {
 export const appRoutes: Routes = [
   {path: '', redirectTo: '/', pathMatch: 'full'},
   {path: 'app', component: AppComponent},
-	{path: 'phonelogin', component: PhoneloginComponent}
+  {path: 'phonelogin', component: PhoneloginComponent},
+  {path: 'login', component: UserLoginComponent},
+  {path: 'user', component: UserInfoComponent},
 ];
 
 @NgModule({
   declarations: [
     AppComponent,
-    PhoneloginComponent
+    PhoneloginComponent,
+    UserInfoComponent,
+    UserLoginComponent
   ],
   exports: [
   	AppComponent
@@ -43,7 +53,7 @@ export const appRoutes: Routes = [
     ReactiveFormsModule,
     RouterModule.forRoot(appRoutes),
   ],
-  providers: [],
+  providers: [AuthService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

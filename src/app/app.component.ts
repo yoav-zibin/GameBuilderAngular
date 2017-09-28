@@ -31,6 +31,10 @@ export class AppComponent {
 		this.router.navigate(['/phonelogin']);
 	}
 
+	loginWithEmail() {
+		this.router.navigate(['/login']);
+	}
+
 	loginAnonymously() {
 		this.afAuth.auth.signInAnonymously();
 	}
