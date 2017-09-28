@@ -24,7 +24,7 @@ export class AppComponent {
 	}
 
 	loginWithGoogle() {
-    	this.afAuth.auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+		this.router.navigate(['/googleLogin']);
 	}
 
 	loginWithPhoneNumber() {

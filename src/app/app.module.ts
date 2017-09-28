@@ -10,6 +10,7 @@ import { RouterModule, Routes } from '@angular/router';
 
 import { AppComponent } from './app.component';
 import { PhoneloginComponent } from './phonelogin/phonelogin.component';
+import { GoogleLoginComponent } from './google-login/google-login.component';
 
 export const firebaseConfig = { 
 	apiKey: "AIzaSyDA5tCzxNzykHgaSv1640GanShQze3UK-M",
@@ -23,13 +24,15 @@ export const firebaseConfig = {
 export const appRoutes: Routes = [
   {path: '', redirectTo: '/', pathMatch: 'full'},
   {path: 'app', component: AppComponent},
-	{path: 'phonelogin', component: PhoneloginComponent}
+	{path: 'phonelogin', component: PhoneloginComponent},
+  {path: 'googleLogin', component: GoogleLoginComponent},
 ];
 
 @NgModule({
   declarations: [
     AppComponent,
-    PhoneloginComponent
+    PhoneloginComponent,
+    GoogleLoginComponent,
   ],
   exports: [
   	AppComponent
