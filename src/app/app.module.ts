@@ -41,7 +41,7 @@ export const appRoutes: Routes = [
     AppComponent,
     PhoneloginComponent,
     UserInfoComponent,
-    UserLoginComponent
+    UserLoginComponent,
     GoogleLoginComponent,
   ],
   exports: [
