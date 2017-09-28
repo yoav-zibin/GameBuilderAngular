@@ -10,17 +10,3 @@
 <button (click)="logout()" *ngIf="(user | async)?.uid">Logout</button>
 <button [routerLink]="['phonelogin']" routerLinkActive='active' *ngIf="!(user | async)?.uid">Login with Phone Number</button>
 <button (click)="loginAnonymously()" *ngIf="!(user | async)?.uid">Login Anonymously</button>
-<button id="directNextpage" onclick="$window.location.href = '/index.html';">Login with Email</button> 
-<body ng-app="app" ng-controller="myctrl">
-  <button ng-click="jump()">点击跳转下一页</button>
-  <a ng-href="./app.component.html">点击跳转下一页</a>
-</body>
-
-<script>
-  var app = angular.module('app', []);
-  app.controller('myctrl', function($scope, $window) {
-      $scope.jump = function() {
-        $location.path('user');
-      }
-  });
-</script>
