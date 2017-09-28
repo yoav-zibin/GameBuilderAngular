@@ -26,6 +26,10 @@ export class AppComponent {
 		this.afAuth.auth.signInAnonymously();
 	}
 
+	loginWithEmail(){
+		this.router.navigate(['/login']);
+	}
+
 	logout() {
     	this.afAuth.auth.signOut();
 	}
