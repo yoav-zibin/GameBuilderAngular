@@ -37,6 +37,7 @@ export class AppComponent {
 
 	loginAnonymously() {
 		this.afAuth.auth.signInAnonymously();
+		this.router.navigate(['']);
 	}
 
 	logout() {
