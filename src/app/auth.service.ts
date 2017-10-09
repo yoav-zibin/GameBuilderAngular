@@ -1,18 +1,30 @@
 import {Injectable} from '@angular/core';
 import {Router} from '@angular/router';
+import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
 import {AngularFireAuth} from 'angularfire2/auth';
+import { Observable } from 'rxjs/Observable';
+import * as firebase from 'firebase/app';
 
 @Injectable()
 export class AuthService {
 
   authState: any = null;
+  user: Observable<firebase.User> = null;
 
-  constructor(private afAuth: AngularFireAuth, private router: Router) {
-    this.afAuth.authState.subscribe((auth) => {
-      this.authState = auth
-    });
+  constructor(
+    private afAuth: AngularFireAuth,
+    public db: AngularFireDatabase, 
+    private router: Router)
+    {
+      this.afAuth.authState.subscribe((auth) => {
+        this.authState = auth;
+      });
   }
 
+  get authenticated(): boolean {
+    return this.authState !== null;
+  }
+  
   get isUserAnonymousLoggedIn(): boolean {
     return (this.authState !== null) ? this.authState.isAnonymous : false
   }
@@ -59,8 +71,24 @@ export class AuthService {
       });
   }
 
+  loginWithGoogle() {
+      this.afAuth.auth.signInWithPopup(
+        new firebase.auth.GoogleAuthProvider()
+      ).then(result => {
+          this.authState = result;
+            this.db.database.ref('users/' + result.user.uid + '/publicFields')
+              .set({
+                avatarImageUrl: (result.user.photoURL || ''),
+                displayName: (result.user.displayName || '')
+        });
+      this.db.database.ref('users/' + result.user.uid + '/privateFields')
+              .set({email: result.user.email});
+    })
+  }
+
   signOut(): void {
     this.afAuth.auth.signOut();
+    this.authState = null;
     this.router.navigate(['/'])
   }
 }

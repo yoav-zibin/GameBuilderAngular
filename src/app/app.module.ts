@@ -16,12 +16,18 @@ import { PhoneloginComponent } from './phonelogin/phonelogin.component';
 import { UserInfoComponent } from './user-info/user-info.component';
 import { UserLoginComponent } from './user-login/user-login.component';
 import { GoogleLoginComponent } from './google-login/google-login.component';
+import { SpecBuilderComponent } from './spec-builder/spec-builder.component';
 
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MatGridListModule, MatStepperModule } from '@angular/material';
+import { ProgressBarComponent } from './progress-bar/progress-bar.component';
+import { SelectBoardComponent } from './select-board/select-board.component';
+
 
 
 export const firebaseConfig = { 
-	apiKey: "AIzaSyDA5tCzxNzykHgaSv1640GanShQze3UK-M",
+	  apiKey: "AIzaSyDA5tCzxNzykHgaSv1640GanShQze3UK-M",
   	authDomain: "universalgamemaker.firebaseapp.com",
   	databaseURL: "https://universalgamemaker.firebaseio.com",
   	projectId: "universalgamemaker",
@@ -36,6 +42,7 @@ export const appRoutes: Routes = [
   {path: 'login', component: UserLoginComponent},
   {path: 'user', component: UserInfoComponent},
   {path: 'googleLogin', component: GoogleLoginComponent},
+  {path: 'build', component: SpecBuilderComponent},
 ];
 
 @NgModule({
@@ -45,6 +52,9 @@ export const appRoutes: Routes = [
     UserInfoComponent,
     UserLoginComponent,
     GoogleLoginComponent,
+    SpecBuilderComponent,
+    ProgressBarComponent,
+    SelectBoardComponent,
   ],
   exports: [
   	AppComponent
@@ -57,7 +67,10 @@ export const appRoutes: Routes = [
     FormsModule,
     ReactiveFormsModule,
     RouterModule.forRoot(appRoutes),
-    BsDropdownModule.forRoot()
+    BsDropdownModule.forRoot(),
+    MatGridListModule,
+    MatStepperModule,
+    BrowserAnimationsModule
   ],
   providers: [AuthService],
   bootstrap: [AppComponent]
