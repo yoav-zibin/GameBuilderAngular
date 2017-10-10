@@ -43,7 +43,15 @@ export class AppComponent {
 		this.auth.loginAnonymously();
 	}
 
+	loginWithGoogle() {
+		this.router.navigate(['/googleLogin']);
+	}
+
 	logout() {
 		this.auth.signOut();
+	}
+
+	build() {
+		this.router.navigate(['/build']);
 	}
 }
