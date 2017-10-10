@@ -23,6 +23,7 @@ export class GoogleLoginComponent implements OnInit {
 
 	ngOnInit() {
 		this.login()
+		this.router.navigate(['']);
 	}
 
 	login() {

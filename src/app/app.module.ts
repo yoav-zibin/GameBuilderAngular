@@ -17,6 +17,8 @@ import { UserInfoComponent } from './user-info/user-info.component';
 import { UserLoginComponent } from './user-login/user-login.component';
 import { GoogleLoginComponent } from './google-login/google-login.component';
 
+import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
+
 
 export const firebaseConfig = { 
 	apiKey: "AIzaSyDA5tCzxNzykHgaSv1640GanShQze3UK-M",
@@ -55,6 +57,7 @@ export const appRoutes: Routes = [
     FormsModule,
     ReactiveFormsModule,
     RouterModule.forRoot(appRoutes),
+    BsDropdownModule.forRoot()
   ],
   providers: [AuthService],
   bootstrap: [AppComponent]
