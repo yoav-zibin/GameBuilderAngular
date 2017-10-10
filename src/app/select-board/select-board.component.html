@@ -1,0 +1,8 @@
+<md-grid-list cols="2" rowHeight="125px">
+	  <md-grid-tile
+	      *ngFor="let image of images | async"
+	      	[colspan]="1"
+	      	[rowspan]="2">
+	      	<img src="{{image.downloadURL}}" alt="could not find image">
+	  </md-grid-tile>
+</md-grid-list>

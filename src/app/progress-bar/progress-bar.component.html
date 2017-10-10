@@ -1,0 +1,46 @@
+<md-horizontal-stepper [linear]="isLinear">
+  <md-step [stepControl]="firstFormGroup">
+    <form [formGroup]="firstFormGroup">
+      <ng-template mdStepLabel>Select a board</ng-template>
+      <!--
+      <md-form-field>
+        <input mdInput placeholder="Last name, First name" formControlName="firstCtrl" required>
+      </md-form-field>
+  		-->
+      <div id="board-container">
+        <app-select-board></app-select-board>
+      </div>
+      <div id="nav-button">
+        <button md-button mdStepperNext>Next</button>
+      </div>
+    </form>
+  </md-step>
+  <md-step [stepControl]="secondFormGroup">
+    <form [formGroup]="secondFormGroup">
+      <ng-template mdStepLabel>Build game spec</ng-template>
+      <!--
+      <md-form-field>
+        <input mdInput placeholder="Address" formControlName="secondCtrl" required>
+      </md-form-field>
+  		-->
+      <div id="nav-button">
+        <button md-button mdStepperPrevious>Back</button>
+        <button md-button mdStepperNext>Next</button>
+      </div>
+    </form>
+  </md-step>
+  <md-step [stepControl]="thirdFormGroup">
+    <form [formGroup]="thirdFormGroup">
+      <ng-template mdStepLabel>Confirm spec</ng-template>
+      <!--
+      <md-form-field>
+        <input mdInput placeholder="Address" formControlName="secondCtrl" required>
+      </md-form-field>
+  		-->
+      <div id="nav-button">
+        <button md-button mdStepperPrevious>Back</button>
+        <button md-button mdStepperNext>Finish</button>
+      </div>
+    </form>
+  </md-step>
+</md-horizontal-stepper>

@@ -15,23 +15,24 @@
       <div id="navbar" class="navbar-collapse collapse">
         <ul class="nav navbar-nav">
           <li><a href="#">Image Uploader</a></li>
-          <li><a href="#">Spec Builder</a></li>
+          <li><a href="/build">Spec Builder</a></li>
         </ul>
 
         <ul class="nav navbar-nav navbar-right">
           <li dropdown placement="bottom right" *ngIf="!(user | async)?.uid">
-          	<a dropdownToggle type="button">Login<span class="caret"></span></a>
+          	<a dropdownToggle type="button" href="javascript:void(0)">Login<span class="caret"></span></a>
           	<ul *dropdownMenu class="dropdown-menu dropdown-menu-right" role="menu">
-            	<li role="menuitem"><a class="dropdown-item" (click)="loginWithGoogle()">Google</a></li>
-            	<li role="menuitem"><a class="dropdown-item" (click)="loginWithEmail()">E-mail</a></li>
-            	<li role="menuitem"><a class="dropdown-item" (click)="loginWithPhoneNumber()">Phone</a></li>
+            <li role="menuitem"><a class="dropdown-item" href="/googleLogin">Google</a></li>
+            	<li role="menuitem"><a class="dropdown-item" href="/login">E-mail</a></li>
+            	<li role="menuitem"><a class="dropdown-item" href="/phonelogin">Phone</a></li>
             	<li role="menuitem"><a class="dropdown-item" (click)="loginAnonymously()">Anonymous</a></li>
           	</ul>
 		    	</li>
-        	<li *ngIf="(user | async)?.uid"><a (click)="logout()">Logout</a></li>
+        	<li *ngIf="(user | async)?.uid"><a href="javascript:void(0)" (click)="logout()">Logout</a></li>
         </ul>
       </div><!--/.nav-collapse -->
     </div><!--/.container-fluid -->
   </nav>
 
+  
   <router-outlet></router-outlet>
