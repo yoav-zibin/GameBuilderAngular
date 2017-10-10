@@ -7,7 +7,7 @@ import { AngularFireDatabaseModule } from 'angularfire2/database';
 import { AngularFireAuthModule } from 'angularfire2/auth';
 import { RouterModule, Routes } from '@angular/router';
 import {AppRoutingModule} from './app-routing.module';
-import {AuthService} from './auth.service';
+import {AuthService} from './auth/auth.service';
 
 //import * as firebase from 'firebase/app';
 

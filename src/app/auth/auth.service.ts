@@ -9,7 +9,6 @@ import * as firebase from 'firebase/app';
 export class AuthService {
 
   authState: any = null;
-  user: Observable<firebase.User> = null;
 
   constructor(
     private afAuth: AngularFireAuth,
@@ -19,6 +18,22 @@ export class AuthService {
       this.afAuth.authState.subscribe((auth) => {
         this.authState = auth;
       });
+  }
+
+  createUserInfo(result: any) {
+    let userInfo = {
+        "publicFields": {
+            "avatarImageUrl": (result.user.photoURL || ''),
+            "displayName":  (result.user.displayName || ''),
+            "isConnected":  true,
+            "lastSeen":  firebase.database.ServerValue.TIMESTAMP,
+        },
+        "privateFields" : {
+            "email":  result.user.email,
+            "createdOn":  firebase.database.ServerValue.TIMESTAMP,
+        }
+     }
+     return userInfo
   }
 
   get authenticated(): boolean {
@@ -76,19 +91,24 @@ export class AuthService {
         new firebase.auth.GoogleAuthProvider()
       ).then(result => {
           this.authState = result;
-            this.db.database.ref('users/' + result.user.uid + '/publicFields')
-              .set({
-                avatarImageUrl: (result.user.photoURL || ''),
-                displayName: (result.user.displayName || '')
-        });
-      this.db.database.ref('users/' + result.user.uid + '/privateFields')
-              .set({email: result.user.email});
+          this.db.database.ref('users/' + result.user.uid)
+              .set(this.createUserInfo(result));
     })
   }
 
+  loginAnonymously() {
+        this.afAuth.auth.signInAnonymously();
+        this.router.navigate(['']);
+    }
+
   signOut(): void {
+    if(!this.isUserAnonymousLoggedIn) {
+      this.db.database
+          .ref('users/' + this.authState.uid + '/publicFields')
+              .update({isConnected: false});
+    }
     this.afAuth.auth.signOut();
     this.authState = null;
-    this.router.navigate(['/'])
+    this.router.navigate([''])
   }
 }

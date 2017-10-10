@@ -5,6 +5,7 @@ import { Observable } from 'rxjs/Observable';
 import { Router } from '@angular/router';
 import { WindowService } from './window.service';
 import * as firebase from 'firebase/app';
+import { AuthService } from './auth/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -16,17 +17,20 @@ export class AppComponent {
 	user: Observable<firebase.User>;
 
 	constructor(
-		public afAuth: AngularFireAuth, 
+		public auth: AuthService,
+		public afAuth: AngularFireAuth,
 		public af: AngularFireDatabase, 
 		private router: Router,
 		){
 		this.user = this.afAuth.authState;
 	}
 
+	/*
 	loginWithGoogle() {
 		this.router.navigate(['/googleLogin']);
 	}
-
+	*/
+	
 	loginWithPhoneNumber() {
 		this.router.navigate(['/phonelogin']);
 	}
@@ -36,12 +40,10 @@ export class AppComponent {
 	}
 
 	loginAnonymously() {
-		this.afAuth.auth.signInAnonymously();
-		this.router.navigate(['']);
+		this.auth.loginAnonymously();
 	}
 
 	logout() {
-		this.afAuth.auth.signOut();
-		this.router.navigate(['']);
+		this.auth.signOut();
 	}
 }

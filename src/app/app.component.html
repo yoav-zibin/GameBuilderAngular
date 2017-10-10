@@ -28,7 +28,7 @@
             	<li role="menuitem"><a class="dropdown-item" (click)="loginAnonymously()">Anonymous</a></li>
           	</ul>
 		    	</li>
-        	<li *ngIf="(user | async)?.uid"><a (click)="logout()">Logout</a></li>
+        	<li *ngIf="(user | async)?.uid"><a href="javascript:void(0)" (click)="logout()">Logout</a></li>
         </ul>
       </div><!--/.nav-collapse -->
     </div><!--/.container-fluid -->

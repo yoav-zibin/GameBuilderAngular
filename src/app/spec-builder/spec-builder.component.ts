@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
 import { AngularFireAuth } from 'angularfire2/auth';
-import { AuthService } from '../auth.service';
+import { AuthService } from '../auth/auth.service';
 import { Observable } from 'rxjs/Observable';
 import { Router } from '@angular/router';
 import * as firebase from 'firebase/app';
@@ -23,7 +23,6 @@ export class SpecBuilderComponent implements OnInit {
 
 	ngOnInit() {
 		/*
-		this doesn't work
 		if(!this.auth.authenticated) {
 			alert("You need to login!")
 			this.router.navigate(['']);
