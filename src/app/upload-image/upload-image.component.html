@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+
+<div style="text-align:center">
+  <h2>
+    Choose an image to upload
+  </h2>
+
+  <input type="file" (change)="fileEvent($event)" accept="image/*" />
+  
+  <input type="checkbox" [(ngModel)]="isBoard" id="boardImage" />
+  <label for="boardImage">This is a board image</label>
+  
+  <input type="checkbox" [(ngModel)]="certified" id="certify" />
+  <label for="certify">I certify that I have the rights to use this image in an open source project</label>
+
+  <button [disabled]="!selectedFiles || !certified" (click)="uploadImage()">Submit</button>
+
+</div>

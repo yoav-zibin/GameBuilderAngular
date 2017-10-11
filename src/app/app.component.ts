@@ -23,6 +23,19 @@ export class AppComponent {
 		this.user = this.afAuth.authState;
 	}
 
+	loginAnonymously() {
+		this.afAuth.auth.signInAnonymously();
+	}
+	
+	logout() {
+		this.afAuth.auth.signOut();
+		this.router.navigate(['']);
+	}
+
+	loginWithEmail() {
+		this.router.navigate(['/login']);
+	}
+
 	loginWithGoogle() {
 		this.router.navigate(['/googleLogin']);
 	}
@@ -31,16 +44,7 @@ export class AppComponent {
 		this.router.navigate(['/phonelogin']);
 	}
 
-	loginWithEmail() {
-		this.router.navigate(['/login']);
-	}
-
-	loginAnonymously() {
-		this.afAuth.auth.signInAnonymously();
-	}
-
-	logout() {
-		this.afAuth.auth.signOut();
-		this.router.navigate(['']);
+	uploadImage() {
+		this.router.navigate(['/uploadImage']);
 	}
 }

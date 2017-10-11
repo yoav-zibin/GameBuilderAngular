@@ -16,6 +16,7 @@ import { PhoneloginComponent } from './phonelogin/phonelogin.component';
 import { UserInfoComponent } from './user-info/user-info.component';
 import { UserLoginComponent } from './user-login/user-login.component';
 import { GoogleLoginComponent } from './google-login/google-login.component';
+import { UploadImageComponent } from './upload-image/upload-image.component';
 
 
 export const firebaseConfig = { 
@@ -34,6 +35,7 @@ export const appRoutes: Routes = [
   {path: 'login', component: UserLoginComponent},
   {path: 'user', component: UserInfoComponent},
   {path: 'googleLogin', component: GoogleLoginComponent},
+  {path: 'uploadImage', component: UploadImageComponent}
 ];
 
 @NgModule({
@@ -43,6 +45,7 @@ export const appRoutes: Routes = [
     UserInfoComponent,
     UserLoginComponent,
     GoogleLoginComponent,
+    UploadImageComponent,
   ],
   exports: [
   	AppComponent
