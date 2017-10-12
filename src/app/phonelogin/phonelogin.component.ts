@@ -19,48 +19,81 @@ export class PhoneNumber {
 }
 
 @Component({
-  selector: 'app-phonelogin',
-  providers: [WindowService],
-  templateUrl: './phonelogin.component.html',
-  styleUrls: ['./phonelogin.component.css']
+    selector: 'app-phonelogin',
+    providers: [WindowService],
+    templateUrl: './phonelogin.component.html',
+    styleUrls: ['./phonelogin.component.css']
 })
 export class PhoneloginComponent implements OnInit {
+    email: string;
     windowRef: any;
     phoneNumber = new PhoneNumber();
+    showPhoneLogin: boolean;
     verificationCode: string;
     user: Observable<firebase.User>;
 
-  constructor(
-      public afAuth: AngularFireAuth, 
-      public af: AngularFireDatabase, 
-      private win: WindowService
+    constructor(
+        public afAuth: AngularFireAuth, 
+        public af: AngularFireDatabase, 
+        private win: WindowService
     ) { }
 
-  ngOnInit() {
-      this.windowRef = this.win.windowRef
-      this.windowRef.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container')
-      this.windowRef.recaptchaVerifier.render()
-  }
+    ngOnInit() {
+        this.showPhoneLogin = false;
+    }
 
-  sendLoginCode() {
-      const appVerifier = this.windowRef.recaptchaVerifier;
-      const num = this.phoneNumber.e164;
-      firebase.auth().signInWithPhoneNumber(num, appVerifier)
-          .then(result => {
-              this.windowRef.confirmationResult = result;
-          })
-          .catch(error => console.log(error));
+    validateEmail() {
+        if (this.email.match(new RegExp("[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}", 'i'))) {
+            this.windowRef = this.win.windowRef;
+            this.windowRef.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container');
+            this.windowRef.recaptchaVerifier.render();    
+            this.showPhoneLogin = true;  
+        } else {
+            this.email = "";
+            window.alert("Please enter the correct email.");       
+        }
+    }
+
+    sendLoginCode() {
+        const appVerifier = this.windowRef.recaptchaVerifier;
+        const num = this.phoneNumber.e164;
+        firebase.auth().signInWithPhoneNumber(num, appVerifier)
+            .then(result => {
+                this.windowRef.confirmationResult = result;
+            })
+            .catch(error => console.log(error));
     }
 
     verifyLoginCode() {
       this.windowRef.confirmationResult
             .confirm(this.verificationCode)
             .then(result => {
-                this.user = result.user;
-                this.af.database.ref('users/' + result.user.uid + '/privateFields').set({
-                    phone_number: this.phoneNumber.e164
-                });
-          })
-          .catch(error => console.log(error, "Incorrect code."));
+                result.user.updateEmail(this.email)
+                .then(() => {
+                    this.user = result.user;
+                    let userInfo = this.createUserInfo(result);
+                    this.af.database.ref('users/' + result.user.uid).update(userInfo);
+                    console.log(userInfo);
+                }).catch(error => {
+                    console.log(error);
+                })
+          }).catch(error => console.log(error, "Incorrect code."));
+    }
+
+    createUserInfo(result: any) {
+        let userInfo = {
+            "publicFields": {
+                "avatarImageUrl": "https://firebasestorage.googleapis.com/v0/b/universalgamemaker.appspot.com/o/images%2F-KwBrfAk0MiQ_s1jBS60.png?alt=media&token=d2f830bf-0b4b-48ca-a232-5a84e7433032",
+                "displayName":  result.user.phoneNumber,
+                "isConnected":  true,
+                "lastSeen":  firebase.database.ServerValue.TIMESTAMP,
+            },
+            "privateFields" : {
+                "email": result.user.email,
+                "createdOn":  firebase.database.ServerValue.TIMESTAMP,
+                //"phone_number": result.user.phoneNumber,
+            }
+         }
+         return userInfo
     }
 }

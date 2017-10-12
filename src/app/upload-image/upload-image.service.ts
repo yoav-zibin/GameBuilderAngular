@@ -14,10 +14,13 @@ export class UploadService {
     ) { }
 
     pushUpload(upload: Upload) {
-        let storagetRef = firebase.storage().ref();
-        // Put image under Storage.
+        upload.name = upload.file.name;
+        upload.uploader_email = this.afauth.auth.currentUser.email;
+        upload.uploader_phone = this.afauth.auth.currentUser.phoneNumber;
+        upload.uploader_uid = this.afauth.auth.currentUser.uid;
+
+        let storagetRef = firebase.storage().ref();        
         upload.$key = this.af.database.ref(this.basePath).push().key;
-        console.log(upload.$key);
         this.uploadTask = storagetRef.child(`${this.basePath}/${upload.$key}`).put(upload.file);
         this.uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED,
             (snapshot) => {
@@ -26,20 +29,25 @@ export class UploadService {
                 console.log(error);
             },
             () => {
+                let metadata = {
+                    customMetadata: {
+                        "height": upload.height.toString(),
+                        "is_board_image": upload.is_board_image.toString(),
+                        "name": upload.name,
+                        "uploader_uid": upload.uploader_uid,
+                        "uploader_email": upload.uploader_email,
+                        "uploader_phone": upload.uploader_phone,
+                        "width": upload.width.toString()
+                    }
+                };
+                storagetRef.child(`${this.basePath}/${upload.$key}`).updateMetadata(metadata);
                 upload.downloadURL = this.uploadTask.snapshot.downloadURL;
-                upload.name = upload.file.name;
-                upload.uploader_email = this.afauth.auth.currentUser.email;
-                upload.uploader_phone = this.afauth.auth.currentUser.phoneNumber;
-                upload.uploader_uid = this.afauth.auth.currentUser.uid;
-                // Save metadata under Database.
-                let metadata = this.getImageMetadata(upload);
-                console.log(metadata);
-                this.af.database.ref(`images/${upload.$key}`).update(metadata);
+                this.af.database.ref(`images/${upload.$key}`).update(this.getImageInfo(upload));
             }      
         )
     }
 
-    getImageMetadata(upload: Upload) {
+    getImageInfo(upload: Upload) {
         return {
             "downloadURL": upload.downloadURL,
             "width": upload.width,
@@ -50,7 +58,7 @@ export class UploadService {
             "uploader_email": upload.uploader_email,
             "uploader_uid": upload.uploader_uid,
             "createdOn": firebase.database.ServerValue.TIMESTAMP,
-            "uploader_phone": upload.uploader_phone
+            //"uploader_phone": upload.uploader_phone
         };
     }
 }

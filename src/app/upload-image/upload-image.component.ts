@@ -1,3 +1,4 @@
+import { AngularFireAuth } from 'angularfire2/auth';
 import { Component, OnInit } from '@angular/core';
 import { Upload } from './upload';
 import { UploadService } from './upload-image.service';
@@ -15,14 +16,19 @@ export class UploadImageComponent implements OnInit {
   selectedFiles: FileList
   height: number
   width: number
+  uploadSucceds: boolean;
+  userIsAnonymous: boolean;
 
   constructor(
-    private uploadService: UploadService
+    private uploadService: UploadService,
+    private afauth: AngularFireAuth
   ) { }
 
   ngOnInit() {
     this.certified = false;
     this.isBoard = false;
+    this.uploadSucceds = false;
+    this.userIsAnonymous = this.afauth.auth.currentUser.isAnonymous;
   }
 
   fileEvent(event: any) {
@@ -46,5 +52,10 @@ export class UploadImageComponent implements OnInit {
     upload.height = this.height;
     upload.width = this.width;
     this.uploadService.pushUpload(upload);
+    this.uploadSucceds = true;
+  }
+
+  reset() {
+    this.uploadSucceds = false;
   }
 }

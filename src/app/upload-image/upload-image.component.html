@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<div style="text-align:center">
+<div *ngIf="!uploadSucceds && !userIsAnonymous" style="text-align:center">
   <h2>
     Choose an image to upload
   </h2>
@@ -14,5 +14,16 @@
   <label for="certify">I certify that I have the rights to use this image in an open source project</label>
 
   <button [disabled]="!selectedFiles || !certified" (click)="uploadImage()">Submit</button>
+</div>
 
+<div *ngIf="uploadSucceds" style="text-align:center">
+  <h2>
+    Image successfully uploaded
+  </h2>
+  <button (click)="reset()">Reset</button>
+</div>
+
+<div *ngIf="userIsAnonymous" style="text-align:center">
+    Users logged in anonymously cannot upload images.
+    Please logout then use Google, phone, or email to login.
 </div>
