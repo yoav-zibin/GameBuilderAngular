@@ -25,12 +25,6 @@ export class AppComponent {
 		this.user = this.afAuth.authState;
 	}
 	
-	/*
-	loginWithGoogle() {
-		this.router.navigate(['/googleLogin']);
-	}
-	*/
-	
 	loginWithPhoneNumber() {
 		this.router.navigate(['/phonelogin']);
 	}

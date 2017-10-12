@@ -18,21 +18,6 @@
           <li><a (click)="build()">Spec Builder</a></li>
         </ul>
 
-<!--
-  <button (click)="loginWithGoogle()" *ngIf="!(user | async)?.uid">Login with Google</button>
-
-  <button (click)="logout()" *ngIf="(user | async)?.uid">Logout</button>
-
-  <button (click)="loginWithPhoneNumber()" *ngIf="!(user | async)?.uid">Login with Phone Number</button>
-
-  <button (click)="loginWithEmail()" *ngIf="!(user | async)?.uid">Login with Email</button>
-  
-  <button (click)="loginAnonymously()" *ngIf="!(user | async)?.uid">Login Anonymously</button>
-  
-  <button (click)="uploadImage()" *ngIf="(user | async)?.uid">Upload Image</button>
-  
-  <router-outlet></router-outlet>
--->
         <ul class="nav navbar-nav navbar-right">
           <li dropdown placement="bottom right" *ngIf="!(user | async)?.uid">
           	<a dropdownToggle type="button" href="javascript:void(0)">Login<span class="caret"></span></a>
@@ -48,5 +33,6 @@
       </div><!--/.nav-collapse -->
     </div><!--/.container-fluid -->
   </nav>
+  
   
   <router-outlet></router-outlet>

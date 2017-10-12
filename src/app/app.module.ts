@@ -24,7 +24,6 @@ import { MatGridListModule, MatStepperModule } from '@angular/material';
 import { ProgressBarComponent } from './progress-bar/progress-bar.component';
 import { SelectBoardComponent } from './select-board/select-board.component';
 
-
 export const firebaseConfig = { 
 	  apiKey: "AIzaSyDA5tCzxNzykHgaSv1640GanShQze3UK-M",
   	authDomain: "universalgamemaker.firebaseapp.com",
