@@ -76,8 +76,9 @@ export class PhoneloginComponent implements OnInit {
                     console.log(userInfo);
                 }).catch(error => {
                     console.log(error);
+                    window.alert("Email is already used by another Google or email account.");
                 })
-          }).catch(error => console.log(error, "Incorrect code."));
+          }).catch(error => window.alert("Incorrect code."));
     }
 
     createUserInfo(result: any) {

@@ -1,10 +1,24 @@
 <!DOCTYPE html>
 
-<div style="text-align:center">
-  <h1>
-    Welcome to {{title}}!
-  </h1>
+  <!-- Static navbar -->
+  <nav class="navbar navbar-default">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="/">GameBuilder</a>
+      </div>
+      <div id="navbar" class="navbar-collapse collapse">
+        <ul class="nav navbar-nav">
+          <li><a (click)="uploadImage()">Image Uploader</a></li>
+          <li><a (click)="build()">Spec Builder</a></li>
+        </ul>
 
+<!--
   <button (click)="loginWithGoogle()" *ngIf="!(user | async)?.uid">Login with Google</button>
 
   <button (click)="logout()" *ngIf="(user | async)?.uid">Logout</button>
@@ -18,5 +32,21 @@
   <button (click)="uploadImage()" *ngIf="(user | async)?.uid">Upload Image</button>
   
   <router-outlet></router-outlet>
-
-</div>
+-->
+        <ul class="nav navbar-nav navbar-right">
+          <li dropdown placement="bottom right" *ngIf="!(user | async)?.uid">
+          	<a dropdownToggle type="button" href="javascript:void(0)">Login<span class="caret"></span></a>
+          	<ul *dropdownMenu class="dropdown-menu dropdown-menu-right" role="menu">
+            <li role="menuitem"><a class="dropdown-item" (click)="loginWithGoogle()">Google</a></li>
+            	<li role="menuitem"><a class="dropdown-item" (click)="loginWithEmail()">E-mail</a></li>
+            	<li role="menuitem"><a class="dropdown-item" (click)="loginWithPhoneNumber()">Phone</a></li>
+            	<li role="menuitem"><a class="dropdown-item" (click)="loginAnonymously()">Anonymous</a></li>
+          	</ul>
+		    	</li>
+        	<li *ngIf="(user | async)?.uid"><a href="javascript:void(0)" (click)="logout()">Logout</a></li>
+        </ul>
+      </div><!--/.nav-collapse -->
+    </div><!--/.container-fluid -->
+  </nav>
+  
+  <router-outlet></router-outlet>

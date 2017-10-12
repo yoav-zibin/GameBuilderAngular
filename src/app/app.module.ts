@@ -7,7 +7,7 @@ import { AngularFireDatabaseModule } from 'angularfire2/database';
 import { AngularFireAuthModule } from 'angularfire2/auth';
 import { RouterModule, Routes } from '@angular/router';
 import {AppRoutingModule} from './app-routing.module';
-import {AuthService} from './auth.service';
+import {AuthService} from './auth/auth.service';
 
 //import * as firebase from 'firebase/app';
 
@@ -17,10 +17,16 @@ import { UserInfoComponent } from './user-info/user-info.component';
 import { UserLoginComponent } from './user-login/user-login.component';
 import { GoogleLoginComponent } from './google-login/google-login.component';
 import { UploadImageComponent } from './upload-image/upload-image.component';
+import { SpecBuilderComponent } from './spec-builder/spec-builder.component';
+import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MatGridListModule, MatStepperModule } from '@angular/material';
+import { ProgressBarComponent } from './progress-bar/progress-bar.component';
+import { SelectBoardComponent } from './select-board/select-board.component';
 
 
 export const firebaseConfig = { 
-	apiKey: "AIzaSyDA5tCzxNzykHgaSv1640GanShQze3UK-M",
+	  apiKey: "AIzaSyDA5tCzxNzykHgaSv1640GanShQze3UK-M",
   	authDomain: "universalgamemaker.firebaseapp.com",
   	databaseURL: "https://universalgamemaker.firebaseio.com",
   	projectId: "universalgamemaker",
@@ -35,7 +41,8 @@ export const appRoutes: Routes = [
   {path: 'login', component: UserLoginComponent},
   {path: 'user', component: UserInfoComponent},
   {path: 'googleLogin', component: GoogleLoginComponent},
-  {path: 'uploadImage', component: UploadImageComponent}
+  {path: 'uploadImage', component: UploadImageComponent},
+  {path: 'build', component: SpecBuilderComponent},
 ];
 
 @NgModule({
@@ -46,6 +53,9 @@ export const appRoutes: Routes = [
     UserLoginComponent,
     GoogleLoginComponent,
     UploadImageComponent,
+    SpecBuilderComponent,
+    ProgressBarComponent,
+    SelectBoardComponent,
   ],
   exports: [
   	AppComponent
@@ -58,6 +68,10 @@ export const appRoutes: Routes = [
     FormsModule,
     ReactiveFormsModule,
     RouterModule.forRoot(appRoutes),
+    BsDropdownModule.forRoot(),
+    MatGridListModule,
+    MatStepperModule,
+    BrowserAnimationsModule
   ],
   providers: [AuthService],
   bootstrap: [AppComponent]
