@@ -23,6 +23,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatGridListModule, MatStepperModule } from '@angular/material';
 import { ProgressBarComponent } from './progress-bar/progress-bar.component';
 import { SelectBoardComponent } from './select-board/select-board.component';
+import { BuildSpecComponent } from './build-spec/build-spec.component';
+import { SelectPiecesComponent } from './select-pieces/select-pieces.component';
 
 export const firebaseConfig = { 
 	  apiKey: "AIzaSyDA5tCzxNzykHgaSv1640GanShQze3UK-M",
@@ -31,7 +33,18 @@ export const firebaseConfig = {
   	projectId: "universalgamemaker",
   	storageBucket: "universalgamemaker.appspot.com",
   	messagingSenderId: "144595629077"
-}; 
+};
+
+/*
+export const firebaseConfig = {
+    apiKey: "AIzaSyD6Q8YS9-rbhCXFR5crQLp-5oUfGaNyDKQ",
+    authDomain: "tutorial-6ea2e.firebaseapp.com",
+    databaseURL: "https://tutorial-6ea2e.firebaseio.com",
+    projectId: "tutorial-6ea2e",
+    storageBucket: "tutorial-6ea2e.appspot.com",
+    messagingSenderId: "424710997339"
+};
+*/
 
 export const appRoutes: Routes = [
   {path: '', redirectTo: '/', pathMatch: 'full'},
@@ -55,6 +68,8 @@ export const appRoutes: Routes = [
     SpecBuilderComponent,
     ProgressBarComponent,
     SelectBoardComponent,
+    BuildSpecComponent,
+    SelectPiecesComponent,
   ],
   exports: [
   	AppComponent

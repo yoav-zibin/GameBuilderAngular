@@ -15,6 +15,7 @@ import constants from '../../constants.js'
   styleUrls: ['./spec-builder.component.css']
 })
 export class SpecBuilderComponent implements OnInit {
+	selectedBoard: string;
 
 	constructor(
 		private auth: AuthService,
@@ -28,6 +29,10 @@ export class SpecBuilderComponent implements OnInit {
 			this.router.navigate(['']);
 		}
 		*/
+	}
+
+	getSelectedBoard() {
+		return this.selectedBoard;
 	}
 
 }

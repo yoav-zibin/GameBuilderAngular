@@ -17,6 +17,7 @@ export class ProgressBarComponent {
 	firstFormGroup: FormGroup;
 	secondFormGroup: FormGroup;
 	thirdFormGroup: FormGroup;
+	selectedBoard: string;
 
 	constructor(
 		private _formBuilder: FormBuilder,
@@ -34,5 +35,13 @@ export class ProgressBarComponent {
     	this.thirdFormGroup = this._formBuilder.group({
       		thirdCtrl: ['', Validators.required]
     	});
+  	}
+
+  	onSelected(board: string) {
+  		this.selectedBoard = board
+  	}
+
+  	getSelectedBoard() {
+  		return this.selectedBoard;
   	}
 }

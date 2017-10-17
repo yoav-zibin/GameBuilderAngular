@@ -12,11 +12,11 @@
   position: relative;
   text-align: center;
   top: 20%;
-  font-size: 18px;
+  font-size: 15px;
   font-family: "Sans Serif";
   color: white;
 }
 
-.board-image:active{
+.piece-image:active{
 	opacity: .75;
 }

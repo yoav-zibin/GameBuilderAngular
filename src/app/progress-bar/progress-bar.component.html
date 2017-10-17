@@ -7,12 +7,13 @@
         <input mdInput placeholder="Last name, First name" formControlName="firstCtrl" required>
       </md-form-field>
   		-->
-      <div id="board-container">
-        <app-select-board></app-select-board>
+      <div id="board-selector">
+        <app-select-board (onSelected)="onSelected($event)"></app-select-board>
       </div>
       <div id="nav-button">
         <button md-button mdStepperNext>Next</button>
       </div>
+      <div *ngIf="currentBoard">{{currentBoard}}</div>
     </form>
   </md-step>
   <md-step [stepControl]="secondFormGroup">
@@ -23,6 +24,14 @@
         <input mdInput placeholder="Address" formControlName="secondCtrl" required>
       </md-form-field>
   		-->
+      <div id="build-container">
+        <div id="piece-selector">
+          <app-select-pieces></app-select-pieces>
+        </div>
+        <div id="board-container">
+          <app-build-spec [selectedBoard]=getSelectedBoard()></app-build-spec>
+        </div>
+      </div>
       <div id="nav-button">
         <button md-button mdStepperPrevious>Back</button>
         <button md-button mdStepperNext>Next</button>

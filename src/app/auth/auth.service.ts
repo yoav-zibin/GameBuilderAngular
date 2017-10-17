@@ -21,6 +21,7 @@ export class AuthService {
   }
 
   createUserInfo(result: any) {
+
     let userInfo = {
         "publicFields": {
             "avatarImageUrl": (result.user.photoURL || ''),
@@ -29,8 +30,15 @@ export class AuthService {
             "lastSeen":  firebase.database.ServerValue.TIMESTAMP,
         },
         "privateFields" : {
-            "email":  result.user.email,
+            "email":  (result.user.email || ''),
             "createdOn":  firebase.database.ServerValue.TIMESTAMP,
+            "phoneNumber": "",
+            "facebookId": "",
+            "googleId": result.user.email,
+            "twitterId": "",
+            "githubId": "",
+            "friends": "",
+            "pushNotificationsToken": "",
         }
      }
      return userInfo
