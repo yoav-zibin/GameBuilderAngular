@@ -24,7 +24,6 @@ import { MatGridListModule, MatStepperModule } from '@angular/material';
 import { ProgressBarComponent } from './progress-bar/progress-bar.component';
 import { SelectBoardComponent } from './select-board/select-board.component';
 import { BuildSpecComponent } from './build-spec/build-spec.component';
-import { SelectPiecesComponent } from './select-pieces/select-pieces.component';
 
 export const firebaseConfig = { 
 	  apiKey: "AIzaSyDA5tCzxNzykHgaSv1640GanShQze3UK-M",
@@ -69,7 +68,6 @@ export const appRoutes: Routes = [
     ProgressBarComponent,
     SelectBoardComponent,
     BuildSpecComponent,
-    SelectPiecesComponent,
   ],
   exports: [
   	AppComponent

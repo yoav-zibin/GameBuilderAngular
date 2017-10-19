@@ -1,1 +1,24 @@
-<img class="board" src={{selectedBoard}} />
+<div class="wrapper">
+<div id="piece-selector">
+	<md-grid-list cols="3" rowHeight="75px">
+	  <md-grid-tile
+	      *ngFor="let image of images | async"
+	      	[colspan]="1"
+	      	[rowspan]="2">
+	      	<input class="piece-image" type="image" src="{{image.downloadURL}}" alt="could not find image" value="{{image.name}}" (click)="selectPiece(image)"/>
+		    <div class="overlay">
+		      	<div class="overlay-text">
+		      		{{image.name}}
+		      	</div>
+		    </div>
+	  </md-grid-tile>
+</md-grid-list>
+</div>
+
+<div id="board-container">
+	<div class="board">
+		<img class="board" src={{selectedBoard}}>
+	</div>
+</div>
+</div>
+
