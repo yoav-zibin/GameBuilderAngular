@@ -1,11 +1,10 @@
-<div class="wrapper">
 <div id="piece-selector">
-	<md-grid-list cols="3" rowHeight="75px">
+	<md-grid-list cols="2" rowHeight="75px">
 	  <md-grid-tile
 	      *ngFor="let image of images | async"
 	      	[colspan]="1"
-	      	[rowspan]="2">
-	      	<input class="piece-image" type="image" src="{{image.downloadURL}}" alt="could not find image" value="{{image.name}}" (click)="selectPiece(image)"/>
+	      	[rowspan]="1">
+	      	<img [draggable] class="piece-image" src="{{image.downloadURL}}" alt="{{image.key}}" (dropped)="onDrop($event)"/>
 		    <div class="overlay">
 		      	<div class="overlay-text">
 		      		{{image.name}}
@@ -15,10 +14,11 @@
 </md-grid-list>
 </div>
 
-<div id="board-container">
-	<div class="board">
+<dropzone (onDrop)="onDrop()" (onDragEnter)="onDragEnter()" (onDragOver)="onDragOver()" (onDragLeave)="onDragLeave()">
+	<div id="board-container">
 		<img class="board" src={{selectedBoard}}>
+		<div class="board-overlay"></div>
 	</div>
-</div>
-</div>
+</dropzone>
+
 
