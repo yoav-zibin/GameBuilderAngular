@@ -1,13 +1,15 @@
 export class Upload {
-    file: File;
+    cloudStoragePath: string;
     downloadURL: string;
+    file: File;
     height: number;
-    is_board_image: boolean;
+    isBoardImage: boolean;
     $key: string;
     name: string;
-    uploader_email: string;
-    uploader_phone: string;
-    uploader_uid: string;
+    sizeInBytes: number;
+    uploaderEmail: string;
+    uploaderPhone: string;
+    uploaderUid: string;
     width: number;
 
     constructor(file: File) {

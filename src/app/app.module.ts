@@ -23,6 +23,9 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatGridListModule, MatStepperModule } from '@angular/material';
 import { ProgressBarComponent } from './progress-bar/progress-bar.component';
 import { SelectBoardComponent } from './select-board/select-board.component';
+import { CreateElementComponent } from './create-element/create-element.component';
+import { InfiniteScrollModule } from 'angular2-infinite-scroll';
+import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 
 export const firebaseConfig = { 
 	  apiKey: "AIzaSyDA5tCzxNzykHgaSv1640GanShQze3UK-M",
@@ -36,12 +39,13 @@ export const firebaseConfig = {
 export const appRoutes: Routes = [
   {path: '', redirectTo: '/', pathMatch: 'full'},
   {path: 'app', component: AppComponent},
-  {path: 'phonelogin', component: PhoneloginComponent},
-  {path: 'login', component: UserLoginComponent},
-  {path: 'user', component: UserInfoComponent},
-  {path: 'googleLogin', component: GoogleLoginComponent},
-  {path: 'uploadImage', component: UploadImageComponent},
   {path: 'build', component: SpecBuilderComponent},
+  {path: 'createElement', component: CreateElementComponent},
+  {path: 'googleLogin', component: GoogleLoginComponent},
+  {path: 'login', component: UserLoginComponent},
+  {path: 'phonelogin', component: PhoneloginComponent},
+  {path: 'uploadImage', component: UploadImageComponent},
+  {path: 'user', component: UserInfoComponent},
 ];
 
 @NgModule({
@@ -55,6 +59,7 @@ export const appRoutes: Routes = [
     SpecBuilderComponent,
     ProgressBarComponent,
     SelectBoardComponent,
+    CreateElementComponent,
   ],
   exports: [
   	AppComponent
@@ -70,9 +75,12 @@ export const appRoutes: Routes = [
     BsDropdownModule.forRoot(),
     MatGridListModule,
     MatStepperModule,
-    BrowserAnimationsModule
+    BrowserAnimationsModule,
+    InfiniteScrollModule
   ],
   providers: [AuthService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
+
+platformBrowserDynamic().bootstrapModule(AppModule);

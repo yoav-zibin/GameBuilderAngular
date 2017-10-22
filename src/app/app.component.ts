@@ -25,31 +25,35 @@ export class AppComponent {
 		this.user = this.afAuth.authState;
 	}
 	
-	loginWithPhoneNumber() {
-		this.router.navigate(['/phonelogin']);
+	build() {
+		this.router.navigate(['/build']);
 	}
 
-	loginWithEmail() {
-		this.router.navigate(['/login']);
+	createElement() {
+		this.router.navigate(['/createElement']);
 	}
 
 	loginAnonymously() {
 		this.auth.loginAnonymously();
 	}
 
+	loginWithEmail() {
+		this.router.navigate(['/login']);
+	}
+
 	loginWithGoogle() {
 		this.router.navigate(['/googleLogin']);
 	}
 
-	uploadImage() {
-		this.router.navigate(['/uploadImage']);
+	loginWithPhoneNumber() {
+		this.router.navigate(['/phonelogin']);
 	}
 
 	logout() {
 		this.auth.signOut();
 	}
 
-	build() {
-		this.router.navigate(['/build']);
+	uploadImage() {
+		this.router.navigate(['/uploadImage']);
 	}
 }

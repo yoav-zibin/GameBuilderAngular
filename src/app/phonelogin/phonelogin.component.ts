@@ -92,7 +92,12 @@ export class PhoneloginComponent implements OnInit {
             "privateFields" : {
                 "email": result.user.email,
                 "createdOn":  firebase.database.ServerValue.TIMESTAMP,
-                //"phone_number": result.user.phoneNumber,
+                "phone_number": result.user.phoneNumber,
+                "facebookId": '',
+                "googleId": '',
+                "twitterId": '',
+                "githubId": '',
+                "pushNotificationsToken": ''
             }
          }
          return userInfo

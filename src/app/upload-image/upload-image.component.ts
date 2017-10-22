@@ -49,9 +49,10 @@ export class UploadImageComponent implements OnInit {
   uploadImage() {
     let file = this.selectedFiles.item(0);
     let upload: Upload = new Upload(file);
-    upload.is_board_image = this.isBoard;
+    upload.isBoardImage = this.isBoard;
     upload.height = this.height;
     upload.width = this.width;
+    upload.sizeInBytes = file.size;
     this.uploadService.pushUpload(upload);
     this.uploadSucceds = true;
   }

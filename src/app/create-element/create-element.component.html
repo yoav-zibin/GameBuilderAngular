@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+
+<div *ngIf="!userIsAnonymous && !elementCreated">
+  <td>
+    <input type="radio" [(ngModel)]="elementType" value="standard"/> Standard
+    <input type="radio" [(ngModel)]="elementType" value="toggable"/> Toggable
+    <input type="radio" [(ngModel)]="elementType" value="dice"/> Dice
+    <input type="radio" [(ngModel)]="elementType" value="card"/> Card
+    <input type="radio" [(ngModel)]="elementType" value="cardsDeck"/> Cards deck
+    <input type="radio" [(ngModel)]="elementType" value="piecesDeck"/> Pieces deck
+  </td>
+  <div *ngIf="!dimensionsMatch">
+    Warning: Images selected must have exact dimensions.
+  </div>
+  <div *ngFor="let selectedImage of selectedImages; let i = index">
+    <p> face {{i}}: {{selectedImage.name}} (dimension: {{selectedImage.height}} x {{selectedImage.width}})</p>
+  </div>
+  <div>
+    <input type="checkbox" [(ngModel)]="isDraggable"/>Draggable
+    <input type="checkbox" [(ngModel)]="isDrawable"/>Drawable
+    <input type="number" [(ngModel)]="rotatableDegrees" min="1" max="360"/>Rotatable Degrees (default to 1)
+    <button *ngIf="dimensionsMatch" (click)="submit()">Submit</button>
+    <button *ngIf="!dimensionsMatch" inactive>Submit</button>
+  </div>
+  
+  <div *ngFor="let image of images | async">
+    <p> {{image?.name}} </p>
+    <a (click)="select(image)"> <img [src]="image?.downloadURL" width="120px"></a>
+  </div>
+</div>
+
+
+<div *ngIf="!userIsAnonymous && elementCreated">
+  <h2>
+    Element created.
+  </h2>
+  <button (click)="reset()">Reset</button>
+</div>
+
+
+<div *ngIf="userIsAnonymous" style="text-align:center">
+    Please login with Google, phone, or email to use this function.
+</div>
