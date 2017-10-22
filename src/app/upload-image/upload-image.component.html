@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<div *ngIf="!uploadSucceds && !userIsAnonymous" style="text-align:center">
+<div [hidden]="uploadSucceds || userIsAnonymous || userEmailEmpty" style="text-align:center">
   <h2>
     Choose an image to upload
   </h2>
@@ -16,13 +16,19 @@
   <button [disabled]="!selectedFiles || !certified" (click)="uploadImage()">Submit</button>
 </div>
 
-<div *ngIf="uploadSucceds" style="text-align:center">
+<div [hidden]="!uploadSucceds || userIsAnonymous || userEmailEmpty" style="text-align:center">
   <h2>
     Image uploaded
   </h2>
   <button (click)="reset()">Reset</button>
 </div>
 
-<div *ngIf="userIsAnonymous" style="text-align:center">
+
+<div [hidden]="!userIsAnonymous" style="text-align:center">
     Please login with Google, phone, or email to use this function.
+</div>
+
+
+<div [hidden]="!userEmailEmpty || userIsAnonymous" style="text-align:center">
+  E-mail required to proceed. Please add your E-mail in "Profile Settings" to use this function.
 </div>

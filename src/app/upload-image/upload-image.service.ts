@@ -6,7 +6,8 @@ import * as firebase from 'firebase';
 
 @Injectable()
 export class UploadService {
-    private basePath: string = 'images/';
+    private storagePath: string = 'images/';
+    private databasePath: string = 'gameBuilder/images/';
     private uploadTask: firebase.storage.UploadTask;
     constructor(
         private afauth: AngularFireAuth,
@@ -15,13 +16,14 @@ export class UploadService {
 
     pushUpload(upload: Upload) {
         upload.name = upload.file.name;
-        upload.uploader_email = this.afauth.auth.currentUser.email;
-        upload.uploader_phone = this.afauth.auth.currentUser.phoneNumber;
-        upload.uploader_uid = this.afauth.auth.currentUser.uid;
+        upload.uploaderEmail = this.afauth.auth.currentUser.email;
+        upload.uploaderPhone = this.afauth.auth.currentUser.phoneNumber;
+        upload.uploaderUid = this.afauth.auth.currentUser.uid;
 
         let storagetRef = firebase.storage().ref();        
-        upload.$key = this.af.database.ref(this.basePath).push().key;
-        this.uploadTask = storagetRef.child(`${this.basePath}/${upload.$key}`).put(upload.file);
+        upload.$key = this.af.database.ref(this.databasePath).push().key;
+        console.log(upload.type);
+        this.uploadTask = storagetRef.child(`${this.storagePath}/${upload.$key}${upload.type}`).put(upload.file);
         this.uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED,
             (snapshot) => {
             },
@@ -32,33 +34,35 @@ export class UploadService {
                 let metadata = {
                     customMetadata: {
                         "height": upload.height.toString(),
-                        "is_board_image": upload.is_board_image.toString(),
+                        "isBoardImage": upload.isBoardImage.toString(),
                         "name": upload.name,
-                        "uploader_uid": upload.uploader_uid,
-                        "uploader_email": upload.uploader_email,
-                        "uploader_phone": upload.uploader_phone,
+                        "sizeInBytes": upload.sizeInBytes.toString(),
+                        "uploaderUid": upload.uploaderUid,
+                        "uploaderEmail": upload.uploaderEmail,
+                        "uploaderPhone": upload.uploaderPhone,
                         "width": upload.width.toString()
                     }
                 };
-                storagetRef.child(`${this.basePath}/${upload.$key}`).updateMetadata(metadata);
+                storagetRef.child(`${this.storagePath}/${upload.$key}${upload.type}`).updateMetadata(metadata);
                 upload.downloadURL = this.uploadTask.snapshot.downloadURL;
-                this.af.database.ref(`images/${upload.$key}`).update(this.getImageInfo(upload));
+                console.log(this.getImageInfo(upload));
+                this.af.database.ref(`${this.databasePath}${upload.$key}`).update(this.getImageInfo(upload));
             }      
         )
     }
 
     getImageInfo(upload: Upload) {
         return {
-            "uploaderEmail": upload.uploader_email,
-            "uploaderUid": upload.uploader_uid,
+            "uploaderEmail": upload.uploaderEmail,
+            "uploaderUid": upload.uploaderUid,
             "createdOn": firebase.database.ServerValue.TIMESTAMP,
             "width": upload.width,
             "height": upload.height,
-            "isBoardImage": upload.is_board_image,
+            "isBoardImage": upload.isBoardImage,
             "downloadURL": upload.downloadURL,
-            "sizeInBytes": ,
+            "sizeInBytes": upload.sizeInBytes,
             "name": upload.name,
-            "cloudStoragePath": `images/${upload.$key}`
+            "cloudStoragePath": `${this.storagePath}${upload.$key}${upload.type}`
         };
     }
 }

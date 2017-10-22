@@ -17,6 +17,7 @@ export class UploadImageComponent implements OnInit {
   height: number
   width: number
   uploadSucceds: boolean;
+  userEmailEmpty: boolean;
   userIsAnonymous: boolean;
 
   constructor(
@@ -28,6 +29,7 @@ export class UploadImageComponent implements OnInit {
     this.certified = false;
     this.isBoard = false;
     this.uploadSucceds = false;
+    this.userEmailEmpty = this.afauth.auth.currentUser.email == null ? true : false;
     this.userIsAnonymous = (this.afauth.auth.currentUser == null) || 
                             this.afauth.auth.currentUser.isAnonymous;
   }
@@ -35,7 +37,6 @@ export class UploadImageComponent implements OnInit {
   fileEvent(event: any) {
     this.selectedFiles = event.target.files;
     let file = this.selectedFiles.item(0);
-
     let _URL = window.URL;
     let img: HTMLImageElement = document.createElement("img");
     let thisClass: UploadImageComponent = this;
@@ -49,9 +50,11 @@ export class UploadImageComponent implements OnInit {
   uploadImage() {
     let file = this.selectedFiles.item(0);
     let upload: Upload = new Upload(file);
-    upload.is_board_image = this.isBoard;
+    upload.isBoardImage = this.isBoard;
     upload.height = this.height;
     upload.width = this.width;
+    upload.sizeInBytes = file.size;
+    upload.type = "." + file.type.substring(6);
     this.uploadService.pushUpload(upload);
     this.uploadSucceds = true;
   }

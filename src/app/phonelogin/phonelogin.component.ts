@@ -25,10 +25,8 @@ export class PhoneNumber {
     styleUrls: ['./phonelogin.component.css']
 })
 export class PhoneloginComponent implements OnInit {
-    email: string;
     windowRef: any;
     phoneNumber = new PhoneNumber();
-    showPhoneLogin: boolean;
     verificationCode: string;
     user: Observable<firebase.User>;
 
@@ -39,20 +37,26 @@ export class PhoneloginComponent implements OnInit {
     ) { }
 
     ngOnInit() {
-        this.showPhoneLogin = false;
+        this.windowRef = this.win.windowRef
+        this.windowRef.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container')
+        this.windowRef.recaptchaVerifier.render()
     }
+
+    /*
+        Do NOT delete this method!
+        Will be moved and used in 'Profile Settings' functionality for user to add email.
 
     validateEmail() {
         if (this.email.match(new RegExp("[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}", 'i'))) {
             this.windowRef = this.win.windowRef;
             this.windowRef.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container');
-            this.windowRef.recaptchaVerifier.render();    
-            this.showPhoneLogin = true;  
+            this.windowRef.recaptchaVerifier.render();  
         } else {
             this.email = "";
             window.alert("Please enter the correct email.");       
         }
     }
+    */
 
     sendLoginCode() {
         const appVerifier = this.windowRef.recaptchaVerifier;
@@ -68,17 +72,12 @@ export class PhoneloginComponent implements OnInit {
       this.windowRef.confirmationResult
             .confirm(this.verificationCode)
             .then(result => {
-                result.user.updateEmail(this.email)
-                .then(() => {
-                    this.user = result.user;
-                    let userInfo = this.createUserInfo(result);
-                    this.af.database.ref('users/' + result.user.uid).update(userInfo);
-                    console.log(userInfo);
-                }).catch(error => {
-                    console.log(error);
-                    window.alert("Email is already used by another Google or email account.");
-                })
-          }).catch(error => window.alert("Incorrect code."));
+                this.user = result.user;
+                let userInfo = this.createUserInfo(result);
+                this.af.database.ref('users/' + result.user.uid).update(userInfo);
+                console.log(userInfo);
+            })
+            .catch(error => window.alert("Incorrect code."));
     }
 
     createUserInfo(result: any) {
@@ -90,7 +89,7 @@ export class PhoneloginComponent implements OnInit {
                 "lastSeen":  firebase.database.ServerValue.TIMESTAMP,
             },
             "privateFields" : {
-                "email": result.user.email,
+                "email": '',
                 "createdOn":  firebase.database.ServerValue.TIMESTAMP,
                 "phoneNumber": result.user.phoneNumber,
                 "facebookId": '',
@@ -100,6 +99,6 @@ export class PhoneloginComponent implements OnInit {
                 "pushNotificationsToken": '',
             }
          }
-         return userInfo
+         return userInfo;
     }
 }
