@@ -4,7 +4,7 @@
 	      *ngFor="let image of images | async"
 	      	[colspan]="1"
 	      	[rowspan]="1">
-	      	<img [draggable] class="piece-image" src="{{image.downloadURL}}" alt="{{image.key}}" (dropped)="onDrop($event)"/>
+	      	<img [draggable] class="piece-image" src="{{image.downloadURL}}" alt="{{image.key}}"/>
 		    <div class="overlay">
 		      	<div class="overlay-text">
 		      		{{image.name}}
@@ -16,8 +16,8 @@
 
 <dropzone (onDrop)="onDrop()" (onDragEnter)="onDragEnter()" (onDragOver)="onDragOver()" (onDragLeave)="onDragLeave()">
 	<div id="board-container">
-		<img class="board" src={{selectedBoard}}>
-		<div class="board-overlay"></div>
+		<img id="board" src={{selectedBoard.url}}>
+		<div id="board-overlay"></div>
 	</div>
 </dropzone>
 

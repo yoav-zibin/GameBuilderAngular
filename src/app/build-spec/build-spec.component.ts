@@ -11,10 +11,10 @@ import constants from '../../constants.js'
   styleUrls: ['./build-spec.component.css']
 })
 export class BuildSpecComponent{
-	@Input() selectedBoard: string;
-	@Output() onSelected = new EventEmitter<object[]>();
+	@Input() selectedBoard: object;
+	@Output() onPiecesSet = new EventEmitter<object[]>();
 	images: FirebaseListObservable<any[]>;
-	pieces: object[];
+	pieces: object[] = new Array();
 
   constructor(
 		public afAuth: AngularFireAuth, 
@@ -31,8 +31,8 @@ export class BuildSpecComponent{
 
 	selectPiece(piece) {
 		console.log(piece.key + ' ' + piece.downloadURL);
-		//this.pieces.push({"key": piece.key, "url": piece.downloadURL});
-		//this.onSelected.emit(this.pieces);
+		this.pieces.push({"key": piece.key, "url": piece.downloadURL});
+		this.onPiecesSet.emit(this.pieces);
 	}
 
 }

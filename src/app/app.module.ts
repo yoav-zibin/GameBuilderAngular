@@ -26,6 +26,7 @@ import { SelectBoardComponent } from './select-board/select-board.component';
 import { BuildSpecComponent } from './build-spec/build-spec.component';
 import { DraggableDirective } from './dnd/draggable.directive';
 import { DroppableDirective } from './dnd/droppable.directive';
+import { FinalizeSpecComponent } from './finalize-spec/finalize-spec.component';
 
 export const firebaseConfig = { 
 	  apiKey: "AIzaSyDA5tCzxNzykHgaSv1640GanShQze3UK-M",
@@ -72,6 +73,7 @@ export const appRoutes: Routes = [
     BuildSpecComponent,
     DraggableDirective,
     DroppableDirective,
+    FinalizeSpecComponent,
   ],
   exports: [
   	AppComponent

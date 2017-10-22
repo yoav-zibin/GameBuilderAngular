@@ -14,9 +14,9 @@ import constants from '../../constants.js'
 })
 export class SelectBoardComponent {
 	images: FirebaseListObservable<any[]>;
-	selectedBoard: string;
+	selectedBoardUrl: string;
 	selectedBoardKey: string;
-	@Output() onSelected = new EventEmitter<string>();
+	@Output() onSelected = new EventEmitter<object>();
 
 	constructor(
 		public afAuth: AngularFireAuth, 
@@ -32,8 +32,14 @@ export class SelectBoardComponent {
 
 	selectBoard(board) {
 		this.selectedBoardKey = board.key;
-		this.selectedBoard = board.downloadURL;
-		this.onSelected.emit(this.selectedBoard);
+		this.selectedBoardUrl = board.downloadURL;
+		console.log("sending board...")
+		this.onSelected.emit(
+			{
+				'key': this.selectedBoardKey,
+				'url': this.selectedBoardUrl
+			}
+		);
 	}
 
 	getSelectedOpacity(board) {
@@ -43,10 +49,12 @@ export class SelectBoardComponent {
 		return 1
 	}
 
+	/*
 	getSelectedColor(board) {
 		if(this.selectedBoardKey === board.key) {
 			return '#3F51B5';
 		}
 		return 'F8F8F8';
 	}
+	*/
 }
