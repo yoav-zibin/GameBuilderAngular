@@ -49,16 +49,16 @@ export class UploadService {
 
     getImageInfo(upload: Upload) {
         return {
-            "downloadURL": upload.downloadURL,
+            "uploaderEmail": upload.uploader_email,
+            "uploaderUid": upload.uploader_uid,
+            "createdOn": firebase.database.ServerValue.TIMESTAMP,
             "width": upload.width,
             "height": upload.height,
-            "is_board_image": upload.is_board_image,
-            "key": upload.$key,
+            "isBoardImage": upload.is_board_image,
+            "downloadURL": upload.downloadURL,
+            "sizeInBytes": ,
             "name": upload.name,
-            "uploader_email": upload.uploader_email,
-            "uploader_uid": upload.uploader_uid,
-            "createdOn": firebase.database.ServerValue.TIMESTAMP,
-            //"uploader_phone": upload.uploader_phone
+            "cloudStoragePath": `images/${upload.$key}`
         };
     }
 }
