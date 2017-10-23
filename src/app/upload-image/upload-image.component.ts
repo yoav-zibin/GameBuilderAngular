@@ -29,9 +29,12 @@ export class UploadImageComponent implements OnInit {
     this.certified = false;
     this.isBoard = false;
     this.uploadSucceds = false;
-    this.userEmailEmpty = this.afauth.auth.currentUser.email == null ? true : false;
-    this.userIsAnonymous = (this.afauth.auth.currentUser == null) || 
-                            this.afauth.auth.currentUser.isAnonymous;
+    this.userIsAnonymous = this.afauth.auth.currentUser == null || this.afauth.auth.currentUser.isAnonymous;
+    if (this.userIsAnonymous) {
+      this.userEmailEmpty = true;
+    } else {
+      this.userEmailEmpty = this.afauth.auth.currentUser.email == null;
+    }
   }
 
   fileEvent(event: any) {

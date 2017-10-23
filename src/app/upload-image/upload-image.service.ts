@@ -33,7 +33,6 @@ export class UploadService {
             () => {
                 let metadata = {
                     customMetadata: {
-                        "cloudStoragePath": `${this.basePath}${upload.$key}`,
                         "height": upload.height.toString(),
                         "isBoardImage": upload.isBoardImage.toString(),
                         "name": upload.name,

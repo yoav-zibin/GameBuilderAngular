@@ -51,7 +51,9 @@ export class CreateElementComponent implements OnInit {
     } else {
       this.userEmailEmpty = this.afauth.auth.currentUser.email == null;
     }
-    this.images = this.imageSelectionService.getImages();
+    if (!this.userIsAnonymous && !this.userEmailEmpty) {
+      this.images = this.imageSelectionService.getImages();
+    }
   }
 
   select(image) {
