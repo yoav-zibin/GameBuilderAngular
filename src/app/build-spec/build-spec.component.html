@@ -16,7 +16,7 @@
 
 <dropzone (onPiecesSet)="onPiecesSet($event)">
 	<div id="board-container">
-		<img id="board" src={{selectedBoard.url}}>
+		<img id="board" src="{{selectedBoard['url']}}">
 		<div id="board-overlay"></div>
 	</div>
 </dropzone>

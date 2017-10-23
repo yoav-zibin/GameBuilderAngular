@@ -21,7 +21,6 @@ import { SpecBuilderComponent } from './spec-builder/spec-builder.component';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatGridListModule, MatStepperModule } from '@angular/material';
-import { ProgressBarComponent } from './progress-bar/progress-bar.component';
 import { SelectBoardComponent } from './select-board/select-board.component';
 import { BuildSpecComponent } from './build-spec/build-spec.component';
 import { DraggableDirective } from './dnd/draggable.directive';
@@ -69,7 +68,6 @@ export const appRoutes: Routes = [
     GoogleLoginComponent,
     UploadImageComponent,
     SpecBuilderComponent,
-    ProgressBarComponent,
     SelectBoardComponent,
     BuildSpecComponent,
     DraggableDirective,
