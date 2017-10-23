@@ -41,13 +41,20 @@ export class DroppableDirective {
 		console.log("container: " + offsets.left + " " + offsets.top);
 		console.log("scroll: " + window.scrollY);
 
-		let newXPos = xPos - offsets.left - 25;
+		xPos = xPos - offsets.left - 25;
 		let offsetCalc = offsets.top + window.scrollY;
-		let newYPos = (yPos + window.scrollY) - offsetCalc - 25;
+		yPos = (yPos + window.scrollY) - offsetCalc - 25;
 
-		let styleString = "position:absolute; top:" + newYPos + "px;" +
-			"left:" + newXPos + "px; width:50px; height:50px; " +
+		console.log("fixed: " + xPos + " " + yPos + " " + (this.zPos + 1));
+
+		let styleString = "position:absolute; top:" + yPos + "px;" +
+			"left:" + xPos + "px; width:50px; height:50px; " +
 			"z-index:" + (++this.zPos);
+
+		//scale coordinates for range (-100, 100)
+		let finalX = this.scaleCoord(xPos);
+		let finalY = this.scaleCoord(yPos);
+		console.log("final: " + finalX + " " + finalY);
 
 		(elem as HTMLElement).setAttribute('style', styleString);
 
@@ -55,13 +62,21 @@ export class DroppableDirective {
         	{
         		"img_key": data["key"],
         		"url": data["url"],
-        		"xPos": newXPos,
-        		"yPos": newYPos,
+        		"xPos": finalX,
+        		"yPos": finalY,
         		"zPos": this.zPos,
         	}
         );
 
 		event.target.appendChild(elem);
+	}
+
+	scaleCoord(coord) {
+		// (0, 0) => (-100, -100)
+		// (256, 256) => (0,0)
+		// (512, 512) => (100, 100)
+		//TO DO
+		return coord;
 	}
 
 	@HostListener('dragenter', ['$event'])

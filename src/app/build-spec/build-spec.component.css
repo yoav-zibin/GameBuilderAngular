@@ -2,6 +2,7 @@
   width: 100%;
   height: 100%;
   position: absolute;
+  padding: 0;
   top: 0;
   left: 0;
 }
@@ -19,19 +20,18 @@
     padding: 10px;
     height: 512px;
     overflow: auto;
-    border-style: solid;
 }
 
 #board-container {
     position: absolute;
     display: inline-block;
     vertical-align: top;
+    padding:  0;
 	  margin: 0 auto;
     height: 512px;
     width: 512px;
-    border-style: solid;
     top: 0;
-    z-index: 1;
+    z-index: 0;
 }
 
 .overlay {

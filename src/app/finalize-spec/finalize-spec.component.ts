@@ -1,5 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { AuthService } from '../auth/auth.service';
+import { Router } from '@angular/router';
 import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
 import constants from '../../constants.js'
 import * as firebase from 'firebase/app';
@@ -34,7 +35,8 @@ export class FinalizeSpecComponent {
 
   constructor(
   	private auth: AuthService,
-  	public db: AngularFireDatabase
+  	private db: AngularFireDatabase,
+  	private router: Router
   ) { 
 	this.userID = this.auth.currentUserId;
 	this.userEmail = this.auth.currentUserName;
@@ -42,6 +44,7 @@ export class FinalizeSpecComponent {
 
 
   createGameSpec() {
+  	this.gameName = (<HTMLInputElement>document.getElementById("gameName")).value;
   	this.generated = false;
   	this.gameSpec = {
 		'uploaderEmail': this.userEmail,
@@ -98,6 +101,9 @@ export class FinalizeSpecComponent {
   	this.db.database.ref(constants.SPECS_PATH).push(this.gameSpec)
   		.then(result => {
   			console.log("this worked!")
+  			this.router.navigate(['/']).then(result => {
+  				alert("Uploaded Spec!");
+  			})
   		})
   		.catch(error => {
   			console.log(error.message);
