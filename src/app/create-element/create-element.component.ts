@@ -25,19 +25,16 @@ enum Types {
 })
 export class CreateElementComponent implements OnInit {
   basePath: string = "gameBuilder/elements/";
-  dimensionsMatch: boolean = true;
   elementCreated: boolean = false;
   elementType: string;
+  faceNumber: number;
+  hideSubmitButton: boolean = true;
+  images: any;
   isDraggable: boolean = false;
   isDrawable: boolean = false;
   rotatableDegrees: number = 1;
   selectedImages: any = [];
   userIsAnonymous: boolean;
-
-  images = new BehaviorSubject([]);
-  batch: number = 10;
-  lastKey: any = '';
-  finished: boolean = false;
   
 
   constructor(
@@ -49,26 +46,17 @@ export class CreateElementComponent implements OnInit {
   ngOnInit() {
     this.userIsAnonymous = (this.afauth.auth.currentUser == null) || 
                             this.afauth.auth.currentUser.isAnonymous;
-    this.getImages();
+    this.images = this.imageSelectionService.getImages();
   }
 
   select(image) {
-    if (this.elementType == Types[Types.standard]) {
-      if (this.selectedImages.length == 0) {
-        this.selectedImages.push(image);
-      } else if (this.selectedImages.length == 1 && this.selectedImages[0] == image) {
-        this.clearArray();
-      }
-
-    } else if (this.elementType == Types[Types.toggable]) {
-      if (this.selectedImages.length <= 1 && this.selectedImages.indexOf(image) == -1) {
-        this.selectedImages.push(image);
-      } else if (this.selectedImages.length <= 2 && this.selectedImages.indexOf(image) != -1) {
-        this.selectedImages.splice(this.selectedImages.indexOf(image), 1);
-      }
+    if (this.selectedImages.length < this.faceNumber && this.selectedImages.indexOf(image) == -1) {
+      this.selectedImages.push(image);
+    } else if (this.selectedImages.length <= this.faceNumber && this.selectedImages.indexOf(image) != -1) {
+      this.selectedImages.splice(this.selectedImages.indexOf(image), 1);
     }
 
-    this.validateImagesDimension();
+    this.validateImages();
   }
 
   reset() {
@@ -76,6 +64,10 @@ export class CreateElementComponent implements OnInit {
   }
 
   submit() {
+    if (this.rotatableDegrees < 1 || this.rotatableDegrees > 360) {
+      window.alert("Rotatable degrees must fall in range 1 ~ 360");
+      return;
+    }
     let images = {};
     this.selectedImages.forEach((image, index) => {
       images[String(index)] = 
@@ -94,22 +86,29 @@ export class CreateElementComponent implements OnInit {
     this.elementCreated = true;
   }
 
-  private validateImagesDimension() {
-    if (this.selectedImages.length <= 1) {
-      this.dimensionsMatch = true;
-    } else{
+  updateFaceNumber(i) {
+    this.faceNumber = i;
+    this.clearArray();
+    this.validateImages();
+  }
+
+  private validateImages() {
+    if (this.faceNumber == this.selectedImages.length) {
       let image = this.selectedImages[0];
       let height: number = image.height;
       let width: number = image.width;
-      this.dimensionsMatch = this.selectedImages.every(function sameHeightWidth(element, index, array) {
+      this.hideSubmitButton = !this.selectedImages.every(function sameHeightWidth(element, index, array) {
         return element.height == height && element.width == width;
       });
+    } else {
+      this.hideSubmitButton = true;
     }
   }
 
   private getBasicElementInfo() {
     return {
-      "uploaderEmail": this.afauth.auth.currentUser.email,
+      //"uploaderEmail": this.afauth.auth.currentUser.email,
+      "uploaderEmail": "yx1366@nyu.edu",
       "uploaderUid": this.afauth.auth.currentUser.uid,
       "createdOn": firebase.database.ServerValue.TIMESTAMP,
       "width": Math.max.apply(Math,this.selectedImages.map(function(image) {return image.width;})),
@@ -123,31 +122,6 @@ export class CreateElementComponent implements OnInit {
 
   private clearArray() {
     this.selectedImages = [];
-  }
-
-  private getImages(key?) {
-    if (this.finished) return
-
-    this.imageSelectionService
-        .getImages(this.batch+1, this.lastKey)
-        .do(images => {
-          // Set the lastKey in preparation for next query.
-          this.lastKey = _.last(images)['$key'];
-          const newImages = _.slice(images, 0, this.batch);
-
-          // Get current images in BehaviorSubject.
-          const currentImages = this.images.getValue()
-
-          // Reach the end of database.
-          if (this.lastKey == _.last(newImages)['$key']) {
-            this.finished = true;
-          }
-
-          // Concatenate new images to current images
-          this.images.next( _.concat(currentImages, newImages) );
-        })
-        .take(1)
-        .subscribe();
   }
 
 }
