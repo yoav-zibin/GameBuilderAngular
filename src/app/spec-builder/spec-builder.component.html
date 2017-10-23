@@ -8,7 +8,7 @@
       <div id="nav-button">
         <button md-button mdStepperNext>Next</button>
       </div>
-      <div *ngIf="currentBoard">{{currentBoard}}</div>
+      <!-- <div *ngIf="currentBoard">{{currentBoard}}</div> -->
     </form>
   </md-step>
   <md-step [stepControl]="secondFormGroup">
@@ -17,7 +17,7 @@
       <div id="build-container">
         <app-build-spec
           [selectedBoard]=getSelectedBoard()
-          (onPiecesSet)="onPiecesSet($event)">
+          (onPiecesSet2)="onPiecesSet($event)">
         </app-build-spec>
       </div>
       <div id="nav-button">
@@ -32,7 +32,7 @@
       <app-finalize-spec [selectedBoard]=getSelectedBoard() [pieces]=getPieces()></app-finalize-spec>
       <div id="nav-button">
         <button md-button mdStepperPrevious>Back</button>
-        <button md-button mdStepperNext>Finish</button>
+        <!-- <button md-button mdStepperNext>Finish</button> -->
       </div>
     </form>
   </md-step>

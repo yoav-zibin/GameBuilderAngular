@@ -52,4 +52,8 @@ export class AppComponent {
 	build() {
 		this.router.navigate(['/build']);
 	}
+
+	home() {
+		this.router.navigate(['/']);
+	}
 }

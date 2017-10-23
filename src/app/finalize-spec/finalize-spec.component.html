@@ -1,0 +1,10 @@
+
+<form>
+	<input type="text" id="gameName" placeholder="Enter your game name">
+	<button (click)="createGameSpec()">Generate Spec</button>
+</form>
+
+<div *ngIf="generated">
+	<pre>{{ gameSpec | json }}</pre>
+	<button (click)=uploadGameSpec()>Upload Spec</button>
+</div>

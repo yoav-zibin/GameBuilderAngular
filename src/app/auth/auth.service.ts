@@ -8,7 +8,7 @@ import * as firebase from 'firebase/app';
 @Injectable()
 export class AuthService {
 
-  authState: any = null;
+  private authState: any = null;
 
   constructor(
     private afAuth: AngularFireAuth,
@@ -17,10 +17,11 @@ export class AuthService {
     {
       this.afAuth.authState.subscribe((auth) => {
         this.authState = auth;
-      });
+    });
   }
 
   createUserInfo(result: any) {
+
     let userInfo = {
         "publicFields": {
             "avatarImageUrl": (result.user.photoURL || ''),
@@ -29,8 +30,15 @@ export class AuthService {
             "lastSeen":  firebase.database.ServerValue.TIMESTAMP,
         },
         "privateFields" : {
-            "email":  result.user.email,
+            "email":  (result.user.email || ''),
             "createdOn":  firebase.database.ServerValue.TIMESTAMP,
+            "phoneNumber": "",
+            "facebookId": "",
+            "googleId": result.user.email,
+            "twitterId": "",
+            "githubId": "",
+            "friends": "",
+            "pushNotificationsToken": "",
         }
      }
      return userInfo
@@ -91,6 +99,24 @@ export class AuthService {
         new firebase.auth.GoogleAuthProvider()
       ).then(result => {
           this.authState = result;
+          
+          /*
+          if(this.authenticated) {
+            console.log('user exists!')
+            this.db.database
+              .ref('users/' + result.user.uid + '/publicFields')
+                .update(
+                  {
+                    isConnected: true,
+                    lastSeen: firebase.database.ServerValue.TIMESTAMP
+                  });
+          }
+          else {
+            console.log('creating new user');
+            this.db.database.ref('users/' + result.user.uid)
+              .set(this.createUserInfo(result));
+          }
+          */
           this.db.database.ref('users/' + result.user.uid)
               .set(this.createUserInfo(result));
     })

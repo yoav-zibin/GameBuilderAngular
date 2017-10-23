@@ -17,6 +17,8 @@ export class ProgressBarComponent {
 	firstFormGroup: FormGroup;
 	secondFormGroup: FormGroup;
 	thirdFormGroup: FormGroup;
+	public selectedBoard: object;
+	public pieces: object[];
 
 	constructor(
 		private _formBuilder: FormBuilder,
@@ -34,5 +36,23 @@ export class ProgressBarComponent {
     	this.thirdFormGroup = this._formBuilder.group({
       		thirdCtrl: ['', Validators.required]
     	});
+  	}
+
+  	onSelected(board: object) {
+  		this.selectedBoard = board
+  		console.log("receiving board");
+  	}
+
+  	onPiecesSet(pieces: object[]) {
+  		this.pieces = pieces;
+  		console.log("receiving pieces");
+  	}
+
+  	getSelectedBoard() {
+  		return this.selectedBoard;
+  	}
+
+  	getPieces() {
+  		return this.pieces;
   	}
 }
