@@ -1,6 +1,7 @@
-<p>
-  {{selectedBoard.url}}
-</p>
-<div *ngFor="let piece of pieces">
-	{{piece.key}}
-</div>
+
+<button (click)=createGameSpec()>Generate Spec</button>
+<button (click)=uploadGameSpec()>Upload Spec</button>
+
+<pre *ngIf="generated">
+	{{ gameSpec | json }}
+</pre>

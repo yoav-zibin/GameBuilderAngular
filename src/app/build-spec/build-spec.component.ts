@@ -1,4 +1,11 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { 
+	Component,
+	ElementRef,
+	Input,
+	Output,
+	HostListener,
+	EventEmitter
+} from '@angular/core';
 import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
 import { AngularFireAuth } from 'angularfire2/auth';
 import { Observable } from 'rxjs/Observable';
@@ -12,27 +19,41 @@ import constants from '../../constants.js'
 })
 export class BuildSpecComponent{
 	@Input() selectedBoard: object;
-	@Output() onPiecesSet = new EventEmitter<object[]>();
+	@Output() onPiecesSet2 = new EventEmitter<object>();
 	images: FirebaseListObservable<any[]>;
-	pieces: object[] = new Array();
 
   constructor(
 		public afAuth: AngularFireAuth, 
-		public db: AngularFireDatabase
+		public db: AngularFireDatabase,
+		private el: ElementRef
 	) {
 		this.images = db.list(constants.IMAGES_PATH, {
 			query: {
-				orderByChild: 'is_board_image',
+				orderByChild: 'isBoardImage',
 				equalTo: false,
 			}
 		});
 
 	}
 
-	selectPiece(piece) {
-		console.log(piece.key + ' ' + piece.downloadURL);
-		this.pieces.push({"key": piece.key, "url": piece.downloadURL});
-		this.onPiecesSet.emit(this.pieces);
-	}
+	onPiecesSet(piece: object) {
+		let img_key = piece['img_key'];
+		let matched = false;
+
+		this.db.list(constants.ELEMENTS_PATH, { preserveSnapshot: true})
+		  .subscribe(snapshots => {
+		    snapshots.forEach(snapshot => {
+		      let data = snapshot.val();
+		      for(let image of data['images']) {
+	            if(image['imageId']=== img_key && !matched) {
+	              matched = true;
+	              console.log('found match');
+		          piece['el_key'] = snapshot.key;
+		          this.onPiecesSet2.emit(piece);
+		        }
+		      }
+		    });
+    	})
+  	}
 
 }

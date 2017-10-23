@@ -1,4 +1,7 @@
 const constants = {
+  IMAGES_PATH: 'gameBuilder/images',
+  SPECS_PATH: 'gameBuilder/gameSpecs',
+  ELEMENTS_PATH: 'gameBuilder/elements',
   IMAGE_ID_IDENTIFIER: 'imageId',
   IS_BOARD_IMAGE_IDENTIFIER: 'isBlock',
   IMAGE_PATH_IDENTIFIER: 'imagePath',
@@ -24,8 +27,6 @@ const constants = {
   NAV_GAME_SPEC_BUILDER_TEXT: 'Spec Builder',
   TITLE_TEXT: 'Game Builder',
   AUTHENTICATION_LOCAL_STORAGE_KEY: 'GAME_BUILDER_LOCAL_STORAGE_$UID',
-  IMAGES_PATH: 'images',
-  SPECS_PATH: 'specs',
   JSON_MALFORMED_ERROR: 'Current JSON is malformed: ',
   PROPER_FORMAT_ACCEPTED_WARNING: 'Upload proper format, accepted formats are ',
   ACCEPTED_IMAGE_FORMATS: '.png,.jpg,.jpeg,.svg,.gif'

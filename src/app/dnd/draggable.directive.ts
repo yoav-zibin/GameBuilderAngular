@@ -29,7 +29,7 @@ export class DraggableDirective {
 	        let key = this.el.nativeElement.getAttribute('alt');
 	        event.dataTransfer.setData("data",
 	        	JSON.stringify({'key': key, 'url': url}));
-	        event.dataTransfer.setData("text/html");
+	        event.dataTransfer.setData("text", event.target.id);
  			event.dataTransfer.dropEffect = "copy";
 	    }
 	}

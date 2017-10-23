@@ -24,16 +24,17 @@ export class SelectBoardComponent {
 	) {
 		this.images = db.list(constants.IMAGES_PATH, {
 			query: {
-				orderByChild: 'is_board_image',
+				orderByChild: 'isBoardImage',
 				equalTo: true,
 			}
 		});
 	}
 
 	selectBoard(board) {
-		this.selectedBoardKey = board.key;
+		this.selectedBoardKey = board.$key;
 		this.selectedBoardUrl = board.downloadURL;
 		console.log("sending board...")
+		console.log(board);
 		this.onSelected.emit(
 			{
 				'key': this.selectedBoardKey,

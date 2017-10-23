@@ -5,7 +5,7 @@ import { Directive, Output, EventEmitter, HostListener, ElementRef } from '@angu
 })
 export class DroppableDirective {
 	public zPos:number = 0;
-	@Output() onPiecesSet = new EventEmitter<object[]>();
+	@Output() onPiecesSet = new EventEmitter<object>();
 	public pieces: object[] = new Array();
 
   	constructor(private el: ElementRef) { }
@@ -22,9 +22,15 @@ export class DroppableDirective {
         let data = event.dataTransfer.getData("data");
         data = JSON.parse(data);
 
-        let elem = document.createElement("img");
-        elem.setAttribute("src", data["url"]);
-        elem.setAttribute("alt", data["key"]);
+        let text = event.dataTransfer.getData("text");
+
+      	//let elem = document.createElement("img");
+      	let elem = document.getElementById(text).cloneNode(true);
+
+      	(elem as HTMLElement).id = (elem as HTMLElement).id + 'copy';
+        (elem as HTMLElement).setAttribute("src", data["url"]);
+        (elem as HTMLElement).setAttribute("alt", data["key"]);
+        (elem as HTMLElement).classList.remove('currentlyDragged');
 
         let xPos = event.clientX;
 		let yPos = event.clientY;
@@ -43,19 +49,19 @@ export class DroppableDirective {
 			"left:" + newXPos + "px; width:50px; height:50px; " +
 			"z-index:" + (++this.zPos);
 
-		elem.setAttribute('style', styleString);
+		(elem as HTMLElement).setAttribute('style', styleString);
 
-        event.target.appendChild(elem);
-
-        this.pieces.push(
+        this.onPiecesSet.emit(
         	{
-        		"key": data["key"],
+        		"img_key": data["key"],
         		"url": data["url"],
         		"xPos": newXPos,
         		"yPos": newYPos,
-        	});
-		this.onPiecesSet.emit(this.pieces);
+        		"zPos": this.zPos,
+        	}
+        );
 
+		event.target.appendChild(elem);
 	}
 
 	@HostListener('dragenter', ['$event'])
@@ -69,6 +75,7 @@ export class DroppableDirective {
     		console.log("prevent dragover!");
     		event.preventDefault();
     	}
+    	event.dataTransfer.dropEffect = "copy";
 		console.log(event.clientX + " " + event.clientY);
 	}
 

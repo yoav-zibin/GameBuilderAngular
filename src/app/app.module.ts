@@ -38,6 +38,7 @@ export const firebaseConfig = {
 };
 
 /*
+//OLD SPEC CONFIG
 export const firebaseConfig = {
     apiKey: "AIzaSyD6Q8YS9-rbhCXFR5crQLp-5oUfGaNyDKQ",
     authDomain: "tutorial-6ea2e.firebaseapp.com",
