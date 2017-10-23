@@ -32,10 +32,11 @@ export class CreateElementComponent implements OnInit {
   images: any;
   isDraggable: boolean = false;
   isDrawable: boolean = false;
-  rotatableDegrees: number = 1;
+  rotatableDegrees: number = 360;
   selectedImages: any = [];
+
   userIsAnonymous: boolean;
-  
+  userEmailEmpty: boolean;
 
   constructor(
     private imageSelectionService: ImageSelectionService,
@@ -44,8 +45,12 @@ export class CreateElementComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.userIsAnonymous = (this.afauth.auth.currentUser == null) || 
-                            this.afauth.auth.currentUser.isAnonymous;
+    this.userIsAnonymous = this.afauth.auth.currentUser == null || this.afauth.auth.currentUser.isAnonymous;
+    if (this.userIsAnonymous) {
+      this.userEmailEmpty = true;
+    } else {
+      this.userEmailEmpty = this.afauth.auth.currentUser.email == null;
+    }
     this.images = this.imageSelectionService.getImages();
   }
 
@@ -107,12 +112,11 @@ export class CreateElementComponent implements OnInit {
 
   private getBasicElementInfo() {
     return {
-      //"uploaderEmail": this.afauth.auth.currentUser.email,
-      "uploaderEmail": "yx1366@nyu.edu",
+      "uploaderEmail": this.afauth.auth.currentUser.email,
       "uploaderUid": this.afauth.auth.currentUser.uid,
       "createdOn": firebase.database.ServerValue.TIMESTAMP,
-      "width": Math.max.apply(Math,this.selectedImages.map(function(image) {return image.width;})),
-      "height": Math.max.apply(Math,this.selectedImages.map(function(image) {return image.height;})),
+      "width": this.selectedImages[0].width,
+      "height": this.selectedImages[0].height,
       "isDraggable": this.isDraggable,
       "elementKind": this.elementType,
       "rotatableDegrees": this.rotatableDegrees,
@@ -125,3 +129,19 @@ export class CreateElementComponent implements OnInit {
   }
 
 }
+
+/*
+newData.hasChildren(['uploaderEmail', 'uploaderUid', 'createdOn', 'width', 'height', 'isDraggable', 'elementKind', 'rotatableDegrees', 'isDrawable']) &&
+$elementId.matches(/^[-_A-Za-z0-9]{17,40}$/) && 
+(
+  (newData.child('elementKind').val().matches(/^cardsDeck|piecesDeck$/) ? newData.child('deckElements/1').exists() : !newData.child('deckElements').exists())  && 
+  (newData.child('isDrawable').val() === false || newData.child('elementKind').val().matches(/^standard|card$/))  && 
+  (newData.child('rotatableDegrees').val() === 360 || newData.child('elementKind').val() === 'standard')  && 
+  newData.child('images/0').exists()  && 
+  (
+    (newData.child('elementKind').val().matches(/^standard|cardsDeck|piecesDeck$/) && !newData.child('images/1').exists())  || 
+    (newData.child('elementKind').val().matches(/^toggable|dice$/) && newData.child('images/1').exists())  || 
+    (newData.child('elementKind').val() === 'card' && newData.child('images/1').exists() && !newData.child('images/2').exists()) 
+  )
+)
+*/

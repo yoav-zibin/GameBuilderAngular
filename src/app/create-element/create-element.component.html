@@ -1,30 +1,41 @@
 <!DOCTYPE html>
 
-<div *ngIf="!userIsAnonymous && !elementCreated">
+<div [hidden]="userIsAnonymous || userEmailEmpty || elementCreated">
   <td>
     <input type="radio" [(ngModel)]="elementType" (ngModelChange)="updateFaceNumber(1)" value="standard"/> Standard
     <input type="radio" [(ngModel)]="elementType" (ngModelChange)="updateFaceNumber(2)" value="toggable"/> Toggable
     <input type="radio" [(ngModel)]="elementType" (ngModelChange)="updateFaceNumber(6)" value="dice"/> Dice
-    <input type="radio" [(ngModel)]="elementType" (ngModelChange)="updateFaceNumber(1)" value="card"/> Card
+    <input type="radio" [(ngModel)]="elementType" (ngModelChange)="updateFaceNumber(2)" value="card"/> Card
     <!--
     <input type="radio" [(ngModel)]="elementType" value="cardsDeck"/> Cards deck
     <input type="radio" [(ngModel)]="elementType" value="piecesDeck"/> Pieces deck
     -->
   </td>
+
   <div *ngIf="hideSubmitButton">
     Warning: Please select {{faceNumber}} images with same dimensions.
   </div>
+
   <div *ngFor="let selectedImage of selectedImages; let i = index">
     <p> face {{i}}: {{selectedImage.name}} (dimension: {{selectedImage.height}} x {{selectedImage.width}})</p>
   </div>
+
   <div>
-    <input type="checkbox" [(ngModel)]="isDraggable"/>Draggable
-    <input type="checkbox" [(ngModel)]="isDrawable"/>Drawable
-    <input type="number" [(ngModel)]="rotatableDegrees" min="1" max="360"/>Rotatable Degrees (default to 1)
+    <input id="draggableButton" type="checkbox" [(ngModel)]="isDraggable"/>
+    <label for="draggableButton">Draggable</label>
+
+    <input *ngIf="elementType=='standard' || elementType=='card'" id="drawableButton" type="checkbox" [(ngModel)]="isDrawable"/>
+    <label *ngIf="elementType=='standard' || elementType=='card'" for="drawableButton">Drawable</label>
+
+    <input *ngIf="elementType=='standard'" id="degreesButton" type="number" [(ngModel)]="rotatableDegrees" min="1" max="360"/>
+    <label *ngIf="elementType=='standard'" for="degreesButton">Rotatable Degrees</label>
+  </div>
+
+  <div>
     <button *ngIf="!hideSubmitButton" (click)="submit()">Submit</button>
     <button *ngIf="hideSubmitButton" inactive>Submit</button>
   </div>
-  
+
   <div *ngFor="let image of images | async">
     <p> {{image?.name}} </p>
     <a (click)="select(image)"> <img [src]="image?.downloadURL" width="120px"></a>
@@ -32,7 +43,7 @@
 </div>
 
 
-<div *ngIf="!userIsAnonymous && elementCreated">
+<div [hidden]="userEmailEmpty || userIsAnonymous || !elementCreated" style="text-align: center">
   <h2>
     Element created.
   </h2>
@@ -40,6 +51,10 @@
 </div>
 
 
-<div *ngIf="userIsAnonymous" style="text-align:center">
+<div [hidden]="!userIsAnonymous" style="text-align:center">
     Please login with Google, phone, or email to use this function.
+</div>
+
+<div [hidden]="!userEmailEmpty || userIsAnonymous" style="text-align:center">
+  E-mail required to proceed. Please add your E-mail in "Profile Settings" to use this function.
 </div>
