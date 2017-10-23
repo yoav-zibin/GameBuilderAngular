@@ -26,6 +26,8 @@ import { BuildSpecComponent } from './build-spec/build-spec.component';
 import { DraggableDirective } from './dnd/draggable.directive';
 import { DroppableDirective } from './dnd/droppable.directive';
 import { FinalizeSpecComponent } from './finalize-spec/finalize-spec.component';
+import { CreateElementComponent } from './create-element/create-element.component';
+import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 
 export const firebaseConfig = { 
 	  apiKey: "AIzaSyDA5tCzxNzykHgaSv1640GanShQze3UK-M",
@@ -51,12 +53,13 @@ export const firebaseConfig = {
 export const appRoutes: Routes = [
   {path: '', redirectTo: '/', pathMatch: 'full'},
   {path: 'app', component: AppComponent},
-  {path: 'phonelogin', component: PhoneloginComponent},
-  {path: 'login', component: UserLoginComponent},
-  {path: 'user', component: UserInfoComponent},
-  {path: 'googleLogin', component: GoogleLoginComponent},
-  {path: 'uploadImage', component: UploadImageComponent},
   {path: 'build', component: SpecBuilderComponent},
+  {path: 'createElement', component: CreateElementComponent},
+  {path: 'googleLogin', component: GoogleLoginComponent},
+  {path: 'login', component: UserLoginComponent},
+  {path: 'phonelogin', component: PhoneloginComponent},
+  {path: 'uploadImage', component: UploadImageComponent},
+  {path: 'user', component: UserInfoComponent},
 ];
 
 @NgModule({
@@ -73,6 +76,7 @@ export const appRoutes: Routes = [
     DraggableDirective,
     DroppableDirective,
     FinalizeSpecComponent,
+    CreateElementComponent,
   ],
   exports: [
   	AppComponent
@@ -88,7 +92,7 @@ export const appRoutes: Routes = [
     BsDropdownModule.forRoot(),
     MatGridListModule,
     MatStepperModule,
-    BrowserAnimationsModule
+    BrowserAnimationsModule,
   ],
   providers: [AuthService],
   bootstrap: [AppComponent]
