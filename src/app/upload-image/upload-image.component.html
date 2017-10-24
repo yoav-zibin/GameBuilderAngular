@@ -1,19 +1,34 @@
 <!DOCTYPE html>
 
-<div [hidden]="uploadSucceds || userIsAnonymous || userEmailEmpty" style="text-align:center">
+<div class="outerClass" [hidden]="uploadSucceds || userIsAnonymous || userEmailEmpty">
   <h2>
     Choose an image to upload
   </h2>
 
-  <input type="file" (change)="fileEvent($event)" accept="image/*" />
+  <div class="uploaderClass">
+    <section>
+      <button md-fab color="primary" (click)="triggerUploadButton(uploadImage)">
+        <md-icon aria-label="File upload icon">file_upload</md-icon>
+      </button>
+      <input type="file" id="uploadImage" (change)="fileEvent($event)" accept="image/*" style="display:none"/>
+    </section>
+    <section>
+      <md-input-container>
+        <input mdInput [placeholder]="imageName" disabled style="text-align:center"/>
+      </md-input-container>
+    </section>
+    <section>
+      <md-checkbox color="primary" [(ngModel)]="isBoard">Board image</md-checkbox>
+    </section>
+  </div>
   
-  <input type="checkbox" [(ngModel)]="isBoard" id="boardImage" />
-  <label for="boardImage">This is a board image</label>
-  
-  <input type="checkbox" [(ngModel)]="certified" id="certify" />
-  <label for="certify">I certify that I have the rights to use this image in an open source project</label>
+  <div class="submitClass">
+    <section>
+      <md-checkbox color="warn" [(ngModel)]="certified">I certify that I have the rights to use this image in an open source project</md-checkbox>
+    </section>
+    <button md-raised-button [disabled]="!selectedFiles || !certified" (click)="uploadImage()">Submit</button>
+  </div>
 
-  <button [disabled]="!selectedFiles || !certified" (click)="uploadImage()">Submit</button>
 </div>
 
 <div [hidden]="!uploadSucceds || userIsAnonymous || userEmailEmpty" style="text-align:center">

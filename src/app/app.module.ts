@@ -20,7 +20,14 @@ import { UploadImageComponent } from './upload-image/upload-image.component';
 import { SpecBuilderComponent } from './spec-builder/spec-builder.component';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MatGridListModule, MatStepperModule } from '@angular/material';
+import {
+  MatButtonModule,
+  MatCheckboxModule,
+  MatIconModule,
+  MatInputModule,
+  MatGridListModule,
+  MatStepperModule
+} from '@angular/material';
 import { SelectBoardComponent } from './select-board/select-board.component';
 import { BuildSpecComponent } from './build-spec/build-spec.component';
 import { DraggableDirective } from './dnd/draggable.directive';
@@ -90,6 +97,10 @@ export const appRoutes: Routes = [
     ReactiveFormsModule,
     RouterModule.forRoot(appRoutes),
     BsDropdownModule.forRoot(),
+    MatButtonModule,
+    MatCheckboxModule,
+    MatIconModule,
+    MatInputModule,
     MatGridListModule,
     MatStepperModule,
     BrowserAnimationsModule,

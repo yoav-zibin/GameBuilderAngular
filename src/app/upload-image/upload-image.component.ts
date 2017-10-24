@@ -12,6 +12,7 @@ import * as firebase from 'firebase/app';
 })
 export class UploadImageComponent implements OnInit {
   certified: boolean
+  imageName: string = "No file chosen"
   isBoard: boolean
   selectedFiles: FileList
   height: number
@@ -40,6 +41,7 @@ export class UploadImageComponent implements OnInit {
   fileEvent(event: any) {
     this.selectedFiles = event.target.files;
     let file = this.selectedFiles.item(0);
+    this.imageName = file.name;
     let _URL = window.URL;
     let img: HTMLImageElement = document.createElement("img");
     let thisClass: UploadImageComponent = this;
@@ -50,6 +52,16 @@ export class UploadImageComponent implements OnInit {
     img.src = _URL.createObjectURL(file);
   }
 
+  reset() {
+    this.certified = false;
+    this.imageName = "No file chosen";
+    this.uploadSucceds = false;
+  }
+
+  triggerUploadButton() {
+    document.getElementById('uploadImage').click();
+  }
+
   uploadImage() {
     let file = this.selectedFiles.item(0);
     let upload: Upload = new Upload(file);
@@ -57,12 +69,8 @@ export class UploadImageComponent implements OnInit {
     upload.height = this.height;
     upload.width = this.width;
     upload.sizeInBytes = file.size;
-    upload.type = "." + file.type.substring(6);
+    upload.type = "." + file.type.substring(("image/").length);
     this.uploadService.pushUpload(upload);
     this.uploadSucceds = true;
-  }
-
-  reset() {
-    this.uploadSucceds = false;
   }
 }
