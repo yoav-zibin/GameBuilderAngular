@@ -118,10 +118,18 @@ export class CreateElementComponent implements OnInit {
   }
 
   selectImage(image) {
-    if (this.selectedImages.length < this.faceNumber && this.selectedImages.indexOf(image) == -1) {
-      this.selectedImages.push(image);
-    } else if (this.selectedImages.length <= this.faceNumber && this.selectedImages.indexOf(image) != -1) {
-      this.selectedImages.splice(this.selectedImages.indexOf(image), 1);
+    if (!this.isToggableOrDice()) {
+      if (this.selectedImages.length < this.faceNumber && this.selectedImages.indexOf(image) == -1) {
+        this.selectedImages.push(image);
+      } else if (this.selectedImages.length <= this.faceNumber && this.selectedImages.indexOf(image) != -1) {
+        this.selectedImages.splice(this.selectedImages.indexOf(image), 1);
+      }
+    } else {
+      if (this.selectedImages.indexOf(image) == -1) {
+        this.selectedImages.push(image);
+      } else {
+        this.selectedImages.splice(this.selectedImages.indexOf(image), 1);
+      }
     }
     this.validateImages();
   }
@@ -156,6 +164,10 @@ export class CreateElementComponent implements OnInit {
     return this.elementType == Types[Types.cardsDeck] || this.elementType == Types[Types.piecesDeck];
   }
 
+  private isToggableOrDice() {
+    return this.elementType == Types[Types.toggable] || this.elementType == Types[Types.dice];
+  }
+
   private getBasicElementInfo() {
     return {
       "uploaderEmail": this.afauth.auth.currentUser.email,
@@ -175,7 +187,10 @@ export class CreateElementComponent implements OnInit {
   }
 
   private validateImages() {
-    if (this.faceNumber == this.selectedImages.length) {
+    if (
+      (this.isToggableOrDice() && this.selectedImages.length >= this.faceNumber) ||
+      (this.selectedImages.length == this.faceNumber)
+    ) {
       let image = this.selectedImages[0];
       let height: number = image.height;
       let width: number = image.width;

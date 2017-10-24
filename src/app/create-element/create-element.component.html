@@ -6,7 +6,7 @@
     <td>
       <input type="radio" [(ngModel)]="elementType" (ngModelChange)="updateFaceNumber(1)" value="standard"/> Standard
       <input type="radio" [(ngModel)]="elementType" (ngModelChange)="updateFaceNumber(2)" value="toggable"/> Toggable
-      <input type="radio" [(ngModel)]="elementType" (ngModelChange)="updateFaceNumber(6)" value="dice"/> Dice
+      <input type="radio" [(ngModel)]="elementType" (ngModelChange)="updateFaceNumber(2)" value="dice"/> Dice
       <input type="radio" [(ngModel)]="elementType" (ngModelChange)="updateFaceNumber(2)" value="card"/> Card
       <input type="radio" [(ngModel)]="elementType" (ngModelChange)="updateFaceNumber(1)" value="cardsDeck"/> Cards deck
       <input type="radio" [(ngModel)]="elementType" (ngModelChange)="updateFaceNumber(1)" value="piecesDeck"/> Pieces deck
@@ -32,7 +32,8 @@
     </div>
 
     <div [hidden]="!hideNextButton">
-      <div *ngIf="faceNumber != 1"> Warning: Please select {{faceNumber}} images with same dimensions. </div>
+      <div *ngIf="elementType == 'toggable' || elementType == 'dice'"> Warning: Please select at least {{faceNumber}} images with same dimensions. </div>
+      <div *ngIf="!(elementType == 'toggable' || elementType == 'dice') && faceNumber != 1"> Warning: Please select {{faceNumber}} images with same dimensions. </div>
       <div *ngIf="faceNumber == 1"> Warning: Please select 1 image. </div>
       <button inactive>Submit</button>
     </div>
