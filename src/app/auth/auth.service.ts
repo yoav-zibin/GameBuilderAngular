@@ -44,6 +44,29 @@ export class AuthService {
      return userInfo
   }
 
+  createUser(result: any) {
+    
+        let userInfo = {
+          "publicFields": {
+            "avatarImageUrl": "https://firebasestorage.googleapis.com/v0/b/universalgamemaker.appspot.com/o/images%2F-KwBrfAk0MiQ_s1jBS60.png?alt=media&token=d2f830bf-0b4b-48ca-a232-5a84e7433032",
+            "displayName":  result.email,
+            "isConnected":  true,
+            "lastSeen":  firebase.database.ServerValue.TIMESTAMP,
+        },
+        "privateFields" : {
+            "email": '',
+            "createdOn":  firebase.database.ServerValue.TIMESTAMP,
+            "phoneNumber": result.email,
+            "facebookId": '',
+            "googleId": '',
+            "twitterId": '',
+            "githubId": '',
+            "pushNotificationsToken": '',
+            }
+         }
+         return userInfo
+      }
+
   get authenticated(): boolean {
     return this.authState !== null;
   }
@@ -74,8 +97,11 @@ export class AuthService {
 
   signUpWithEmail(email: string, password: string) {
     return this.afAuth.auth.createUserWithEmailAndPassword(email, password)
-      .then((user) => {
-        this.authState = user
+      .then((result) => {
+        this.authState = result
+        console.log(result);
+        this.db.database.ref('users/' + result.uid)
+        .set(this.createUser(result));
       })
       .catch(error => {
         console.log(error)
@@ -85,8 +111,8 @@ export class AuthService {
 
   loginWithEmail(email: string, password: string) {
     return this.afAuth.auth.signInWithEmailAndPassword(email, password)
-      .then((user) => {
-        this.authState = user
+      .then((result) => {
+        this.authState = result
       })
       .catch(error => {
         console.log(error)
