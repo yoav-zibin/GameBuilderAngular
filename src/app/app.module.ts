@@ -25,8 +25,11 @@ import {
   MatCheckboxModule,
   MatIconModule,
   MatInputModule,
+  MatListModule,
   MatGridListModule,
-  MatStepperModule
+  MatRadioModule,
+  MatStepperModule,
+  MatTooltipModule
 } from '@angular/material';
 import { SelectBoardComponent } from './select-board/select-board.component';
 import { BuildSpecComponent } from './build-spec/build-spec.component';
@@ -101,8 +104,11 @@ export const appRoutes: Routes = [
     MatCheckboxModule,
     MatIconModule,
     MatInputModule,
+    MatListModule,
     MatGridListModule,
+    MatRadioModule,
     MatStepperModule,
+    MatTooltipModule,
     BrowserAnimationsModule,
   ],
   providers: [AuthService],
