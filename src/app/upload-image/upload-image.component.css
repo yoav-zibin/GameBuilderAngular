@@ -1,20 +1,11 @@
-div.outerClass {
-    text-align: center;
-    margin: auto;
-    height: 100%;
-    width: 100%;
-}
-
 div.uploaderClass {
     margin: auto;
-    position: absolute;
-    top: 23%;
-    left: 45%;
+    position: relative;
+    top: 100px;
 }
 
 div.submitClass {
     margin: auto;
-    position: absolute;
-    top: 60%;
-    left: 36.5%
+    position: relative;
+    top: 250px;
 }

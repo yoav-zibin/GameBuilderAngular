@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<div class="outerClass" [hidden]="uploadSucceds || userIsAnonymous || userEmailEmpty">
+<div [hidden]="uploadSucceds || userIsAnonymous || userEmailEmpty" style="text-align: center">
   <h2>
     Choose an image to upload
   </h2>
@@ -14,7 +14,7 @@
     </section>
     <section>
       <md-input-container>
-        <input mdInput [placeholder]="imageName" disabled style="text-align:center"/>
+        <input mdInput [placeholder]="imageName" disabled/>
       </md-input-container>
     </section>
     <section>
