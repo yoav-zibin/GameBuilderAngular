@@ -1,4 +1,69 @@
-.scrollingImages {
-    height: 400px;
-    width: 100px;
+.listImages {
+    position: relative;
+    display: inline-block;
+    margin: 0 auto;
+    width: 300px;
+    height: 550px;
+    top: 10px;
+    left: 10px;
+    overflow: scroll;
+}
+
+.listElements {
+    position: relative;
+    display: inline-block;
+    margin: 0 auto;
+    width: 300px;
+    height: 550px;
+    top: 10px;
+    left: 10px;
+    overflow: scroll;
+}
+
+.buttons {
+    position: absolute;
+	margin: 0 auto;
+    left: 550px;
+    top: 100px;
+}
+
+.features {
+    position: absolute;
+	margin: 0 auto;
+    left: 550px;
+    top: 350px;
+}
+
+#submit {
+    position: absolute;
+	margin: 0 auto;
+    left: 550px;
+    top: 500px;
+}
+
+.warning {
+    position: absolute;
+    margin: 0 auto;
+    left: 430px;
+    top: 570px;
+}
+
+.selectedImages {
+    position: absolute;
+    margin: 0 auto;
+    left: 350px;
+    top: 0px;
+}
+
+#notice {
+    position: absolute;
+    margin: 0 auto;
+    left: 535px;
+    top: 200px;
+}
+
+.reset {
+    margin: auto;
+    position: relative;
+    top: 250px;
 }

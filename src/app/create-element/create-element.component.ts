@@ -27,8 +27,9 @@ export class CreateElementComponent implements OnInit {
   basePath: string = "gameBuilder/elements/";
   elementCreated: boolean = false;
   elementInfo: Object = {};
+  elementTypeAndFaceNumber: string;
   elementType: string;
-  faceNumber: number;
+  faceNumber: number = null;
   isDraggable: boolean = false;
   isDrawable: boolean = false;
   rotatableDegrees: number = 360;
@@ -91,7 +92,7 @@ export class CreateElementComponent implements OnInit {
   reset() {
     this.elementCreated = false;
     this.elementInfo = {};
-    this.elementType = "";
+    this.elementType = null;
     this.faceNumber = null;
     this.isDraggable = false;
     this.isDrawable = false;
@@ -154,8 +155,10 @@ export class CreateElementComponent implements OnInit {
     this.elementCreated = true;
   }
 
-  updateFaceNumber(i) {
-    this.faceNumber = i;
+  updateType() {
+    const separationIndex: number = this.elementTypeAndFaceNumber.length - 1;
+    this.elementType = this.elementTypeAndFaceNumber.substring(0, separationIndex);
+    this.faceNumber = +this.elementTypeAndFaceNumber.substring(separationIndex);
     this.selectedImages = [];
     this.validateImages();
   }

@@ -1,10 +1,16 @@
-div.uploaderClass {
+.uploaderClass {
     margin: auto;
     position: relative;
     top: 100px;
 }
 
-div.submitClass {
+.submitClass {
+    margin: auto;
+    position: relative;
+    top: 250px;
+}
+
+.reset {
     margin: auto;
     position: relative;
     top: 250px;

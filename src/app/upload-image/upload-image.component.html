@@ -31,11 +31,11 @@
 
 </div>
 
-<div [hidden]="!uploadSucceds || userIsAnonymous || userEmailEmpty" style="text-align:center">
+<div class="reset"  [hidden]="!uploadSucceds || userIsAnonymous || userEmailEmpty" style="text-align:center">
   <h2>
     Image uploaded
   </h2>
-  <button (click)="reset()">Reset</button>
+  <button md-raised-button (click)="reset()">Reset</button>
 </div>
 
 
