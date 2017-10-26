@@ -3,13 +3,15 @@
 <div [hidden]="userIsAnonymous || userEmailEmpty || elementCreated">
   <!-- Page for picking images -->
   <div [hidden]="showElements">
-    <md-grid-list cols='2' rowHeight='100px' class="listImages">
-      <md-grid-tile *ngFor="let image of images | async" [colspan]='1' [rowspan]='1'>
-        <span mdTooltip="{{image?.name}} ({{image?.height}}x{{image?.width}})" mdTooltipPosition="above">
-          <a (click)="selectImage(image)"> <img [src]="image?.downloadURL" width="100px"></a>
-        </span>
-      </md-grid-tile>
-    </md-grid-list>
+    <div class="listImages">
+      <md-grid-list cols='2' rowHeight='100px'>
+        <md-grid-tile *ngFor="let image of images | async" [colspan]='1' [rowspan]='1'>
+          <span mdTooltip="{{image?.name}} ({{image?.height}}x{{image?.width}})" mdTooltipPosition="above">
+            <a (click)="selectImage(image)"> <img [src]="image?.downloadURL" width="100px"></a>
+          </span>
+        </md-grid-tile>
+      </md-grid-list>
+    </div>
 
     <div class="buttons">
       <md-radio-group [(ngModel)]="elementTypeAndFaceNumber" (ngModelChange)="updateType()">
@@ -59,19 +61,21 @@
       <font color="red"> Warning: Please select at least 2 cards.</font>
     </div>
 
-    <md-grid-list cols='1' rowHeight='100px' class="listElements">
-      <md-grid-tile *ngFor="let element of elements | async as asdf; let i = index">
-        <md-checkbox color="primary" (click)="selectElement(element)"></md-checkbox>
-        <div *ngFor="let image of images | async">
-          <div *ngIf="(element.images)[0]['imageId'] == image?.$key">
-            <img [src]="image?.downloadURL" width="100px">
+    <div class="listElements">
+      <md-grid-list cols='1' rowHeight='100px'>
+        <md-grid-tile *ngFor="let element of elements | async as asdf; let i = index">
+          <md-checkbox color="primary" (click)="selectElement(element)"></md-checkbox>
+          <div *ngFor="let image of images | async">
+            <div *ngIf="(element.images)[0]['imageId'] == image?.$key">
+              <img [src]="image?.downloadURL" width="100px">
+            </div>
+            <div *ngIf="(element.images)[1]['imageId'] == image?.$key">
+              <img [src]="image?.downloadURL" width="100px">
+            </div>
           </div>
-          <div *ngIf="(element.images)[1]['imageId'] == image?.$key">
-            <img [src]="image?.downloadURL" width="100px">
-          </div>
-        </div>
-        </md-grid-tile>
-    </md-grid-list>
+          </md-grid-tile>
+      </md-grid-list>
+    </div>
   </div>
 </div>
 
