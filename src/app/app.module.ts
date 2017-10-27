@@ -27,6 +27,7 @@ import {
   MatInputModule,
   MatListModule,
   MatGridListModule,
+  MatProgressSpinnerModule,
   MatRadioModule,
   MatStepperModule,
   MatTooltipModule
@@ -106,6 +107,7 @@ export const appRoutes: Routes = [
     MatInputModule,
     MatListModule,
     MatGridListModule,
+    MatProgressSpinnerModule,
     MatRadioModule,
     MatStepperModule,
     MatTooltipModule,

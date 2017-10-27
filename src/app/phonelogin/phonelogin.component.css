@@ -1,0 +1,17 @@
+.input {
+    margin: auto;
+    position: relative;
+    top: 100px;
+}
+
+.spinner {
+    margin:auto;
+    position: relative;
+    top: 130px;
+}
+
+.verify {
+    margin: auto;
+    position: relative;
+    top: 150px;
+}

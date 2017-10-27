@@ -6,18 +6,6 @@ import { Observable } from 'rxjs/Observable';
 import { WindowService } from '../window.service';
 import * as firebase from 'firebase/app';
 
-export class PhoneNumber {
-	country: string;
-	area: string;
-	prefix: string;
-	line: string;
-
-	get e164() {
-		const num = this.country + this.area + this.prefix + this.line;
-		return '+' + num;
-	}
-}
-
 @Component({
     selector: 'app-phonelogin',
     providers: [WindowService],
@@ -26,7 +14,8 @@ export class PhoneNumber {
 })
 export class PhoneloginComponent implements OnInit {
     windowRef: any;
-    phoneNumber = new PhoneNumber();
+    phoneNumber: string;
+    sendSMS: boolean = false;
     verificationCode: string;
     user: Observable<firebase.User>;
 
@@ -38,8 +27,10 @@ export class PhoneloginComponent implements OnInit {
 
     ngOnInit() {
         this.windowRef = this.win.windowRef
-        this.windowRef.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container')
-        this.windowRef.recaptchaVerifier.render()
+        this.windowRef.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+            'size': 'invisible'
+        })
+        //this.windowRef.recaptchaVerifier.render()
     }
 
     /*
@@ -59,13 +50,16 @@ export class PhoneloginComponent implements OnInit {
     */
 
     sendLoginCode() {
-        const appVerifier = this.windowRef.recaptchaVerifier;
-        const num = this.phoneNumber.e164;
-        firebase.auth().signInWithPhoneNumber(num, appVerifier)
+        this.sendSMS = true;
+        firebase.auth().signInWithPhoneNumber("+1"+this.phoneNumber, this.windowRef.recaptchaVerifier)
             .then(result => {
                 this.windowRef.confirmationResult = result;
             })
-            .catch(error => console.log(error));
+            .catch(error => {
+                console.log(error);
+                this.sendSMS = false;
+                window.alert("Invalid phone number.");
+            });
     }
 
     verifyLoginCode() {
@@ -75,7 +69,6 @@ export class PhoneloginComponent implements OnInit {
                 this.user = result.user;
                 let userInfo = this.createUserInfo(result);
                 this.af.database.ref('users/' + result.user.uid).update(userInfo);
-                console.log(userInfo);
             })
             .catch(error => window.alert("Incorrect code."));
     }
