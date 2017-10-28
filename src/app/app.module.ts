@@ -31,11 +31,11 @@ import {
   MatStepperModule,
   MatTooltipModule
 } from '@angular/material';
-import { SelectBoardComponent } from './select-board/select-board.component';
-import { BuildSpecComponent } from './build-spec/build-spec.component';
+import { SelectBoardComponent } from './spec-builder/select-board/select-board.component';
+import { BuildSpecComponent } from './spec-builder/build-spec/build-spec.component';
 import { DraggableDirective } from './dnd/draggable.directive';
 import { DroppableDirective } from './dnd/droppable.directive';
-import { FinalizeSpecComponent } from './finalize-spec/finalize-spec.component';
+import { FinalizeSpecComponent } from './spec-builder/finalize-spec/finalize-spec.component';
 import { CreateElementComponent } from './create-element/create-element.component';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 

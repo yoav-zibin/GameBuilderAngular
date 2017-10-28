@@ -1,8 +1,8 @@
 import { Component, Input } from '@angular/core';
-import { AuthService } from '../auth/auth.service';
+import { AuthService } from '../../auth/auth.service';
 import { Router } from '@angular/router';
 import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
-import constants from '../../constants.js'
+import constants from '../../../constants.js'
 import * as firebase from 'firebase/app';
 
 @Component({

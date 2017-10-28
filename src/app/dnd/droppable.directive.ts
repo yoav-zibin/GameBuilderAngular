@@ -30,6 +30,7 @@ export class DroppableDirective {
       	(elem as HTMLElement).id = (elem as HTMLElement).id + 'copy';
         (elem as HTMLElement).setAttribute("src", data["url"]);
         (elem as HTMLElement).setAttribute("alt", data["key"]);
+        (elem as HTMLElement).setAttribute('draggable', "true");
         (elem as HTMLElement).classList.remove('currentlyDragged');
 
         let xPos = event.clientX;
@@ -51,7 +52,7 @@ export class DroppableDirective {
 			"left:" + xPos + "px; width:50px; height:50px; " +
 			"z-index:" + (++this.zPos);
 
-		//scale coordinates for range (-100, 100)
+		//scale coordinates for range (0,0)
 		let finalX = this.scaleCoord(xPos);
 		let finalY = this.scaleCoord(yPos);
 		console.log("final: " + finalX + " " + finalY);
@@ -72,9 +73,7 @@ export class DroppableDirective {
 	}
 
 	scaleCoord(coord) {
-		// (0, 0) => (-100, -100)
-		// (256, 256) => (0,0)
-		// (512, 512) => (100, 100)
+		// (0, 0) should be top left corner
 		//TO DO
 		return coord;
 	}
@@ -97,6 +96,29 @@ export class DroppableDirective {
 	@HostListener('dragleave', ['$event'])
 	onDragLeave(event) {
 		console.log("drag leave");
+	}
+
+	@HostListener('dragstart', ['$event'])
+	onDragStart(event) {
+		console.log("hello");
+		
+	    if (this.el.nativeElement === event.target) {
+	        event.target.classList.add('currentlyDragged');
+	        let url = this.el.nativeElement.getAttribute('src');
+	        let key = this.el.nativeElement.getAttribute('alt');
+	        event.dataTransfer.setData("data",
+	        	JSON.stringify({'key': key, 'url': url}));
+	        event.dataTransfer.setData("text", event.target.id);
+ 			event.dataTransfer.dropEffect = "copy";
+	    }
+	}
+
+	@HostListener('dragend', ['$event'])
+    onDragEnd(event) {
+    	console.log("goodbye");
+        if (this.el.nativeElement === event.target) {
+            event.target.classList.remove('currentlyDragged');
+        }
 	}
 
 }

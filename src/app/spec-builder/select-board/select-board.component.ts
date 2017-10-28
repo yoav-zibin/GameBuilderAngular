@@ -1,9 +1,9 @@
-import { Component, EventEmitter, Output  } from '@angular/core';
+import { Component, EventEmitter, Output, ElementRef  } from '@angular/core';
 import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
 import { AngularFireAuth } from 'angularfire2/auth';
 import { Observable } from 'rxjs/Observable';
 import * as firebase from 'firebase/app';
-import constants from '../../constants.js'
+import constants from '../../../constants.js'
 
 
 
@@ -19,8 +19,9 @@ export class SelectBoardComponent {
 	@Output() onSelected = new EventEmitter<object>();
 
 	constructor(
-		public afAuth: AngularFireAuth, 
-		public db: AngularFireDatabase
+		private afAuth: AngularFireAuth, 
+		private db: AngularFireDatabase,
+		private el: ElementRef,
 	) {
 		this.images = db.list(constants.IMAGES_PATH, {
 			query: {

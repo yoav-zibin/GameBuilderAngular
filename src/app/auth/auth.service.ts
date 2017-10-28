@@ -4,6 +4,7 @@ import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/databa
 import {AngularFireAuth} from 'angularfire2/auth';
 import { Observable } from 'rxjs/Observable';
 import * as firebase from 'firebase/app';
+import constants from '../../constants.js'
 
 @Injectable()
 export class AuthService {
@@ -24,8 +25,8 @@ export class AuthService {
 
     let userInfo = {
         "publicFields": {
-            "avatarImageUrl": (result.user.photoURL || ''),
-            "displayName":  (result.user.displayName || ''),
+            "avatarImageUrl": (result.user.photoURL || constants.DEFAULT_AVATAR),
+            "displayName":  (result.user.displayName || result.user.uid),
             "isConnected":  true,
             "lastSeen":  firebase.database.ServerValue.TIMESTAMP,
         },
@@ -43,29 +44,6 @@ export class AuthService {
      }
      return userInfo
   }
-
-  createUser(result: any) {
-    
-        let userInfo = {
-          "publicFields": {
-            "avatarImageUrl": "https://firebasestorage.googleapis.com/v0/b/universalgamemaker.appspot.com/o/images%2F-KwBrfAk0MiQ_s1jBS60.png?alt=media&token=d2f830bf-0b4b-48ca-a232-5a84e7433032",
-            "displayName":  result.email,
-            "isConnected":  true,
-            "lastSeen":  firebase.database.ServerValue.TIMESTAMP,
-        },
-        "privateFields" : {
-            "email": '',
-            "createdOn":  firebase.database.ServerValue.TIMESTAMP,
-            "phoneNumber": result.email,
-            "facebookId": '',
-            "googleId": '',
-            "twitterId": '',
-            "githubId": '',
-            "pushNotificationsToken": '',
-            }
-         }
-         return userInfo
-      }
 
   get authenticated(): boolean {
     return this.authState !== null;
@@ -101,7 +79,7 @@ export class AuthService {
         this.authState = result
         console.log(result);
         this.db.database.ref('users/' + result.uid)
-        .set(this.createUser(result));
+        .set(this.createUserInfo(result));
       })
       .catch(error => {
         console.log(error)
@@ -125,7 +103,14 @@ export class AuthService {
         new firebase.auth.GoogleAuthProvider()
       ).then(result => {
           this.authState = result;
+          let users = this.db.database.ref('users')
           
+          users.once('value', function(snapshot) {
+            if (snapshot.hasChild(result.user.uid)) {
+              console.log("exists");
+            }
+          });
+          console.log("creating user");
           /*
           if(this.authenticated) {
             console.log('user exists!')

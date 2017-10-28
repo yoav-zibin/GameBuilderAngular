@@ -46,10 +46,32 @@ export class SpecBuilderComponent implements OnInit {
   		console.log("receiving board");
   	}
 
-  	onPiecesSet(piece: object) {
-  		this.pieces.push(piece)
-  		console.log("adding pieces to array");
+  	onPiecesSet(pieces: object[]) {
+  		this.pieces = pieces;
+  		console.log("updating pieces");
   	}
+
+    /*
+    onPiecesSet(piece: object) {
+    let img_key = piece['img_key'];
+    let matched = false;
+
+    this.db.list(constants.ELEMENTS_PATH, { preserveSnapshot: true})
+      .subscribe(snapshots => {
+        snapshots.forEach(snapshot => {
+          let data = snapshot.val();
+          for(let image of data['images']) {
+              if(image['imageId']=== img_key && !matched) {
+                matched = true;
+                console.log('found match');
+              piece['el_key'] = snapshot.key;
+              this.onPiecesSet.emit(piece);
+            }
+          }
+        });
+      })
+    }
+    */
 
   	getSelectedBoard() {
   		return this.selectedBoard;

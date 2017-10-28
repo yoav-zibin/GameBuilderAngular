@@ -1,0 +1,28 @@
+<div id="piece-selector">
+	<md-grid-list cols="2" rowHeight="75px">
+	  <md-grid-tile
+	      *ngFor="let image of images | async; let i = index;"
+	      	[colspan]="1"
+	      	[rowspan]="1">
+	      	<img id="piece-{{i}}" class="piece-image" src="{{image.downloadURL}}" alt="{{image.$key}}"/>
+		    <div class="overlay">
+		      	<div class="overlay-text">
+		      		{{image.name}}
+		      	</div>
+		    </div>
+	  </md-grid-tile>
+</md-grid-list>
+</div>
+
+
+<div id="board-container">
+	<img id="board" src="{{selectedBoard['url']}}">
+	<div id="board-overlay">
+		<!--
+		<img [draggable] id="piece-213214" class="piece-image" src="https://firebasestorage.googleapis.com/v0/b/universalgamemaker.appspot.com/o/images%2F-KtRtvilLSLZbDDIR3If.png?alt=media&amp;token=20404ca3-d200-441d-a0ff-0d57309e4902" alt="sdfsdf"/>
+		-->
+	</div>
+</div>
+
+
+
