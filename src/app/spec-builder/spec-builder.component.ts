@@ -18,13 +18,12 @@ import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 export class SpecBuilderComponent implements OnInit {
 	isLinear = true;
   selected = false;
+  piecesSet = false;
 	firstFormGroup: FormGroup;
 	secondFormGroup: FormGroup;
 	thirdFormGroup: FormGroup;
 	selectedBoard: object = new Object();
 	pieces: Map<string, object>;
-  boardName: string = '';
-  piecesAdded: string = '';
   blocked: boolean;
 
 	constructor(
@@ -70,5 +69,13 @@ export class SpecBuilderComponent implements OnInit {
   	getPieces() {
   		return this.pieces;
   	}
+
+   getPiecesSet() {
+     return this.piecesSet;
+   }
+
+    toFinalStage() {
+      this.piecesSet = true;
+    }
 
 }

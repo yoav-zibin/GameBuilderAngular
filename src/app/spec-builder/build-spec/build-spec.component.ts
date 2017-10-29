@@ -14,17 +14,29 @@ export class BuildSpecComponent{
 	@Input() selectedBoard: object;
 	@Output() onPiecesSet = new EventEmitter<Map<string, object>>();
 
-	public zPos:number = 2;
-	public uniqueID: number = 0;
-	public piecesMap = new Map<string, object>();
-	public pieces: object[] = new Array();
+	zPos:number = 2;
+	uniqueID: number = 0;
+	piecesMap = new Map<string, object>();
+	pieces: object[] = new Array();
 	images: FirebaseListObservable<any[]>;
+	query: object;
+
+	currentFilter = 'all';
+	options = [
+		{value: 'all', viewValue: 'All Elements'},
+		{value: 'standard', viewValue: 'Standard'},
+		{value: 'toggable', viewValue: 'Toggable'},
+		{value: 'dice', viewValue: 'Dice'},
+		{value: 'card', viewValue: 'Card'},
+		{value: 'cardsDeck', viewValue: 'Cards Deck'},
+		{value: 'piecesDeck', viewValue: 'Pieces Deck'},
+	]
 
   constructor(
-		public auth: AuthService, 
-		public db: AngularFireDatabase
+		private auth: AuthService, 
+		private db: AngularFireDatabase
 	) {
-
+  		let query = this.buildQuery();
   		if(this.auth.authenticated) {
 			this.images = db.list(constants.IMAGES_PATH, {
 				query: {
@@ -175,11 +187,23 @@ export class BuildSpecComponent{
 		(elem as HTMLElement).id = (elem as HTMLElement).id + 'copy' + this.uniqueID;
         (elem as HTMLElement).setAttribute("src", data["url"]);
         (elem as HTMLElement).setAttribute("alt", data["key"]);
-        //(elem as HTMLElement).setAttribute('draggable', "true");
         (elem as HTMLElement).classList.remove('currentlyDragged');
         this.uniqueID++;
 
         return elem;
+	}
+
+	buildQuery() {
+		if(this.currentFilter === 'all')
+			return '';
+		else {
+			return {
+				query: {
+					orderByChild: 'elementKind',
+					equalTo: this.currentFilter,
+				}
+			};
+		}
 	}
 
 }

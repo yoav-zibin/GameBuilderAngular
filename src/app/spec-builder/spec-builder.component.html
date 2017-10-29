@@ -23,7 +23,7 @@
         </div>
         <div id="nav-button">
           <button md-button mdStepperPrevious>Back</button>
-          <button md-button mdStepperNext>Next</button>
+          <button md-button mdStepperNext (click)="toFinalStage()">Next</button>
         </div>
       </form>
     </md-step>
@@ -32,7 +32,8 @@
         <ng-template mdStepLabel>Confirm spec</ng-template>
           <app-finalize-spec
             [selectedBoard]=getSelectedBoard()
-            [piecesMap]=getPieces()>
+            [piecesMap]=getPieces()
+            [piecesSet]=getPiecesSet()>
           </app-finalize-spec>
         <div id="nav-button">
           <button md-button mdStepperPrevious>Back</button>
