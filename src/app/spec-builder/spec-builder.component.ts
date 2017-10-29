@@ -17,11 +17,13 @@ import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 })
 export class SpecBuilderComponent implements OnInit {
 	isLinear = false;
+  selected = false;
 	firstFormGroup: FormGroup;
 	secondFormGroup: FormGroup;
 	thirdFormGroup: FormGroup;
 	selectedBoard: object = new Object();
-	pieces: object[] = new Array();
+	pieces: Map<string, object>;
+  blocked: boolean;
 
 	constructor(
 		private auth: AuthService,
@@ -30,6 +32,7 @@ export class SpecBuilderComponent implements OnInit {
 	) {	}
 
 	ngOnInit() {
+    this.blocked = this.auth.isAnonymous || !this.auth.authenticated;
 		this.firstFormGroup = this._formBuilder.group({
 			firstCtrl: ['', Validators.required]
 		});
@@ -39,39 +42,18 @@ export class SpecBuilderComponent implements OnInit {
     	this.thirdFormGroup = this._formBuilder.group({
       		thirdCtrl: ['', Validators.required]
     	});
-  	}
+  }
 
   	onSelected(board: object) {
-  		this.selectedBoard = board
+      this.selected = true;
+  		this.selectedBoard = board;
   		console.log("receiving board");
   	}
 
-  	onPiecesSet(pieces: object[]) {
+  	onPiecesSet(pieces: Map<string, object>) {
   		this.pieces = pieces;
   		console.log("updating pieces");
   	}
-
-    /*
-    onPiecesSet(piece: object) {
-    let img_key = piece['img_key'];
-    let matched = false;
-
-    this.db.list(constants.ELEMENTS_PATH, { preserveSnapshot: true})
-      .subscribe(snapshots => {
-        snapshots.forEach(snapshot => {
-          let data = snapshot.val();
-          for(let image of data['images']) {
-              if(image['imageId']=== img_key && !matched) {
-                matched = true;
-                console.log('found match');
-              piece['el_key'] = snapshot.key;
-              this.onPiecesSet.emit(piece);
-            }
-          }
-        });
-      })
-    }
-    */
 
   	getSelectedBoard() {
   		return this.selectedBoard;

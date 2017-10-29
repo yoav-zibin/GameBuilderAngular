@@ -3,7 +3,7 @@
 	      *ngFor="let image of images | async"
 	      	[colspan]="1"
 	      	[rowspan]="2">
-	      	<input class="board-image" type="image" src="{{image.downloadURL}}" alt="could not find image" id="selected-board" value="{{image.name}}" (click)="selectBoard(image)" [ngStyle]="{'opacity': getSelectedOpacity(image)}" />
+	      	<input class="board-image" type="image" src="{{image.downloadURL}}" alt="could not find image" id="selected-board" value="{{image.name}}" (click)="selectBoard(image)"/>
 		    <div class="overlay">
 		      	<div class="overlay-text">
 		      		{{image.name}}

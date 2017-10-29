@@ -1,6 +1,6 @@
 import { Component, Input, Output, HostListener, EventEmitter } from '@angular/core';
 import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
-import { AngularFireAuth } from 'angularfire2/auth';
+import { AuthService } from '../../auth/auth.service';
 import { Observable } from 'rxjs/Observable';
 import * as firebase from 'firebase/app';
 import constants from '../../../constants.js'
@@ -12,22 +12,27 @@ import constants from '../../../constants.js'
 })
 export class BuildSpecComponent{
 	@Input() selectedBoard: object;
-	@Output() onPiecesSet = new EventEmitter<object>();
+	@Output() onPiecesSet = new EventEmitter<Map<string, object>>();
 
 	public zPos:number = 0;
+	public uniqueID: number = 0;
+	public piecesMap = new Map<string, object>();
 	public pieces: object[] = new Array();
 	images: FirebaseListObservable<any[]>;
 
   constructor(
-		public afAuth: AngularFireAuth, 
+		public auth: AuthService, 
 		public db: AngularFireDatabase
 	) {
-		this.images = db.list(constants.IMAGES_PATH, {
-			query: {
-				orderByChild: 'isBoardImage',
-				equalTo: false,
-			}
-		});
+
+  		if(this.auth.authenticated) {
+			this.images = db.list(constants.IMAGES_PATH, {
+				query: {
+					orderByChild: 'isBoardImage',
+					equalTo: false,
+				}
+			});
+		}
 
 	}
 
@@ -43,13 +48,36 @@ export class BuildSpecComponent{
         event.dataTransfer.setData("data",
         	JSON.stringify({'key': key, 'url': url}));
         event.dataTransfer.setData("text", event.target.id);
-			event.dataTransfer.dropEffect = "copy";
 	}
 
 	@HostListener('dragend', ['$event'])
     onDragEnd(event) {
-    	console.log("goodbye");
+    	console.log("dragend");
         event.target.classList.remove('currentlyDragged');
+	}
+
+	@HostListener('dragenter', ['$event'])
+	onDragEnter(event) {
+		console.log("drag enter");
+	}
+
+	@HostListener('dragover', ['$event'])
+	onDragOver(event) {
+		if(event.preventDefault) {
+    		console.log("prevent dragover!");
+    		event.preventDefault();
+    	}
+    	console.log(event.clientX + " " + event.clientY);
+
+        if(this.fromSource(event.dataTransfer.getData("text")))
+			event.dataTransfer.dropEffect = "copy";
+		else
+			event.dataTransfer.dropEffect = "move";
+	}
+
+	@HostListener('dragleave', ['$event'])
+	onDragLeave(event) {
+		console.log("drag leave");
 	}
 
   	@HostListener('drop', ['$event'])
@@ -75,8 +103,10 @@ export class BuildSpecComponent{
         console.log('y:' + yPos);
 
 
-      	if(this.fromSource(elementID))
+      	if(this.fromSource(elementID)) {
       		elem = this.copyElement(data, elementID);
+      		elementID = (elem as HTMLElement).id;
+      	}
       	else
       		elem = document.getElementById(elementID);
 
@@ -87,23 +117,24 @@ export class BuildSpecComponent{
 		[xPos, yPos] = this.scaleCoord(xPos, yPos);
 		console.log("final: " + xPos + " " + yPos);
 
-        this.pieces.push(
-        	{
-        		"img_key": data["key"],
-        		"url": data["url"],
-        		"xPos": xPos,
-        		"yPos": yPos,
-        		"zPos": this.zPos,
-        	}
-        );
+		let piece = {
+    		"img_key": data["key"],
+    		"url": data["url"],
+    		"xPos": xPos,
+    		"yPos": yPos,
+    		"zPos": this.zPos,
+    	}
 
-        this.onPiecesSet.emit(this.pieces);
+		this.piecesMap.set(elementID, piece);
+		console.log(this.piecesMap);
+        this.onPiecesSet.emit(this.piecesMap);
 
         event.target.appendChild(elem);
 	}
 
 	scaleCoord(xPos, yPos) {
-		//TODO
+		xPos = (xPos * 100) / 512;
+		yPos = (yPos * 100) / 512;
 		return [xPos, yPos];
 	}
 
@@ -141,33 +172,14 @@ export class BuildSpecComponent{
 
 	copyElement(data, id) {
 		let elem = document.getElementById(id).cloneNode(true);
-		(elem as HTMLElement).id = (elem as HTMLElement).id + 'copy';
+		(elem as HTMLElement).id = (elem as HTMLElement).id + 'copy' + this.uniqueID;
         (elem as HTMLElement).setAttribute("src", data["url"]);
         (elem as HTMLElement).setAttribute("alt", data["key"]);
-        (elem as HTMLElement).setAttribute('draggable', "true");
+        //(elem as HTMLElement).setAttribute('draggable', "true");
         (elem as HTMLElement).classList.remove('currentlyDragged');
+        this.uniqueID++;
 
         return elem;
-	}
-
-	@HostListener('dragenter', ['$event'])
-	onDragEnter(event) {
-		console.log("drag enter");
-	}
-
-	@HostListener('dragover', ['$event'])
-	onDragOver(event) {
-		if(event.preventDefault) {
-    		console.log("prevent dragover!");
-    		event.preventDefault();
-    	}
-    	event.dataTransfer.dropEffect = "copy";
-		console.log(event.clientX + " " + event.clientY);
-	}
-
-	@HostListener('dragleave', ['$event'])
-	onDragLeave(event) {
-		console.log("drag leave");
 	}
 
 }

@@ -12,7 +12,8 @@ import * as firebase from 'firebase/app';
 })
 export class FinalizeSpecComponent {
 	@Input() selectedBoard: object;
-	@Input() pieces: object[];
+	@Input() piecesMap: Map<string, object>;
+  pieces: object[];
 
 	generated: boolean = false;
 	gameSpec: object;
@@ -37,13 +38,17 @@ export class FinalizeSpecComponent {
   	private auth: AuthService,
   	private db: AngularFireDatabase,
   	private router: Router
-  ) { 
-	this.userID = this.auth.currentUserId;
-	this.userEmail = this.auth.currentUserName;
+  ) { }
+
+  createPiecesArray() {
+    this.pieces = Array.from(this.piecesMap.values());
+    console.log(this.pieces);
   }
 
-
   createGameSpec() {
+    this.userID = this.auth.currentUserId;
+    this.userEmail = this.auth.currentUserName;
+    this.createPiecesArray();
   	this.gameName = (<HTMLInputElement>document.getElementById("gameName")).value;
   	this.generated = false;
   	this.gameSpec = {
@@ -75,6 +80,7 @@ export class FinalizeSpecComponent {
   createPiecesSpec() {
   	let pieceList = [];
   	for(let piece of this.pieces) {
+      piece = this.addElementID(piece);
   		pieceList.push(this.createPieceSpec(piece))
   	}
   	return pieceList;
@@ -108,6 +114,26 @@ export class FinalizeSpecComponent {
   		.catch(error => {
   			console.log(error.message);
   		})
+  }
+
+  addElementID(piece: object) {
+    let img_key = piece['img_key'];
+    let matched = false;
+
+    this.db.list(constants.ELEMENTS_PATH, { preserveSnapshot: true})
+      .subscribe(snapshots => {
+        snapshots.forEach(snapshot => {
+          let data = snapshot.val();
+          for(let image of data['images']) {
+              if(image['imageId'] === img_key && !matched) {
+                matched = true;
+                console.log('found match');
+              piece['el_key'] = snapshot.key;
+              }
+          }
+        });
+      })
+    return piece;
   }
 
 }

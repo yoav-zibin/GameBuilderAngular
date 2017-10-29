@@ -1,10 +1,9 @@
 import { Component, EventEmitter, Output, ElementRef  } from '@angular/core';
 import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
-import { AngularFireAuth } from 'angularfire2/auth';
 import { Observable } from 'rxjs/Observable';
+import { AuthService } from '../../auth/auth.service';
 import * as firebase from 'firebase/app';
 import constants from '../../../constants.js'
-
 
 
 @Component({
@@ -14,49 +13,36 @@ import constants from '../../../constants.js'
 })
 export class SelectBoardComponent {
 	images: FirebaseListObservable<any[]>;
+	selected: boolean;
 	selectedBoardUrl: string;
 	selectedBoardKey: string;
+	selectedBoardName: string;
 	@Output() onSelected = new EventEmitter<object>();
 
 	constructor(
-		private afAuth: AngularFireAuth, 
 		private db: AngularFireDatabase,
-		private el: ElementRef,
+		private auth: AuthService,
 	) {
-		this.images = db.list(constants.IMAGES_PATH, {
-			query: {
-				orderByChild: 'isBoardImage',
-				equalTo: true,
-			}
-		});
+
+		if(this.auth.authenticated) {
+			this.images = db.list(constants.IMAGES_PATH, {
+				query: {
+					orderByChild: 'isBoardImage',
+					equalTo: true,
+				}
+			});
+		}
 	}
 
 	selectBoard(board) {
-		this.selectedBoardKey = board.$key;
-		this.selectedBoardUrl = board.downloadURL;
 		console.log("sending board...")
 		console.log(board);
 		this.onSelected.emit(
 			{
-				'key': this.selectedBoardKey,
-				'url': this.selectedBoardUrl
+				'key': board.$key,
+				'name': board.name,
+				'url': board.downloadURL
 			}
 		);
 	}
-
-	getSelectedOpacity(board) {
-		if(this.selectedBoardKey === board.key) {
-			return 0.6
-		}
-		return 1
-	}
-
-	/*
-	getSelectedColor(board) {
-		if(this.selectedBoardKey === board.key) {
-			return '#3F51B5';
-		}
-		return 'F8F8F8';
-	}
-	*/
 }
