@@ -5,6 +5,6 @@
 </form>
 
 <div *ngIf="generated">
-	<pre>{{ gameSpec | json }}</pre>
+	<pre style="text-align: left">{{ gameSpec | json }}</pre>
 	<button (click)=uploadGameSpec()>Upload Spec</button>
 </div>

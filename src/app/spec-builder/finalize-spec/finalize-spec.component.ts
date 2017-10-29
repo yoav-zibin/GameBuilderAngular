@@ -1,8 +1,8 @@
-import { Component, Input } from '@angular/core';
-import { AuthService } from '../auth/auth.service';
+import { Component, Input, OnChanges } from '@angular/core';
+import { AuthService } from '../../auth/auth.service';
 import { Router } from '@angular/router';
 import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
-import constants from '../../constants.js'
+import constants from '../../../constants.js'
 import * as firebase from 'firebase/app';
 
 @Component({
@@ -10,9 +10,12 @@ import * as firebase from 'firebase/app';
   templateUrl: './finalize-spec.component.html',
   styleUrls: ['./finalize-spec.component.css']
 })
-export class FinalizeSpecComponent {
+export class FinalizeSpecComponent implements OnChanges {
 	@Input() selectedBoard: object;
-	@Input() pieces: object[];
+	@Input() piecesMap: Map<string, object>;
+  @Input() piecesSet: boolean;
+  pieces: object[] = new Array<object>();
+  count:number = 0;
 
 	generated: boolean = false;
 	gameSpec: object;
@@ -37,30 +40,37 @@ export class FinalizeSpecComponent {
   	private auth: AuthService,
   	private db: AngularFireDatabase,
   	private router: Router
-  ) { 
-	this.userID = this.auth.currentUserId;
-	this.userEmail = this.auth.currentUserName;
+  ) { }
+
+  ngOnChanges() {
+    this.createPiecesArray();
   }
 
+  createPiecesArray() {
+    if(this.piecesSet) {
+      console.log('creating piece array!');
+      this.pieces = Array.from(this.piecesMap.values());
+      this.updatePieceArrays();
+    }  
+  }
 
   createGameSpec() {
+    this.userID = this.auth.currentUserId;
+    this.userEmail = this.auth.currentUserName;
   	this.gameName = (<HTMLInputElement>document.getElementById("gameName")).value;
-  	this.generated = false;
   	this.gameSpec = {
-		'uploaderEmail': this.userEmail,
-		'uploaderUid': this.userID,
-		'createdOn': firebase.database.ServerValue.TIMESTAMP,
-		'gameName': (this.gameName || 'default'),
-		'gameIcon50x50': this.icon_50,
-		'gameIcon512x512': this.icon_512,
-		'wikipediaUrl': (this.wiki || 'https://no-wiki.com'),
-		'tutorialYoutubeVideo': (this.tutorial || 'no_vid_here'),
-		'board': this.createBoardSpec(),
-		'pieces': this.createPiecesSpec(),
-	}
-
-	this.generated = true;
-	console.log(this.gameSpec);
+  		'uploaderEmail': this.userEmail,
+  		'uploaderUid': this.userID,
+  		'createdOn': firebase.database.ServerValue.TIMESTAMP,
+  		'gameName': (this.gameName || 'default'),
+  		'gameIcon50x50': this.icon_50,
+  		'gameIcon512x512': this.icon_512,
+  		'wikipediaUrl': (this.wiki || 'https://no-wiki.com'),
+  		'tutorialYoutubeVideo': (this.tutorial || 'no_vid_here'),
+  		'board': this.createBoardSpec(),
+  		'pieces': this.createPiecesSpec(),
+  	};
+    this.generated = true;
   }
 
   createBoardSpec() {
@@ -75,6 +85,7 @@ export class FinalizeSpecComponent {
   createPiecesSpec() {
   	let pieceList = [];
   	for(let piece of this.pieces) {
+      piece = this.addElementID(piece);
   		pieceList.push(this.createPieceSpec(piece))
   	}
   	return pieceList;
@@ -108,6 +119,30 @@ export class FinalizeSpecComponent {
   		.catch(error => {
   			console.log(error.message);
   		})
+  }
+
+  updatePieceArrays() {
+    for(let piece of this.pieces)
+      piece = this.addElementID(piece);
+  }
+
+  addElementID(piece: object) {
+    let img_key = piece['img_key'];
+    let matched = false;
+    this.db.list(constants.ELEMENTS_PATH, { preserveSnapshot: true})
+      .subscribe(snapshots => {
+        snapshots.forEach(snapshot => {
+          let data = snapshot.val();
+          for(let image of data['images']) {
+              if(image['imageId'] === img_key && !matched) {
+                matched = true;
+                piece['el_key'] = snapshot.key;
+                return;
+              }
+          }
+        });
+      });
+    return piece;
   }
 
 }
