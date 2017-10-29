@@ -141,7 +141,15 @@ export class BuildSpecComponent{
 		console.log(this.piecesMap);
         this.onPiecesSet.emit(this.piecesMap);
 
-        event.target.appendChild(elem);
+        if (event.target.nodeName !== "IMG") {
+        	console.log('ok to drop here.')
+    		event.target.appendChild(elem);
+		}
+		else {
+			console.log('dropping in parent');
+			event.target.parentNode.appendChild(elem);
+		}
+        
 	}
 
 	scaleCoord(xPos, yPos) {
@@ -173,6 +181,7 @@ export class BuildSpecComponent{
 		let styleString = "position:absolute; top:" + yPos + "px;" +
 				"left:" + xPos + "px; width:50px; height:50px; " +
 				"z-index:" + (++this.zPos);
+		console.log('zpos=' + this.zPos);
 		(elem as HTMLElement).setAttribute('style', styleString);
 
 		return elem;
