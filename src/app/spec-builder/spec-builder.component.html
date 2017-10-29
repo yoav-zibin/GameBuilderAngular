@@ -3,7 +3,7 @@
     <md-step [stepControl]="firstFormGroup">
       <form [formGroup]="firstFormGroup">
         <ng-template mdStepLabel>Select a board</ng-template>
-        <div *ngIf="selected">Selected {{selectedBoard['name']}}</div>
+          <div *ngIf="selected">Selected {{selectedBoard['name']}}</div>
         <div id="board-selector">
           <app-select-board (onSelected)="onSelected($event)"></app-select-board>
         </div>
@@ -30,7 +30,10 @@
     <md-step [stepControl]="thirdFormGroup">
       <form [formGroup]="thirdFormGroup">
         <ng-template mdStepLabel>Confirm spec</ng-template>
-        <app-finalize-spec [selectedBoard]=getSelectedBoard() [piecesMap]=getPieces()></app-finalize-spec>
+          <app-finalize-spec
+            [selectedBoard]=getSelectedBoard()
+            [piecesMap]=getPieces()>
+          </app-finalize-spec>
         <div id="nav-button">
           <button md-button mdStepperPrevious>Back</button>
           <!-- <button md-button mdStepperNext>Finish</button> -->

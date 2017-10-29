@@ -14,7 +14,7 @@ export class BuildSpecComponent{
 	@Input() selectedBoard: object;
 	@Output() onPiecesSet = new EventEmitter<Map<string, object>>();
 
-	public zPos:number = 0;
+	public zPos:number = 2;
 	public uniqueID: number = 0;
 	public piecesMap = new Map<string, object>();
 	public pieces: object[] = new Array();

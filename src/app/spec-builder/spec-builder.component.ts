@@ -16,13 +16,15 @@ import {FormBuilder, FormGroup, Validators} from '@angular/forms';
   styleUrls: ['./spec-builder.component.css']
 })
 export class SpecBuilderComponent implements OnInit {
-	isLinear = false;
+	isLinear = true;
   selected = false;
 	firstFormGroup: FormGroup;
 	secondFormGroup: FormGroup;
 	thirdFormGroup: FormGroup;
 	selectedBoard: object = new Object();
 	pieces: Map<string, object>;
+  boardName: string = '';
+  piecesAdded: string = '';
   blocked: boolean;
 
 	constructor(
@@ -37,21 +39,27 @@ export class SpecBuilderComponent implements OnInit {
 			firstCtrl: ['', Validators.required]
 		});
 		this.secondFormGroup = this._formBuilder.group({
-      		secondCtrl: ['', Validators.required]
-    	});
-    	this.thirdFormGroup = this._formBuilder.group({
-      		thirdCtrl: ['', Validators.required]
-    	});
+      secondCtrl: ['', Validators.required]
+    });
+    this.thirdFormGroup = this._formBuilder.group({
+      thirdCtrl: ['', Validators.required]
+    });
   }
 
   	onSelected(board: object) {
       this.selected = true;
   		this.selectedBoard = board;
+      this.firstFormGroup = this._formBuilder.group({
+        firstCtrl: ['validated', Validators.required]
+      });
   		console.log("receiving board");
   	}
 
   	onPiecesSet(pieces: Map<string, object>) {
   		this.pieces = pieces;
+      this.secondFormGroup = this._formBuilder.group({
+        secondCtrl: ['validated', Validators.required]
+      });
   		console.log("updating pieces");
   	}
 
