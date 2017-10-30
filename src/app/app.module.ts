@@ -8,6 +8,7 @@ import { AngularFireAuthModule } from 'angularfire2/auth';
 import { RouterModule, Routes } from '@angular/router';
 import {AppRoutingModule} from './app-routing.module';
 import {AuthService} from './auth/auth.service';
+import { KonvaService } from './spec-builder/build-spec/konva.service';
 
 //import * as firebase from 'firebase/app';
 
@@ -109,7 +110,7 @@ export const appRoutes: Routes = [
     MatTooltipModule,
     BrowserAnimationsModule,
   ],
-  providers: [AuthService],
+  providers: [AuthService, KonvaService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

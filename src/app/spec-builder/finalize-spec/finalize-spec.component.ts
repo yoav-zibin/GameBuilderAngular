@@ -51,7 +51,10 @@ export class FinalizeSpecComponent implements OnChanges {
       console.log('creating piece array!');
       this.pieces = Array.from(this.piecesMap.values());
       this.updatePieceArrays();
-    }  
+    }
+    else {
+      console.log("can't build array yet");
+    }
   }
 
   createGameSpec() {

@@ -3,6 +3,7 @@ import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/databa
 import { AngularFireAuth } from 'angularfire2/auth';
 import { Observable } from 'rxjs/Observable';
 import { AuthService } from '../auth/auth.service';
+import { KonvaService } from './build-spec/konva.service'
 import * as firebase from 'firebase/app';
 import constants from '../../constants.js'
 
@@ -13,7 +14,8 @@ import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 @Component({
   selector: 'app-spec-builder',
   templateUrl: './spec-builder.component.html',
-  styleUrls: ['./spec-builder.component.css']
+  styleUrls: ['./spec-builder.component.css'],
+  providers: [KonvaService]
 })
 export class SpecBuilderComponent implements OnInit {
 	isLinear = true;
@@ -29,7 +31,8 @@ export class SpecBuilderComponent implements OnInit {
 	constructor(
 		private auth: AuthService,
 		private _formBuilder: FormBuilder,
-		public db: AngularFireDatabase
+		private db: AngularFireDatabase,
+    private konva: KonvaService
 	) {	}
 
 	ngOnInit() {
@@ -75,7 +78,12 @@ export class SpecBuilderComponent implements OnInit {
    }
 
     toFinalStage() {
-      this.piecesSet = true;
+      if(this.pieces)
+        this.piecesSet = true;
+    }
+
+    buildStage() {
+      this.konva.buildStage('board-overlay');
     }
 
 }

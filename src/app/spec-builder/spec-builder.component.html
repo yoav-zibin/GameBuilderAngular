@@ -8,7 +8,7 @@
           <app-select-board (onSelected)="onSelected($event)"></app-select-board>
         </div>
         <div id="nav-button">
-          <button md-button mdStepperNext>Next</button>
+          <button md-button mdStepperNext (click)="buildStage()">Next</button>
         </div>
       </form>
     </md-step>

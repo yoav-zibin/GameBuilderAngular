@@ -1,6 +1,7 @@
 import { Component, Input, Output, HostListener, EventEmitter } from '@angular/core';
 import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
 import { AuthService } from '../../auth/auth.service';
+import { KonvaService } from './konva.service';
 import { Observable } from 'rxjs/Observable';
 import * as firebase from 'firebase/app';
 import constants from '../../../constants.js'
@@ -10,7 +11,7 @@ import constants from '../../../constants.js'
   templateUrl: './build-spec.component.html',
   styleUrls: ['./build-spec.component.css']
 })
-export class BuildSpecComponent{
+export class BuildSpecComponent {
 	@Input() selectedBoard: object;
 	@Output() onPiecesSet = new EventEmitter<Map<string, object>>();
 
@@ -34,9 +35,11 @@ export class BuildSpecComponent{
 
   constructor(
 		private auth: AuthService, 
-		private db: AngularFireDatabase
+		private db: AngularFireDatabase,
+		private konva: KonvaService
 	) {
-  		let query = this.buildQuery();
+  		//TODO: filter by element kind
+  		//let query = this.buildQuery();
   		if(this.auth.authenticated) {
 			this.images = db.list(constants.IMAGES_PATH, {
 				query: {
@@ -46,11 +49,13 @@ export class BuildSpecComponent{
 			});
 		}
 
+		
 	}
 
 	@HostListener('dragstart', ['$event'])
 	onDragStart(event) {
 		console.log("hello");
+		this.konva.buildStage('board-overlay');
 		
         event.target.classList.add('currentlyDragged');
         let url = event.target.getAttribute('src');
@@ -126,7 +131,8 @@ export class BuildSpecComponent{
 		elem = this.updateStyle(elem, xPos, yPos);
 
 		//scale coordinates for range (0,0)
-		[xPos, yPos] = this.scaleCoord(xPos, yPos);
+		[xPos, yPos] = this.scaleCoord(
+			xPos, yPos, document.getElementById(event.target.id));
 		console.log("final: " + xPos + " " + yPos);
 
 		let piece = {
@@ -152,16 +158,16 @@ export class BuildSpecComponent{
         
 	}
 
-	scaleCoord(xPos, yPos) {
-		xPos = (xPos * 100) / 512;
-		yPos = (yPos * 100) / 512;
+	scaleCoord(xPos, yPos, container) {
+		xPos = (xPos * 100) / container.clientWidth;
+		yPos = (yPos * 100) / container.clientHeight;
 		return [xPos, yPos];
 	}
 
 	calculatePosition(event) {
 		let xPos = event.clientX;
 		let yPos = event.clientY;
-		let container = document.getElementById("board-overlay");
+		let container = document.getElementById(event.target.id);
 		let offsets = container.getBoundingClientRect();
 
 		console.log("mouse: " + xPos + " " + yPos);
