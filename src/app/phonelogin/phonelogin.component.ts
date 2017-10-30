@@ -67,14 +67,28 @@ export class PhoneloginComponent implements OnInit {
             .confirm(this.verificationCode)
             .then(result => {
                 this.user = result.user;
-                let userInfo = this.createUserInfo(result);
-                this.af.database.ref('users/' + result.user.uid).update(userInfo);
+                const users = this.af.database.ref(`users/${result.user.uid}`);
+                const thisClass = this;
+                users.once('value', function(snapshot) {
+                    console.log(snapshot);
+                    if (snapshot.exists()) {
+                        console.log("user exists");
+                        thisClass.af.database.ref(`users/${result.user.uid}/publicFields`)
+                        .update({
+                            isConnected: true,
+                            lastSeen: firebase.database.ServerValue.TIMESTAMP
+                        });
+                    } else {
+                        console.log("new user");
+                        thisClass.af.database.ref(`users/${result.user.uid}`).update(thisClass.createUserInfo(result));
+                    }
+                });
             })
             .catch(error => window.alert("Incorrect code."));
     }
 
     createUserInfo(result: any) {
-        let userInfo = {
+        const userInfo = {
             "publicFields": {
                 "avatarImageUrl": "https://firebasestorage.googleapis.com/v0/b/universalgamemaker.appspot.com/o/images%2F-KwBrfAk0MiQ_s1jBS60.png?alt=media&token=d2f830bf-0b4b-48ca-a232-5a84e7433032",
                 "displayName":  result.user.phoneNumber,
