@@ -4,7 +4,6 @@ import { AuthService } from '../../auth/auth.service';
 import { Observable } from 'rxjs/Observable';
 import * as firebase from 'firebase/app';
 import constants from '../../../constants.js'
-import "rxjs/add/operator/map"
 
 @Component({
   selector: 'app-build-spec',
@@ -19,9 +18,11 @@ export class BuildSpecComponent {
 	uniqueID: number = 0;
 	piecesMap = new Map<string, object>();
 	pieces: object[] = new Array();
-	images: FirebaseListObservable<any[]>;
-	imageKeys: FirebaseListObservable<any[]>;
-	elements: FirebaseListObservable<any[]>;
+	images: object[] = new Array();
+	elements: object[] = new Array();
+	imageData = new Map<string, object>();
+	elementRef: FirebaseListObservable<any[]>;
+	imageRef: FirebaseListObservable<any[]>;
 
 	currentFilter = 'all';
 	options = [
@@ -39,33 +40,43 @@ export class BuildSpecComponent {
 		private db: AngularFireDatabase
 	) {
   		if(this.auth.authenticated) {
-			this.images = db.list(constants.IMAGES_PATH, {
+			db.list(constants.IMAGES_PATH, {
 				query: {
 					orderByChild: 'isBoardImage',
 					equalTo: false,
-				}
-			});
-
-			/*
-			come back to this
-			*/
-
-			this.imageKeys = <FirebaseListObservable<any>>
-				db.list(constants.IMAGES_PATH, {
-					query: {
-						orderByChild: 'isBoardImage',
-						equalTo: false,
-					}
-				}).map(function(value) {
-					console.log(value);
-					return value.$key;
-				});
-
-
-
-			this.elements = db.list(constants.ELEMENTS_PATH);
+				},
+				preserveSnapshot: true
+			}).subscribe(snapshots => {
+				snapshots.forEach(snapshot => {
+					this.images.push(snapshot.val());
+					this.imageData.set(snapshot.key, {
+						'downloadURL': snapshot.val().downloadURL,
+						'name': snapshot.val().name
+					});
+				})
+			},
+				function(error) {
+					console.log("Error happened" + error)
+				},
+	    		function() {
+	    			console.log("the subscription is completed");
+	    			db.list(constants.ELEMENTS_PATH,
+						{
+							preserveSnapshot: true
+						}
+					).subscribe(snapshots => {
+						snapshots.forEach(snapshot => {
+							let element = snapshot.val();
+							let imgData = this.imageData
+								.get(element.images[0].imageID)
+							element['downloadURL'] = imgData['downloadURL'];
+							element['name'] = imgData['name'];
+							this.elements.push(element);
+						})
+					});
+	    		}
+			)
 		}
-
 	}
 
 	onChange(value){
