@@ -1,25 +1,25 @@
 <!--
 TO DO - filter by element types
 
-<mat-form-field>
-  <mat-select placeholder="Filter elements" [(ngModel)]="currentFilter">
-    <mat-option *ngFor="let opt of options" [value]="opt.value">
-      {{ opt.viewValue }}
-    </mat-option>
-  </mat-select>
-</mat-form-field>
 -->
 
 <div id="piece-selector">
+	<div>
+	  <md-select placeholder="Filter elements" [(ngModel)]="currentFilter" name="opt" (ngModelChange)="onChange($event)">
+	    <md-option *ngFor="let opt of options" [value]="opt.value">
+	      {{ opt.viewValue }}
+	    </md-option>
+	  </md-select>
+	</div>
 	<md-grid-list cols="2" rowHeight="75px">
 	  <md-grid-tile
-	      *ngFor="let image of images | async; let i = index;"
+	      *ngFor="let element of elements | async; let i = index;"
 	      	[colspan]="1"
 	      	[rowspan]="1">
-	      	<img id="piece-{{i}}" class="piece-image" src="{{image.downloadURL}}" alt="{{image.$key}}"/>
+	      	<img id="piece-{{i}}" class="piece-image" src="" alt="{{element.$key}}"/>
 		    <div class="overlay">
 		      	<div class="overlay-text">
-		      		{{image.name}}
+		      		{{element.name}}
 		      	</div>
 		    </div>
 	  </md-grid-tile>
@@ -33,6 +33,4 @@ TO DO - filter by element types
 </div>
 
 <div class="clear"></div>
-
-
 

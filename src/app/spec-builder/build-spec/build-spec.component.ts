@@ -4,13 +4,14 @@ import { AuthService } from '../../auth/auth.service';
 import { Observable } from 'rxjs/Observable';
 import * as firebase from 'firebase/app';
 import constants from '../../../constants.js'
+import "rxjs/add/operator/map"
 
 @Component({
   selector: 'app-build-spec',
   templateUrl: './build-spec.component.html',
   styleUrls: ['./build-spec.component.css']
 })
-export class BuildSpecComponent{
+export class BuildSpecComponent {
 	@Input() selectedBoard: object;
 	@Output() onPiecesSet = new EventEmitter<Map<string, object>>();
 
@@ -19,7 +20,8 @@ export class BuildSpecComponent{
 	piecesMap = new Map<string, object>();
 	pieces: object[] = new Array();
 	images: FirebaseListObservable<any[]>;
-	query: object;
+	imageKeys: FirebaseListObservable<any[]>;
+	elements: FirebaseListObservable<any[]>;
 
 	currentFilter = 'all';
 	options = [
@@ -32,11 +34,10 @@ export class BuildSpecComponent{
 		{value: 'piecesDeck', viewValue: 'Pieces Deck'},
 	]
 
-  constructor(
+	constructor(
 		private auth: AuthService, 
 		private db: AngularFireDatabase
 	) {
-  		let query = this.buildQuery();
   		if(this.auth.authenticated) {
 			this.images = db.list(constants.IMAGES_PATH, {
 				query: {
@@ -44,9 +45,41 @@ export class BuildSpecComponent{
 					equalTo: false,
 				}
 			});
+
+			/*
+			come back to this
+			*/
+
+			this.imageKeys = <FirebaseListObservable<any>>
+				db.list(constants.IMAGES_PATH, {
+					query: {
+						orderByChild: 'isBoardImage',
+						equalTo: false,
+					}
+				}).map(function(value) {
+					console.log(value);
+					return value.$key;
+				});
+
+
+
+			this.elements = db.list(constants.ELEMENTS_PATH);
 		}
 
 	}
+
+	onChange(value){
+		this.currentFilter = value;
+
+		value = (value === 'all') ? '' : value;
+
+		console.log("current filter: " + this.currentFilter);
+		let query = {
+			orderByChild: 'elementKind',
+			equalTo: value
+		}
+	}
+
 
 	@HostListener('dragstart', ['$event'])
 	onDragStart(event) {
@@ -56,7 +89,7 @@ export class BuildSpecComponent{
         let url = event.target.getAttribute('src');
         let key = event.target.getAttribute('alt');
 
-        console.log('key:' + key + 'url:' + url);
+        console.log('key:' + key + ' url:' + url);
         event.dataTransfer.setData("data",
         	JSON.stringify({'key': key, 'url': url}));
         event.dataTransfer.setData("text", event.target.id);
