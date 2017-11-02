@@ -1,4 +1,10 @@
-<div *ngIf="!authService.isUserEmailLoggedIn">
+<!DOCTYPE html>
+<style> 
+body{ text-align:center} 
+.window{ margin:0 auto; width:350px;} 
+</style> 
+<body>
+<div class="window" *ngIf="!authService.isUserEmailLoggedIn">
 	<div style="width: 350px;" *ngIf="isNewUser">
  
 		<p *ngIf="errorMessage.length > 0" class="text-danger">
@@ -9,7 +15,7 @@
  
 		<form (ngSubmit)="onSignUp()">
 			<div class="form-group">
-				<label for="email">Email</label> <input type="email"
+				<label for="email">Email</label> <input type="email" 
 					class="form-control" id="email" name="email" required
 					[(ngModel)]="email">
 			</div>
@@ -53,3 +59,4 @@
 		<h4 class="text-primary" (click)="changeForm()">Not have any Account yet? >> Register</h4>
 	</div>
 </div>
+</body>
