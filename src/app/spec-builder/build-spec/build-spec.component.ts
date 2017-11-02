@@ -111,8 +111,6 @@ export class BuildSpecComponent {
         let data = event.dataTransfer.getData("data");
         data = JSON.parse(data);
         let elementID = event.dataTransfer.getData("text");
-
-        console.log('data: ' + data);
         console.log('id:' + elementID);
 
         [xPos, yPos] = this.calculatePosition(event);
@@ -121,13 +119,22 @@ export class BuildSpecComponent {
 
 
       	if(this.fromSource(elementID)) {
-      		elem = this.copyElement(data, elementID);
-      		elementID = (elem as HTMLElement).id;
+      		//scale coordinates for range (0,0)
+			[xPos, yPos] = this.scaleCoord(
+				xPos, yPos, document.getElementById('board-overlay'));
+			console.log("final: " + xPos + " " + yPos);
+      		this.konva.onDrop({
+      			'xPos': xPos,
+      			'yPos': yPos,
+      			'src': data['url']
+      		})
+      		//elem = this.copyElement(data, elementID);
+      		//elementID = (elem as HTMLElement).id;
       	}
       	else
       		elem = document.getElementById(elementID);
 
-		
+		/*
 		elem = this.updateStyle(elem, xPos, yPos);
 
 		//scale coordinates for range (0,0)
@@ -155,7 +162,7 @@ export class BuildSpecComponent {
 			console.log('dropping in parent');
 			event.target.parentNode.appendChild(elem);
 		}
-        
+        */
 	}
 
 	scaleCoord(xPos, yPos, container) {
@@ -167,7 +174,7 @@ export class BuildSpecComponent {
 	calculatePosition(event) {
 		let xPos = event.clientX;
 		let yPos = event.clientY;
-		let container = document.getElementById(event.target.id);
+		let container = document.getElementById('board-overlay');
 		let offsets = container.getBoundingClientRect();
 
 		console.log("mouse: " + xPos + " " + yPos);

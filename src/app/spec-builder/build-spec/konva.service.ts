@@ -9,20 +9,27 @@ export class KonvaService {
 
     constructor() { }
     
-    buildImage(xPos, yPos, url) {
+    buildImage(image, layer, stage) {
+        console.log('building image!');
         let imageObj = new Image();
             imageObj.onload = function() {
                 let img = new Konva.Image({
-                    x: xPos,
-                    y: yPos,
+                    x: image.xPos,
+                    y: image.yPos,
                     image: imageObj,
                     width: 50,
-                    height: 50
+                    height: 50,
+                    draggable: true,
                 });
-                img.cache();
-                img.drawHitFromCache(0);
+                //img.cache();
+                //img.drawHitFromCache(0);
+
+                layer.add(img);
+                stage.add(layer);
+
             };
-            imageObj.src = url;
+            imageObj.src = image.url;
+         console.log('image built!');
         return imageObj;
     }
 
@@ -37,22 +44,46 @@ export class KonvaService {
         this.layer = new Konva.Layer();
         this.dragLayer = new Konva.Layer();
 
-            var circle = new Konva.Circle({
-                  x: this.stage.getWidth() / 2,
-                  y: this.stage.getHeight() / 2,
-                  radius: 70,
-                  fill: 'red',
-                  stroke: 'black',
-                  strokeWidth: 4
-                });
+        /*
+        var circle = new Konva.Circle({
+              x: this.stage.getWidth() / 2,
+              y: this.stage.getHeight() / 2,
+              radius: 70,
+              fill: 'red',
+              stroke: 'black',
+              strokeWidth: 4
+            });
         this.layer.add(circle)
+        */
         
         this.stage.add(this.layer, this.dragLayer);
     }
 
-    onDrop(img) {
-        let image = this.buildImage(
-            img.xPos, img.yPos, img.src);
-        this.layer.add(image);
+    onDrop(image) {
+        console.log('konva drop!');
+        let img = this.buildImage(
+            image, this.layer, this.stage);
+        console.log('adding image!');
+    }
+
+    onDragStart(event) {
+        this.stage.on('dragstart', function(event) {
+          var shape = event.target;
+          // moving to another layer will improve dragging performance
+          shape.moveTo(this.dragLayer);
+          this.stage.draw();
+        });
+    }
+
+    onDragEnd(event) {
+        this.stage.on('dragend', function(event) {
+          var shape = event.target;
+          shape.moveTo(this.layer);
+          this.stage.draw();
+          shape.to({
+            duration: 0.5,
+            easing: Konva.Easings.ElasticEaseOut,
+          });
+        });
     }
 }
