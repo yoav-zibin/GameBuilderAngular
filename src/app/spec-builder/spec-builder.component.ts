@@ -16,12 +16,15 @@ import {FormBuilder, FormGroup, Validators} from '@angular/forms';
   styleUrls: ['./spec-builder.component.css']
 })
 export class SpecBuilderComponent implements OnInit {
-	isLinear = false;
+	isLinear = true;
+  selected = false;
+  piecesSet = false;
 	firstFormGroup: FormGroup;
 	secondFormGroup: FormGroup;
 	thirdFormGroup: FormGroup;
 	selectedBoard: object = new Object();
-	pieces: object[] = new Array();
+	pieces: Map<string, object>;
+  blocked: boolean;
 
 	constructor(
 		private auth: AuthService,
@@ -30,25 +33,33 @@ export class SpecBuilderComponent implements OnInit {
 	) {	}
 
 	ngOnInit() {
+    this.blocked = this.auth.isAnonymous || !this.auth.authenticated;
 		this.firstFormGroup = this._formBuilder.group({
 			firstCtrl: ['', Validators.required]
 		});
 		this.secondFormGroup = this._formBuilder.group({
-      		secondCtrl: ['', Validators.required]
-    	});
-    	this.thirdFormGroup = this._formBuilder.group({
-      		thirdCtrl: ['', Validators.required]
-    	});
-  	}
+      secondCtrl: ['', Validators.required]
+    });
+    this.thirdFormGroup = this._formBuilder.group({
+      thirdCtrl: ['', Validators.required]
+    });
+  }
 
   	onSelected(board: object) {
-  		this.selectedBoard = board
+      this.selected = true;
+  		this.selectedBoard = board;
+      this.firstFormGroup = this._formBuilder.group({
+        firstCtrl: ['validated', Validators.required]
+      });
   		console.log("receiving board");
   	}
 
-  	onPiecesSet(piece: object) {
-  		this.pieces.push(piece)
-  		console.log("adding pieces to array");
+  	onPiecesSet(pieces: Map<string, object>) {
+  		this.pieces = pieces;
+      this.secondFormGroup = this._formBuilder.group({
+        secondCtrl: ['validated', Validators.required]
+      });
+  		console.log("updating pieces");
   	}
 
   	getSelectedBoard() {
@@ -58,5 +69,13 @@ export class SpecBuilderComponent implements OnInit {
   	getPieces() {
   		return this.pieces;
   	}
+
+   getPiecesSet() {
+     return this.piecesSet;
+   }
+
+    toFinalStage() {
+      this.piecesSet = true;
+    }
 
 }

@@ -4,6 +4,7 @@ import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/databa
 import {AngularFireAuth} from 'angularfire2/auth';
 import { Observable } from 'rxjs/Observable';
 import * as firebase from 'firebase/app';
+import constants from '../../constants.js'
 
 @Injectable()
 export class AuthService {
@@ -20,21 +21,20 @@ export class AuthService {
     });
   }
 
-  createUserInfo(result: any) {
-
+  createUserInfo(user: any) {
     let userInfo = {
         "publicFields": {
-            "avatarImageUrl": (result.user.photoURL || ''),
-            "displayName":  (result.user.displayName || ''),
+            "avatarImageUrl": (user.photoURL || constants.DEFAULT_AVATAR),
+            "displayName":  (user.displayName || user.uid),
             "isConnected":  true,
             "lastSeen":  firebase.database.ServerValue.TIMESTAMP,
         },
         "privateFields" : {
-            "email":  (result.user.email || ''),
+            "email":  (user.email || ''),
             "createdOn":  firebase.database.ServerValue.TIMESTAMP,
             "phoneNumber": "",
             "facebookId": "",
-            "googleId": result.user.email,
+            "googleId": user.email,
             "twitterId": "",
             "githubId": "",
             "friends": "",
@@ -44,34 +44,11 @@ export class AuthService {
      return userInfo
   }
 
-  createUser(result: any) {
-    
-        let userInfo = {
-          "publicFields": {
-            "avatarImageUrl": "https://firebasestorage.googleapis.com/v0/b/universalgamemaker.appspot.com/o/images%2F-KwBrfAk0MiQ_s1jBS60.png?alt=media&token=d2f830bf-0b4b-48ca-a232-5a84e7433032",
-            "displayName":  result.email,
-            "isConnected":  true,
-            "lastSeen":  firebase.database.ServerValue.TIMESTAMP,
-        },
-        "privateFields" : {
-            "email": '',
-            "createdOn":  firebase.database.ServerValue.TIMESTAMP,
-            "phoneNumber": result.email,
-            "facebookId": '',
-            "googleId": '',
-            "twitterId": '',
-            "githubId": '',
-            "pushNotificationsToken": '',
-            }
-         }
-         return userInfo
-      }
-
   get authenticated(): boolean {
     return this.authState !== null;
   }
   
-  get isUserAnonymousLoggedIn(): boolean {
+  get isAnonymous(): boolean {
     return (this.authState !== null) ? this.authState.isAnonymous : false
   }
 
@@ -88,7 +65,7 @@ export class AuthService {
   }
 
   get isUserEmailLoggedIn(): boolean {
-    if ((this.authState !== null) && (!this.isUserAnonymousLoggedIn)) {
+    if ((this.authState !== null) && (!this.isAnonymous)) {
       return true
     } else {
       return false
@@ -101,7 +78,7 @@ export class AuthService {
         this.authState = result
         console.log(result);
         this.db.database.ref('users/' + result.uid)
-        .set(this.createUser(result));
+        .set(this.createUserInfo(result));
       })
       .catch(error => {
         console.log(error)
@@ -125,27 +102,37 @@ export class AuthService {
         new firebase.auth.GoogleAuthProvider()
       ).then(result => {
           this.authState = result;
+          let exists: boolean;
+          let users = this.db.database.ref('users/' + result.user.uid);
           
-          /*
-          if(this.authenticated) {
-            console.log('user exists!')
-            this.db.database
-              .ref('users/' + result.user.uid + '/publicFields')
-                .update(
-                  {
-                    isConnected: true,
-                    lastSeen: firebase.database.ServerValue.TIMESTAMP
-                  });
-          }
-          else {
-            console.log('creating new user');
-            this.db.database.ref('users/' + result.user.uid)
-              .set(this.createUserInfo(result));
-          }
-          */
-          this.db.database.ref('users/' + result.user.uid)
-              .set(this.createUserInfo(result));
+          users.once('value', function(snapshot) {
+            if (snapshot.exists()) {
+              console.log('user exists');
+              exists = true;
+            }
+            else {
+              console.log("creating new user");
+              exists = false;
+            }
+          }).then(temp => {
+            if(exists){
+              this.db.database
+                .ref('users/' + this.authState.uid + '/publicFields')
+                  .update(
+                    {
+                      isConnected: true,
+                      lastSeen: firebase.database.ServerValue.TIMESTAMP
+                    });
+            }
+            else {
+              users.set(this.createUserInfo(this.authState));
+            }
+          });
     })
+    .catch(error => {
+        console.log(error)
+        throw error
+    });
   }
 
   loginAnonymously() {
@@ -154,7 +141,7 @@ export class AuthService {
     }
 
   signOut(): void {
-    if(!this.isUserAnonymousLoggedIn) {
+    if(!this.isAnonymous) {
       this.db.database
           .ref('users/' + this.authState.uid + '/publicFields')
               .update({isConnected: false});

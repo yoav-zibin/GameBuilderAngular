@@ -22,7 +22,6 @@ export class UploadService {
 
         let storagetRef = firebase.storage().ref();        
         upload.$key = this.af.database.ref(this.databasePath).push().key;
-        console.log(upload.type);
         this.uploadTask = storagetRef.child(`${this.storagePath}/${upload.$key}${upload.type}`).put(upload.file);
         this.uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED,
             (snapshot) => {
@@ -45,7 +44,6 @@ export class UploadService {
                 };
                 storagetRef.child(`${this.storagePath}/${upload.$key}${upload.type}`).updateMetadata(metadata);
                 upload.downloadURL = this.uploadTask.snapshot.downloadURL;
-                console.log(this.getImageInfo(upload));
                 this.af.database.ref(`${this.databasePath}${upload.$key}`).update(this.getImageInfo(upload));
             }      
         )

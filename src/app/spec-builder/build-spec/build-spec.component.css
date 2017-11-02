@@ -5,10 +5,11 @@
   padding: 0;
   top: 0;
   left: 0;
+  z-index: 0;
 }
 
 #board-overlay {
-  z-index: 10;
+  z-index: 1;
 }
 
 #piece-selector {
@@ -20,10 +21,11 @@
     padding: 10px;
     height: 512px;
     overflow: auto;
+    float: left;
 }
 
 #board-container {
-    position: absolute;
+    position: relative;
     display: inline-block;
     vertical-align: top;
     padding:  0;
@@ -31,7 +33,10 @@
     height: 512px;
     width: 512px;
     top: 0;
-    z-index: 0;
+}
+
+.clear {
+  clear: both;
 }
 
 .overlay {

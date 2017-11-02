@@ -1,28 +1,38 @@
 <!DOCTYPE html>
 
-<div [hidden]="user">
+<div [hidden]="user" style="text-align: center">
 
     <h2>Login with Phone Number</h2>
     
-    <label for="phone">Phone Number</label><br>
-    <input type="text" [(ngModel)]="phoneNumber.country" class="input" placeholder="1" maxlength="2"/>
-    <input type="text" [(ngModel)]="phoneNumber.area" class="input" placeholder="555" maxlength="3"/>
-    <input type="text" [(ngModel)]="phoneNumber.prefix" class="input" placeholder="555" maxlength="3"/>
-    <input type="text" [(ngModel)]="phoneNumber.line" class="input" placeholder="5555" maxlength="4"/>
-
     <div id="recaptcha-container"></div>
 
-    <button (click)="sendLoginCode()">Send Verification Code</button>
+    <div class="input">
+        <md-icon color="primary" style="display: inline-block">phone</md-icon>
+        <md-input-container style="display: inline-block">
+            <span mdPrefix>+1</span>
+            <input mdInput md-maxlength="10" [(ngModel)]="phoneNumber" maxlength="10"/>
+        </md-input-container>
+        <button md-icon-button (click)="sendLoginCode()">
+            <md-icon color="primary">send</md-icon>
+        </button>
+    </div>
 
-    <div *ngIf="windowRef.confirmationResult">
-        <label for="code">Enter your verification code here</label><br>
-        <input type="text" name="code" [(ngModel)]="verificationCode" class="input">
-        <button (click)="verifyLoginCode()">Verify</button>
+    <div [hidden]="windowRef.confirmationResult || !sendSMS" class="spinner">
+        <md-progress-spinner color="warn" mode="indeterminate" class="spinner"></md-progress-spinner>
+        <font color="#808000">reCAPTCHA verifying...</font>
+    </div>
+
+    <div [hidden]="!windowRef.confirmationResult" class="verify">
+        <md-input-container>
+            <input mdInput md-maxlength="6" placeholder="verification code" [(ngModel)]="verificationCode" maxlength="6"/>
+        </md-input-container><br>
+        <button md-raised-button (click)="verifyLoginCode()">Verify</button>
     </div>
 
 </div>
 
-<div *ngIf="user">
-    You have successfully logged in with your phone number.
-    UserId: {{ user?.uid }}
+<div [hidden]="!user" style="text-align: center">
+    <h3>
+        You have successfully logged in with your phone number: +1{{phoneNumber}}.
+    </h3>
 </div>

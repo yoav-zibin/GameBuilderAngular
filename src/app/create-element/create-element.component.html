@@ -3,83 +3,88 @@
 <div [hidden]="userIsAnonymous || userEmailEmpty || elementCreated">
   <!-- Page for picking images -->
   <div [hidden]="showElements">
-    <td>
-      <input type="radio" [(ngModel)]="elementType" (ngModelChange)="updateFaceNumber(1)" value="standard"/> Standard
-      <input type="radio" [(ngModel)]="elementType" (ngModelChange)="updateFaceNumber(2)" value="toggable"/> Toggable
-      <input type="radio" [(ngModel)]="elementType" (ngModelChange)="updateFaceNumber(2)" value="dice"/> Dice
-      <input type="radio" [(ngModel)]="elementType" (ngModelChange)="updateFaceNumber(2)" value="card"/> Card
-      <input type="radio" [(ngModel)]="elementType" (ngModelChange)="updateFaceNumber(1)" value="cardsDeck"/> Cards deck
-      <input type="radio" [(ngModel)]="elementType" (ngModelChange)="updateFaceNumber(1)" value="piecesDeck"/> Pieces deck
-    </td>
-
-    <div *ngFor="let selectedImage of selectedImages; let i = index">
-      <p> image {{i+1}}: {{selectedImage.name}} (dimension: {{selectedImage.height}} x {{selectedImage.width}})</p>
+    <div class="listImages">
+      <md-grid-list cols='2' rowHeight='100px'>
+        <md-grid-tile *ngFor="let image of images | async" [colspan]='1' [rowspan]='1'>
+          <span mdTooltip="{{image?.name}} ({{image?.height}}x{{image?.width}})" mdTooltipPosition="above">
+            <a (click)="selectImage(image)"> <img [src]="image?.downloadURL" width="100px"></a>
+          </span>
+        </md-grid-tile>
+      </md-grid-list>
     </div>
 
-    <div>
-      <input id="draggableButton" type="checkbox" [(ngModel)]="isDraggable"/>
-      <label for="draggableButton">Draggable</label>
+    <div class="buttons">
+      <md-radio-group [(ngModel)]="elementTypeAndFaceNumber" (ngModelChange)="updateType()">
+        <md-radio-button value="standard1">Standard</md-radio-button><br>
+        <md-radio-button value="toggable2">Toggable</md-radio-button><br>
+        <md-radio-button value="dice2">Dice</md-radio-button><br>
+        <md-radio-button value="card2">Card</md-radio-button><br>
+        <md-radio-button value="cardsDeck1">Cards deck</md-radio-button><br>
+        <md-radio-button value="piecesDeck1">Pieces deck</md-radio-button>
+      </md-radio-group>
 
-      <div *ngIf="elementType=='standard' || elementType=='card'">
-        <input id="drawableButton" type="checkbox" [(ngModel)]="isDrawable"/>
-        <label for="drawableButton">Drawable</label>
-      </div>
-
-      <div *ngIf="elementType=='standard'">
-        <input id="degreesButton" type="number" [(ngModel)]="rotatableDegrees" min="1" max="360"/>
-        <label for="degreesButton">Rotatable Degrees</label>
-      </div>
+      <md-list class="selectedImages">  
+        <h3 md-subheader>Selected images</h3>
+        <md-list-item *ngFor="let selectedImage of selectedImages">
+          <md-icon md-list-icon>photo</md-icon>
+          <h4 md-line>{{selectedImage.name}}</h4>
+          <p md-line> {{selectedImage.height}} x {{selectedImage.width}}</p>
+        </md-list-item>   
+      </md-list>
     </div>
 
-    <div [hidden]="!hideNextButton">
-      <div *ngIf="elementType == 'toggable' || elementType == 'dice'"> Warning: Please select at least {{faceNumber}} images with same dimensions. </div>
-      <div *ngIf="!(elementType == 'toggable' || elementType == 'dice') && faceNumber != 1"> Warning: Please select {{faceNumber}} images with same dimensions. </div>
-      <div *ngIf="faceNumber == 1"> Warning: Please select 1 image. </div>
-      <button inactive>Submit</button>
-    </div>
-    <div [hidden]="hideNextButton">
-      <button (click)="next()">Submit</button>
+    <button id="submit" md-raised-button [disabled]="hideNextButton" (click)="next()">Submit</button>
+
+    <div [hidden]="!hideNextButton" class="warning">
+      <font *ngIf="elementType == 'toggable' || elementType == 'dice'" color="red"> Warning: Please select at least {{faceNumber}} images with same dimensions. </font>
+      <font *ngIf="!(elementType == 'toggable' || elementType == 'dice') && faceNumber != 1" color="red"> Warning: Please select {{faceNumber}} images with same dimensions. </font>
+      <font *ngIf="faceNumber == 1" color="red"> Warning: Please select 1 image. </font>
     </div>
 
-    <div *ngFor="let image of images | async">
-      <p> {{image?.name}} </p>
-      <a (click)="selectImage(image)"> <img [src]="image?.downloadURL" width="120px"></a>
+    <div class="features">
+      <md-checkbox color="primary" [(ngModel)]="isDraggable">Draggable</md-checkbox><br>
+      <md-checkbox color="primary"  *ngIf="elementType=='standard' || elementType=='card'" [(ngModel)]="isDrawable">Drawable</md-checkbox><br>
+      <md-input-container *ngIf="elementType=='standard'">
+        <input mdInput type="number" min="1" max="360" placeholder="Rotatable Degrees" [(ngModel)]="rotatableDegrees"/>
+      </md-input-container>
     </div>
   </div>
 
   <!-- Page for picking cards -->
   <div [hidden]="!showElements">
 
-    <p> You have selected {{selectedElements.length}} cards.</p>
+    <p id="notice"> You have selected {{selectedElements.length}} cards.</p>
 
-    <div [hidden]="!hideSubmitButton">
-      Warning: Please select at least 2 cards.
-      <button inactive>Submit</button>
-    </div>
-    <div [hidden]="hideSubmitButton">
-      <button (click)="submit()">Submit</button>
+    <button id="submit" md-raised-button [disabled]="hideSubmitButton" (click)="submit()">Submit</button>
+
+    <div [hidden]="!hideSubmitButton" class="warning">
+      <font color="red"> Warning: Please select at least 2 cards.</font>
     </div>
 
-    <div *ngFor="let element of elements | async as asdf; let i = index">
-      <input type="checkbox" (click)="selectElement(element)"/>
-      <div *ngFor="let image of images | async">
-        <div *ngIf="(element.images)[0]['imageId'] == image?.$key">
-          <img [src]="image?.downloadURL" width="120px">
-        </div>
-        <div *ngIf="(element.images)[1]['imageId'] == image?.$key">
-          <img [src]="image?.downloadURL" width="120px">
-        </div>
-      </div>
+    <div class="listElements">
+      <md-grid-list cols='1' rowHeight='100px'>
+        <md-grid-tile *ngFor="let element of elements | async as asdf; let i = index">
+          <md-checkbox color="primary" (click)="selectElement(element)"></md-checkbox>
+          <div *ngFor="let image of images | async">
+            <div *ngIf="(element.images)[0]['imageId'] == image?.$key">
+              <img [src]="image?.downloadURL" width="100px">
+            </div>
+            <div *ngIf="(element.images)[1]['imageId'] == image?.$key">
+              <img [src]="image?.downloadURL" width="100px">
+            </div>
+          </div>
+          </md-grid-tile>
+      </md-grid-list>
     </div>
   </div>
 </div>
 
 
-<div [hidden]="userEmailEmpty || userIsAnonymous || !elementCreated" style="text-align: center">
+<div class="reset" [hidden]="userEmailEmpty || userIsAnonymous || !elementCreated" style="text-align: center">
   <h2>
     Element created.
   </h2>
-  <button (click)="reset()">Reset</button>
+  <button md-raised-button (click)="reset()">Reset</button>
 </div>
 
 
