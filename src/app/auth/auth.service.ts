@@ -81,7 +81,7 @@ export class AuthService {
         .set(this.createUserInfo(result));
       })
       .catch(error => {
-        console.log(error)
+        // console.log(error)
         throw error
       });
   }
@@ -92,7 +92,7 @@ export class AuthService {
         this.authState = result
       })
       .catch(error => {
-        console.log(error)
+        // console.log(error)
         throw error
       });
   }

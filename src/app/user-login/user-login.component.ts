@@ -35,10 +35,10 @@ export class UserLoginComponent implements OnInit {
     if (this.validateForm(this.email, this.password)) {
       this.authService.signUpWithEmail(this.email, this.password)
         .then(() => {
-          this.router.navigate(['/user'])
+          this.router.navigate(['/'])
         }).catch(_error => {
           this.error = _error
-          this.router.navigate(['/'])
+          this.router.navigate(['/login'])
         })
     }
   }
@@ -48,10 +48,10 @@ export class UserLoginComponent implements OnInit {
  
     if (this.validateForm(this.email, this.password)) {
       this.authService.loginWithEmail(this.email, this.password)
-        .then(() => this.router.navigate(['/user']))
+        .then(() => this.router.navigate(['/']))
         .catch(_error => {
           this.error = _error
-          this.router.navigate(['/'])
+          this.router.navigate(['/login'])
         })
     }
   }
