@@ -25,8 +25,12 @@ export class AppComponent {
 		this.user = this.afAuth.authState;
 	}
 	
-	build() {
-		this.router.navigate(['/build']);
+	buildSpec() {
+		this.router.navigate(['/buildSpec']);
+	}
+
+	viewSpec() {
+		this.router.navigate(['/viewSpec']);
 	}
 
 	createElement() {

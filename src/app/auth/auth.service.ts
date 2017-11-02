@@ -34,7 +34,7 @@ export class AuthService {
             "createdOn":  firebase.database.ServerValue.TIMESTAMP,
             "phoneNumber": "",
             "facebookId": "",
-            "googleId": user.email,
+            "googleId": "",
             "twitterId": "",
             "githubId": "",
             "friends": "",
