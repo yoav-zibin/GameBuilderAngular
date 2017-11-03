@@ -11,13 +11,13 @@
 	<div id="piece-selector">
 		<md-grid-list cols="2" rowHeight="75px">
 		  <md-grid-tile
-		      *ngFor="let element of elements | async; let i = index;"
+		      *ngFor="let element of elements; let i = index;"
 		      	[colspan]="1"
 		      	[rowspan]="1">
-		      	<img id="piece-{{i}}" class="piece-image" src="{{imageData['element.images[0].imageId']?.downloadURL}}"alt="{{element.$key}}"/>
+		      	<img id="piece-{{i}}" class="piece-image" src="{{element.downloadURL}}"alt="{{element.$key}}"/>
 			    <div class="overlay">
 			      	<div class="overlay-text">
-			      		{{imageData['element.images[0].imageID']?.name}}
+			      		{{element.name}}
 			      	</div>
 			    </div>
 		  </md-grid-tile>
