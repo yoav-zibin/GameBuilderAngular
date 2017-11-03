@@ -3,7 +3,9 @@ import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/databa
 import { AuthService } from '../../auth/auth.service';
 import { Observable } from 'rxjs/Observable';
 import * as firebase from 'firebase/app';
-import constants from '../../../constants.js'
+import constants from '../../../constants.js';
+import 'rxjs/add/observable/combineLatest';
+import 'rxjs/add/operator/concatMap';
 
 @Component({
   selector: 'app-build-spec',
@@ -19,9 +21,11 @@ export class BuildSpecComponent {
 	piecesMap = new Map<string, object>();
 	pieces: object[] = new Array();
 	images: object[] = new Array();
-	elements: object[] = new Array();
-	imageData = new Map<string, object>();
-	elementRef: FirebaseListObservable<any[]>;
+	//elements: object[] = new Array();
+	//imageData = new Map<string, object>();
+	imageData = new Object()
+	//elementRef:
+	elements: FirebaseListObservable<any[]>;
 	imageRef: FirebaseListObservable<any[]>;
 
 	currentFilter = 'all';
@@ -40,42 +44,50 @@ export class BuildSpecComponent {
 		private db: AngularFireDatabase
 	) {
   		if(this.auth.authenticated) {
-			db.list(constants.IMAGES_PATH, {
+  			console.log('got here');
+
+  			db.list(constants.IMAGES_PATH, {
 				query: {
 					orderByChild: 'isBoardImage',
 					equalTo: false,
 				},
 				preserveSnapshot: true
-			}).subscribe(snapshots => {
-				snapshots.forEach(snapshot => {
-					this.images.push(snapshot.val());
-					this.imageData.set(snapshot.key, {
-						'downloadURL': snapshot.val().downloadURL,
-						'name': snapshot.val().name
-					});
+			}).subscribe(snapshot => {
+				console.log('creating image array');
+				snapshot.forEach(data => {
+					this.images.push(data.val());
+					this.imageData[data.key] = {
+						'downloadURL': data.val().downloadURL,
+						'name': data.val().name
+					};
 				})
-			},
-				function(error) {
-					console.log("Error happened" + error)
-				},
-	    		function() {
-	    			console.log("the subscription is completed");
-	    			db.list(constants.ELEMENTS_PATH,
-						{
-							preserveSnapshot: true
-						}
-					).subscribe(snapshots => {
-						snapshots.forEach(snapshot => {
-							let element = snapshot.val();
-							let imgData = this.imageData
-								.get(element.images[0].imageID)
-							element['downloadURL'] = imgData['downloadURL'];
-							element['name'] = imgData['name'];
-							this.elements.push(element);
-						})
-					});
-	    		}
-			)
+			});
+
+			this.elements = db.list(constants.ELEMENTS_PATH)
+			/*
+			.subscribe(snapshot => {
+				console.log('creating element array');
+				snapshot.forEach(data => {
+					this.elements.push(data.val());
+				})
+				console.log(this.elements);
+			});
+			*/
+			/*
+			.then( () => {
+				console.log('got here?');
+				
+				for (let element of this.elements) {
+					console.log(element);
+					/*
+					let imgData = this.imageData
+						.get(element.images[0].imageID)
+					element['downloadURL'] = imgData['downloadURL'];
+					element['name'] = imgData['name'];
+					
+				}
+			});
+			*/
 		}
 	}
 
@@ -90,7 +102,6 @@ export class BuildSpecComponent {
 			equalTo: value
 		}
 	}
-
 
 	@HostListener('dragstart', ['$event'])
 	onDragStart(event) {
