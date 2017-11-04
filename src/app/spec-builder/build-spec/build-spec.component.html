@@ -19,7 +19,7 @@
 
 <div id="filter-and-trash">
 	<div id="filter">
-	  <md-select placeholder="Filter elements" [(ngModel)]="currentFilter" name="opt" (ngModelChange)="onChange($event)">
+	  <md-select placeholder="Filter elements" [(ngModel)]="currentFilter" (ngModelChange)="onChange($event)">
 	    <md-option *ngFor="let opt of options" [value]="opt.value">
 	      {{ opt.viewValue }}
 	    </md-option>

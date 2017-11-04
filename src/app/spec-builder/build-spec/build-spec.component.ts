@@ -4,7 +4,6 @@ import { AuthService } from '../../auth/auth.service';
 import { Observable } from 'rxjs/Observable';
 import * as firebase from 'firebase/app';
 import constants from '../../../constants.js';
-import 'rxjs/add/observable/forkJoin';
 
 @Component({
   selector: 'app-build-spec',
@@ -317,8 +316,12 @@ export class BuildSpecComponent {
 		}
 	}
 
+	/*
+	TO DO: popover warning when hover on trash
+	
 	deleteWarning(){
 		return "Warning! You're about to delete this piece!"
 	}
+	*/
 
 }
