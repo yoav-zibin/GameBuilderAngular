@@ -99,14 +99,34 @@ export class BuildSpecComponent {
 
 	onChange(value){
 		this.currentFilter = value;
-
-		value = (value === 'all') ? '' : value;
-
 		console.log("current filter: " + this.currentFilter);
-		let query = {
-			orderByChild: 'elementKind',
-			equalTo: value
-		}
+
+		let p = new Promise( (resolve, reject) => {
+
+			this.elementsRef = this.db.list(constants.ELEMENTS_PATH, {
+				query: this.buildQuery(),
+				preserveSnapshot: true
+			})
+
+			this.elements = new Array()
+
+			this.elementsRef.subscribe(snapshot => {
+				console.log('updating element array');
+				snapshot.forEach(data => {
+					let element = data.val();
+					let key = element.images[0]['imageId'];
+					let img = this.imageData.get(key);
+					
+					if(img !== undefined) {
+						console.log('ok to go');
+						element['downloadURL'] = img['downloadURL'];
+						element['name'] = img['name'];
+						this.elements.push(element);
+					}
+				})
+				console.log(this.elements);
+			});
+		})
 	}
 
 	@HostListener('dragstart', ['$event'])
@@ -159,14 +179,24 @@ export class BuildSpecComponent {
 		
 		let elem, xPos, yPos, styleString;
 
+		let data = event.dataTransfer.getData("data");
+        data = JSON.parse(data);
+        let elementID = event.dataTransfer.getData("text");
+
 		if(event.preventDefault)
 			event.preventDefault();
         if(event.stopPropagation)
         	event.stopPropagation();
 
-        let data = event.dataTransfer.getData("data");
-        data = JSON.parse(data);
-        let elementID = event.dataTransfer.getData("text");
+        if(event.target.id !== 'board-overlay') {
+        	if(event.target.id === "trash-can") {
+				console.log("deleting piece");
+				this.deleteElement(data, elementID);
+        	}
+			else
+				console.log("abandoning drop")
+			return
+		}
 
         console.log('data: ' + data);
         console.log('id:' + elementID);
@@ -263,17 +293,32 @@ export class BuildSpecComponent {
         return elem;
 	}
 
+	deleteElement(data, id) {
+		if(this.fromSource(id))
+			return
+		
+		this.piecesMap.delete(id);
+		console.log(this.piecesMap);
+        this.onPiecesSet.emit(this.piecesMap);
+        document.getElementById('board-overlay').removeChild(
+        	document.getElementById(id));
+	}
+
 	buildQuery() {
 		if(this.currentFilter === 'all')
-			return '';
+			return {
+				orderByChild: 'elementKind'
+			}
 		else {
 			return {
-				query: {
-					orderByChild: 'elementKind',
-					equalTo: this.currentFilter,
-				}
-			};
+				orderByChild: 'elementKind',
+				equalTo: this.currentFilter,
+			}
 		}
+	}
+
+	deleteWarning(){
+		return "Warning! You're about to delete this piece!"
 	}
 
 }
