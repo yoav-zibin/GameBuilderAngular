@@ -3,14 +3,15 @@ import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/databa
 import { AuthService } from '../../auth/auth.service';
 import { Observable } from 'rxjs/Observable';
 import * as firebase from 'firebase/app';
-import constants from '../../../constants.js'
+import constants from '../../../constants.js';
+import 'rxjs/add/observable/forkJoin';
 
 @Component({
   selector: 'app-build-spec',
   templateUrl: './build-spec.component.html',
   styleUrls: ['./build-spec.component.css']
 })
-export class BuildSpecComponent{
+export class BuildSpecComponent {
 	@Input() selectedBoard: object;
 	@Output() onPiecesSet = new EventEmitter<Map<string, object>>();
 
@@ -18,8 +19,11 @@ export class BuildSpecComponent{
 	uniqueID: number = 0;
 	piecesMap = new Map<string, object>();
 	pieces: object[] = new Array();
-	images: FirebaseListObservable<any[]>;
-	query: object;
+	images: object[] = new Array();
+	elements: object[] = new Array();
+	imageData = new Map<string, object>();
+	elementsRef: FirebaseListObservable<any[]>;
+	imagesRef: FirebaseListObservable<any[]>;
 
 	currentFilter = 'all';
 	options = [
@@ -32,20 +36,97 @@ export class BuildSpecComponent{
 		{value: 'piecesDeck', viewValue: 'Pieces Deck'},
 	]
 
-  constructor(
+	constructor(
 		private auth: AuthService, 
 		private db: AngularFireDatabase
 	) {
-  		let query = this.buildQuery();
   		if(this.auth.authenticated) {
-			this.images = db.list(constants.IMAGES_PATH, {
-				query: {
-					orderByChild: 'isBoardImage',
-					equalTo: false,
-				}
-			});
-		}
+  			console.log('got here');
 
+  			let p = new Promise( (resolve, reject) => {
+
+	  			this.imagesRef = db.list(constants.IMAGES_PATH, {
+					query: {
+						orderByChild: 'isBoardImage',
+						equalTo: false,
+					},
+					preserveSnapshot: true
+				});
+
+				this.imagesRef.subscribe(snapshot => {
+					console.log('creating image array');
+					snapshot.forEach(data => {
+						this.images.push(data.val());
+						this.imageData.set(data.key, {
+							'downloadURL': data.val().downloadURL,
+							'name': data.val().name
+						});
+						if(this.imageData.size === snapshot.length)
+							resolve("Got images!");
+					})
+				})
+			});
+
+			p.then( (msg) => {
+				console.log(msg);
+				
+				this.elementsRef = db.list(constants.ELEMENTS_PATH, {
+					preserveSnapshot: true
+				})
+
+				this.elementsRef.subscribe(snapshot => {
+					console.log('creating element array');
+					snapshot.forEach(data => {
+						let element = data.val();
+						let key = element.images[0]['imageId'];
+						let img = this.imageData.get(key);
+						
+						if(img !== undefined) {
+							console.log('ok to go');
+							element['downloadURL'] = img['downloadURL'];
+							element['name'] = img['name'];
+							this.elements.push(element);
+						}
+					})
+					console.log(this.elements);
+				});
+			}).catch( (error) => {
+				console.log("something went wrong... " + error);
+			})
+		}
+	}
+
+
+	onChange(value){
+		this.currentFilter = value;
+		console.log("current filter: " + this.currentFilter);
+
+		let p = new Promise( (resolve, reject) => {
+
+			this.elementsRef = this.db.list(constants.ELEMENTS_PATH, {
+				query: this.buildQuery(),
+				preserveSnapshot: true
+			})
+
+			this.elements = new Array()
+
+			this.elementsRef.subscribe(snapshot => {
+				console.log('updating element array');
+				snapshot.forEach(data => {
+					let element = data.val();
+					let key = element.images[0]['imageId'];
+					let img = this.imageData.get(key);
+					
+					if(img !== undefined) {
+						console.log('ok to go');
+						element['downloadURL'] = img['downloadURL'];
+						element['name'] = img['name'];
+						this.elements.push(element);
+					}
+				})
+				console.log(this.elements);
+			});
+		})
 	}
 
 	@HostListener('dragstart', ['$event'])
@@ -56,7 +137,7 @@ export class BuildSpecComponent{
         let url = event.target.getAttribute('src');
         let key = event.target.getAttribute('alt');
 
-        console.log('key:' + key + 'url:' + url);
+        console.log('key:' + key + ' url:' + url);
         event.dataTransfer.setData("data",
         	JSON.stringify({'key': key, 'url': url}));
         event.dataTransfer.setData("text", event.target.id);
@@ -98,14 +179,24 @@ export class BuildSpecComponent{
 		
 		let elem, xPos, yPos, styleString;
 
+		let data = event.dataTransfer.getData("data");
+        data = JSON.parse(data);
+        let elementID = event.dataTransfer.getData("text");
+
 		if(event.preventDefault)
 			event.preventDefault();
         if(event.stopPropagation)
         	event.stopPropagation();
 
-        let data = event.dataTransfer.getData("data");
-        data = JSON.parse(data);
-        let elementID = event.dataTransfer.getData("text");
+        if(event.target.id !== 'board-overlay') {
+        	if(event.target.id === "trash-can") {
+				console.log("deleting piece");
+				this.deleteElement(data, elementID);
+        	}
+			else
+				console.log("abandoning drop")
+			return
+		}
 
         console.log('data: ' + data);
         console.log('id:' + elementID);
@@ -202,17 +293,32 @@ export class BuildSpecComponent{
         return elem;
 	}
 
+	deleteElement(data, id) {
+		if(this.fromSource(id))
+			return
+		
+		this.piecesMap.delete(id);
+		console.log(this.piecesMap);
+        this.onPiecesSet.emit(this.piecesMap);
+        document.getElementById('board-overlay').removeChild(
+        	document.getElementById(id));
+	}
+
 	buildQuery() {
 		if(this.currentFilter === 'all')
-			return '';
+			return {
+				orderByChild: 'elementKind'
+			}
 		else {
 			return {
-				query: {
-					orderByChild: 'elementKind',
-					equalTo: this.currentFilter,
-				}
-			};
+				orderByChild: 'elementKind',
+				equalTo: this.currentFilter,
+			}
 		}
+	}
+
+	deleteWarning(){
+		return "Warning! You're about to delete this piece!"
 	}
 
 }
