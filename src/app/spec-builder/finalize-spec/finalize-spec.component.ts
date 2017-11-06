@@ -57,12 +57,15 @@ export class FinalizeSpecComponent implements OnChanges {
   createGameSpec() {
     this.userID = this.auth.currentUserId;
     this.userEmail = this.auth.currentUserName;
-  	this.gameName = (<HTMLInputElement>document.getElementById("gameName")).value;
+    this.wiki =
+      (<HTMLInputElement>document.getElementById("wikiURL")).value;
+    this.tutorial = this.gameName =
+      (<HTMLInputElement>document.getElementById("youtubeURL")).value;
   	this.gameSpec = {
   		'uploaderEmail': this.userEmail,
   		'uploaderUid': this.userID,
   		'createdOn': firebase.database.ServerValue.TIMESTAMP,
-  		'gameName': (this.gameName || 'default'),
+  		'gameName': this.gameName,
   		'gameIcon50x50': this.icon_50,
   		'gameIcon512x512': this.icon_512,
   		'wikipediaUrl': (this.wiki || 'https://no-wiki.com'),
@@ -143,6 +146,13 @@ export class FinalizeSpecComponent implements OnChanges {
         });
       });
     return piece;
+  }
+
+  isValid() {
+    this.gameName =
+      (<HTMLInputElement>document.getElementById("gameName")).value;
+    console.log(this.gameName);
+    return this.gameName !== "";
   }
 
 }

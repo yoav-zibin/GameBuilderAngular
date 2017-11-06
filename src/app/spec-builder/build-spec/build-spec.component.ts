@@ -28,6 +28,7 @@ export class BuildSpecComponent {
 	currentFilter = 'all';
 	options = [
 		{value: 'all', viewValue: 'All Elements'},
+		{value: 'mine', viewValue: 'My Uploads'},
 		{value: 'standard', viewValue: 'Standard'},
 		{value: 'toggable', viewValue: 'Toggable'},
 		{value: 'dice', viewValue: 'Dice'},
@@ -308,6 +309,11 @@ export class BuildSpecComponent {
 		if(this.currentFilter === 'all')
 			return {
 				orderByChild: 'elementKind'
+			}
+		else if(this.currentFilter === 'mine')
+			return {
+				orderByChild: 'uploaderUid',
+				equalTo: this.auth.currentUserId,
 			}
 		else {
 			return {

@@ -1,7 +1,9 @@
 
-<form>
-	<input type="text" id="gameName" placeholder="Enter your game name">
-	<button (click)="createGameSpec()">Generate Spec</button>
+<form id="user-input">
+	<input type="text" id="gameName" placeholder="Enter your game name" ngRequired>
+	<input type="text" id="wikiURL" placeholder="Link to game wiki">
+	<input type="text" id="youtubeURL" placeholder="Link to youtube tutorial">
+	<input type="submit" value="Generate Spec" (click)="isValid() && createGameSpec()">
 </form>
 
 <div *ngIf="generated">
