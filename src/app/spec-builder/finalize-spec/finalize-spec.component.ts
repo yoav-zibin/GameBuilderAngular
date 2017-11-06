@@ -43,14 +43,13 @@ export class FinalizeSpecComponent implements OnChanges {
   ) { }
 
   ngOnChanges() {
-    this.createPiecesArray();
+    this.convertPiecesMapToArray();
   }
 
-  createPiecesArray() {
+  convertPiecesMapToArray() {
     if(this.piecesSet) {
       console.log('creating piece array!');
       this.pieces = Array.from(this.piecesMap.values());
-      this.updatePieceArrays();
     }  
   }
 
@@ -59,7 +58,7 @@ export class FinalizeSpecComponent implements OnChanges {
     this.userEmail = this.auth.currentUserName;
     this.wiki =
       (<HTMLInputElement>document.getElementById("wikiURL")).value;
-    this.tutorial = this.gameName =
+    this.tutorial =
       (<HTMLInputElement>document.getElementById("youtubeURL")).value;
   	this.gameSpec = {
   		'uploaderEmail': this.userEmail,
@@ -71,7 +70,7 @@ export class FinalizeSpecComponent implements OnChanges {
   		'wikipediaUrl': (this.wiki || 'https://no-wiki.com'),
   		'tutorialYoutubeVideo': (this.tutorial || 'no_vid_here'),
   		'board': this.createBoardSpec(),
-  		'pieces': this.createPiecesSpec(),
+  		'pieces': this.createPiecesSpecArray(),
   	};
     this.generated = true;
   }
@@ -85,10 +84,9 @@ export class FinalizeSpecComponent implements OnChanges {
   	return boardSpec
   }
 
-  createPiecesSpec() {
+  createPiecesSpecArray() {
   	let pieceList = [];
   	for(let piece of this.pieces) {
-      piece = this.addElementID(piece);
   		pieceList.push(this.createPieceSpec(piece))
   	}
   	return pieceList;
@@ -101,7 +99,7 @@ export class FinalizeSpecComponent implements OnChanges {
   			'x': piece['xPos'],
   			'y': piece['yPos'],
   			'zDepth': piece['zPos'],
-  			'currentImageIndex': 0,
+  			'currentImageIndex': piece['zPos'],
   			//'cardVisibilitiy': [],
   			//'drawing'
   		},
@@ -124,29 +122,6 @@ export class FinalizeSpecComponent implements OnChanges {
   		})
   }
 
-  updatePieceArrays() {
-    for(let piece of this.pieces)
-      piece = this.addElementID(piece);
-  }
-
-  addElementID(piece: object) {
-    let img_key = piece['img_key'];
-    let matched = false;
-    this.db.list(constants.ELEMENTS_PATH, { preserveSnapshot: true})
-      .subscribe(snapshots => {
-        snapshots.forEach(snapshot => {
-          let data = snapshot.val();
-          for(let image of data['images']) {
-              if(image['imageId'] === img_key && !matched) {
-                matched = true;
-                piece['el_key'] = snapshot.key;
-                return;
-              }
-          }
-        });
-      });
-    return piece;
-  }
 
   isValid() {
     this.gameName =

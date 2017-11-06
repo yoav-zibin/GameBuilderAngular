@@ -17,11 +17,14 @@ export class BuildSpecComponent {
 
 	zPos:number = 2;
 	uniqueID: number = 0;
+	dragged: boolean = false;
 	piecesMap = new Map<string, object>();
 	pieces: object[] = new Array();
 	images: object[] = new Array();
 	elements: object[] = new Array();
 	imageData = new Map<string, object>();
+	elementData = new Map<string, object>();
+	elementImageIndex = new Map<string, object>();
 	elementsRef: FirebaseListObservable<any[]>;
 	imagesRef: FirebaseListObservable<any[]>;
 
@@ -79,14 +82,19 @@ export class BuildSpecComponent {
 					console.log('creating element array');
 					snapshot.forEach(data => {
 						let element = data.val();
+						element['_key'] = data.key;
 						let key = element.images[0]['imageId'];
 						let img = this.imageData.get(key);
 						
 						if(img !== undefined) {
-							console.log('ok to go');
 							element['downloadURL'] = img['downloadURL'];
 							element['name'] = img['name'];
 							this.elements.push(element);
+							this.elementData.set(data.key, element);
+							this.elementImageIndex.set(data.key, {
+								'current': 0,
+								'max': (element.images.length - 1),
+							});
 						}
 					})
 					console.log(this.elements);
@@ -114,17 +122,22 @@ export class BuildSpecComponent {
 			this.elementsRef.subscribe(snapshot => {
 				console.log('updating element array');
 				snapshot.forEach(data => {
-					let element = data.val();
-					let key = element.images[0]['imageId'];
-					let img = this.imageData.get(key);
-					
-					if(img !== undefined) {
-						console.log('ok to go');
-						element['downloadURL'] = img['downloadURL'];
-						element['name'] = img['name'];
-						this.elements.push(element);
-					}
-				})
+						let element = data.val();
+						element['_key'] = data.key;
+						let key = element.images[0]['imageId'];
+						let img = this.imageData.get(key);
+						
+						if(img !== undefined) {
+							element['downloadURL'] = img['downloadURL'];
+							element['name'] = img['name'];
+							this.elements.push(element);
+							this.elementData.set(data.key, element);
+							this.elementImageIndex.set(data.key, {
+								'current': 0,
+								'max': (element.images.length - 1),
+							});
+						}
+					})
 				console.log(this.elements);
 			});
 		})
@@ -133,6 +146,7 @@ export class BuildSpecComponent {
 	@HostListener('dragstart', ['$event'])
 	onDragStart(event) {
 		console.log("hello");
+		this.dragged = true;
 		
         event.target.classList.add('currentlyDragged');
         let url = event.target.getAttribute('src');
@@ -222,11 +236,12 @@ export class BuildSpecComponent {
 		console.log("final: " + xPos + " " + yPos);
 
 		let piece = {
-    		"img_key": data["key"],
+    		"el_key": data["key"],
     		"url": data["url"],
     		"xPos": xPos,
     		"yPos": yPos,
     		"zPos": this.zPos,
+    		"index": this.elementImageIndex.get(data["key"])["current"]
     	}
 
 		this.piecesMap.set(elementID, piece);
@@ -242,6 +257,54 @@ export class BuildSpecComponent {
 			event.target.parentNode.appendChild(elem);
 		}
         
+	}
+
+	@HostListener('click', ['$event'])
+	onClick(event) {
+		if(this.dragged) {
+			this.dragged = false;
+			return;
+		}
+
+		if(event.target.id.indexOf('piece') === -1 ) {
+			console.log("can't click here");
+			return;
+		}
+
+		console.log('toggling!');
+		let element = document.getElementById(event.target.id);
+		let key = element.getAttribute('alt');
+		let index = this.getImageIndex(key);
+		let images = this.elementData.get(key)['images'];
+		element.setAttribute(
+			'src',
+			this.imageData.get(images[index]['imageId'])['downloadURL']
+		);
+
+		let piece = this.piecesMap.get(event.target.id);
+		piece['index'] = this.elementImageIndex.get(key)["current"];
+		this.piecesMap.set(event.target.id, piece);
+		console.log(this.piecesMap);
+        this.onPiecesSet.emit(this.piecesMap);
+
+	}
+
+
+	getImageIndex(key) {
+		console.log(key);
+		let indexData = this.elementImageIndex.get(key);
+		console.log(indexData);
+		let cur = indexData['current'];
+		let max = indexData['max'];
+
+		cur = (cur < max) ? (cur + 1) : 0;
+
+		this.elementImageIndex.set(key, {
+			'current': cur,
+			'max': max
+		});
+
+		return cur;
 	}
 
 	scaleCoord(xPos, yPos) {
