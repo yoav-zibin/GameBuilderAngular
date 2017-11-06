@@ -6,7 +6,7 @@
 	      *ngFor="let element of elements; let i = index;"
 	      	[colspan]="1"
 	      	[rowspan]="1">
-	      	<img id="piece-{{i}}" class="piece-image" src="{{element.downloadURL}}" alt="{{element.$key}}"/>
+	      	<img id="piece-{{i}}" class="piece-image" src="{{element.downloadURL}}" alt="{{element._key}}"/>
 		    <div class="overlay">
 		      	<div class="overlay-text">
 		      		{{element.name}}
