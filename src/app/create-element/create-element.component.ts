@@ -1,8 +1,10 @@
-import { Component, OnInit } from '@angular/core';
-import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
 import { AngularFireAuth } from 'angularfire2/auth';
-import { ImageSelectionService } from './imageSelection.service';
+import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { Component, OnInit } from '@angular/core';
+import { DBQueryService } from './db-query.service';
+import { ModifyElement } from './modify-element.service';
+import { UploadService } from '../upload-image/upload-image.service';
 import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/take';
 import * as _ from 'lodash';
@@ -19,7 +21,7 @@ enum Types {
 
 @Component({
   selector: 'app-create-element',
-  providers: [ImageSelectionService],
+  providers: [DBQueryService, ModifyElement, UploadService],
   templateUrl: './create-element.component.html',
   styleUrls: ['./create-element.component.css']
 })
@@ -50,9 +52,10 @@ export class CreateElementComponent implements OnInit {
   userIsAnonymous: boolean;
 
   constructor(
-    private imageSelectionService: ImageSelectionService,
     private af: AngularFireDatabase,
     private afauth: AngularFireAuth,
+    private dbQueryService: DBQueryService,
+    private modifyElement: ModifyElement
   ) { }
 
   ngOnInit() {
@@ -63,7 +66,7 @@ export class CreateElementComponent implements OnInit {
       this.userEmailEmpty = this.afauth.auth.currentUser.email == null;
     }
     if (!this.userIsAnonymous && !this.userEmailEmpty) {
-      this.images = this.imageSelectionService.getImages();
+      this.images = this.dbQueryService.getAllImages();
     }
   }
 
@@ -84,7 +87,7 @@ export class CreateElementComponent implements OnInit {
     if (!this.isDeck()) {
       this.submit();
     } else {
-      this.elements = this.imageSelectionService.getElements();
+      this.elements = this.dbQueryService.getCardElements();
       this.showElements = true;
     }
   }
@@ -203,6 +206,10 @@ export class CreateElementComponent implements OnInit {
     } else {
       this.hideNextButton = true;
     }
+  }
+
+  testResize() {
+    return this.modifyElement.resizeElement("-Kx5y4lVe-ju223xVfel", 90, 100);
   }
 
 }

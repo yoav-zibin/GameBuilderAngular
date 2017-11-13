@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-
+<button (click)="testResize()">test resize</button>
 <div [hidden]="userIsAnonymous || userEmailEmpty || elementCreated">
   <!-- Page for picking images -->
   <div [hidden]="showElements">
     <div class="listImages">
       <md-grid-list cols='2' rowHeight='100px'>
         <md-grid-tile *ngFor="let image of images | async" [colspan]='1' [rowspan]='1'>
-          <span mdTooltip="{{image?.name}} ({{image?.height}}x{{image?.width}})" mdTooltipPosition="above">
+          <span mdTooltip="{{image?.name}} ({{image?.width}}x{{image?.height}})" mdTooltipPosition="above">
             <a (click)="selectImage(image)"> <img [src]="image?.downloadURL" width="100px"></a>
           </span>
         </md-grid-tile>
@@ -28,7 +28,7 @@
         <md-list-item *ngFor="let selectedImage of selectedImages">
           <md-icon md-list-icon>photo</md-icon>
           <h4 md-line>{{selectedImage.name}}</h4>
-          <p md-line> {{selectedImage.height}} x {{selectedImage.width}}</p>
+          <p md-line>{{selectedImage.width}} x {{selectedImage.height}}</p>
         </md-list-item>   
       </md-list>
     </div>

@@ -17,12 +17,12 @@ export class UploadService {
     pushUpload(upload: Upload) {
         upload.name = upload.file.name;
         upload.uploaderEmail = this.afauth.auth.currentUser.email;
-        upload.uploaderPhone = this.afauth.auth.currentUser.phoneNumber;
         upload.uploaderUid = this.afauth.auth.currentUser.uid;
 
-        let storagetRef = firebase.storage().ref();        
+        let storagetRef = firebase.storage().ref();
         upload.$key = this.af.database.ref(this.databasePath).push().key;
         this.uploadTask = storagetRef.child(`${this.storagePath}/${upload.$key}${upload.type}`).put(upload.file);
+        console.log("Image uploaded to storage.");
         this.uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED,
             (snapshot) => {
             },
@@ -43,10 +43,14 @@ export class UploadService {
                     }
                 };
                 storagetRef.child(`${this.storagePath}/${upload.$key}${upload.type}`).updateMetadata(metadata);
+                console.log("Image metadata updated.");
                 upload.downloadURL = this.uploadTask.snapshot.downloadURL;
+                console.log(this.getImageInfo(upload));
                 this.af.database.ref(`${this.databasePath}${upload.$key}`).update(this.getImageInfo(upload));
-            }      
-        )
+                console.log("Image data uploaded to DB.")
+            }
+        );
+        return upload.$key;
     }
 
     getImageInfo(upload: Upload) {

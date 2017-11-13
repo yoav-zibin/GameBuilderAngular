@@ -1,43 +1,41 @@
-import {environment} from '../environments/environment';
-import { BrowserModule } from '@angular/platform-browser';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { NgModule } from '@angular/core';
-import { AngularFireModule} from 'angularfire2';
-import { AngularFireDatabaseModule } from 'angularfire2/database';
 import { AngularFireAuthModule } from 'angularfire2/auth';
-import { RouterModule, Routes } from '@angular/router';
-import {AppRoutingModule} from './app-routing.module';
-import {AuthService} from './auth/auth.service';
-
-//import * as firebase from 'firebase/app';
-
+import { AngularFireDatabaseModule } from 'angularfire2/database';
+import { AngularFireModule} from 'angularfire2';
 import { AppComponent } from './app.component';
-import { PhoneloginComponent } from './phonelogin/phonelogin.component';
-import { UserInfoComponent } from './user-info/user-info.component';
-import { UserLoginComponent } from './user-login/user-login.component';
-import { GoogleLoginComponent } from './google-login/google-login.component';
-import { UploadImageComponent } from './upload-image/upload-image.component';
-import { SpecBuilderComponent } from './spec-builder/spec-builder.component';
-import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
+import { AppRoutingModule } from './app-routing.module';
+import { AuthService } from './auth/auth.service';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { BrowserModule } from '@angular/platform-browser';
+import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
+import { BuildSpecComponent } from './spec-builder/build-spec/build-spec.component';
+import { CreateElementComponent } from './create-element/create-element.component';
+import { environment } from '../environments/environment';
+import { FinalizeSpecComponent } from './spec-builder/finalize-spec/finalize-spec.component';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { GoogleLoginComponent } from './google-login/google-login.component';
 import {
   MdButtonModule,
   MdCheckboxModule,
+  MdGridListModule,
   MdIconModule,
   MdInputModule,
   MdListModule,
-  MdGridListModule,
   MdProgressSpinnerModule,
   MdRadioModule,
+  MdSelectModule,
   MdStepperModule,
   MdTooltipModule,
-  MdSelectModule,
 } from '@angular/material';
-import { SelectBoardComponent } from './spec-builder/select-board/select-board.component';
-import { BuildSpecComponent } from './spec-builder/build-spec/build-spec.component';
-import { FinalizeSpecComponent } from './spec-builder/finalize-spec/finalize-spec.component';
-import { CreateElementComponent } from './create-element/create-element.component';
+import { Ng2ImgMaxModule } from 'ng2-img-max';
+import { NgModule } from '@angular/core';
+import { PhoneloginComponent } from './phonelogin/phonelogin.component';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import { RouterModule, Routes } from '@angular/router';
+import { SelectBoardComponent } from './spec-builder/select-board/select-board.component';
+import { SpecBuilderComponent } from './spec-builder/spec-builder.component';
+import { UserInfoComponent } from './user-info/user-info.component';
+import { UserLoginComponent } from './user-login/user-login.component';
+import { UploadImageComponent } from './upload-image/upload-image.component';
 
 export const firebaseConfig = { 
 	  apiKey: "AIzaSyDA5tCzxNzykHgaSv1640GanShQze3UK-M",
@@ -75,16 +73,16 @@ export const appRoutes: Routes = [
 @NgModule({
   declarations: [
     AppComponent,
+    BuildSpecComponent,
+    CreateElementComponent,
+    FinalizeSpecComponent,
+    GoogleLoginComponent,
     PhoneloginComponent,
+    SelectBoardComponent,
+    SpecBuilderComponent,
+    UploadImageComponent,
     UserInfoComponent,
     UserLoginComponent,
-    GoogleLoginComponent,
-    UploadImageComponent,
-    SpecBuilderComponent,
-    SelectBoardComponent,
-    BuildSpecComponent,
-    FinalizeSpecComponent,
-    CreateElementComponent,
   ],
   exports: [
   	AppComponent
@@ -93,23 +91,24 @@ export const appRoutes: Routes = [
     AngularFireModule.initializeApp(firebaseConfig),
     AngularFireDatabaseModule,
     AngularFireAuthModule,
+    BrowserAnimationsModule,
     BrowserModule,
+    BsDropdownModule.forRoot(),
     FormsModule,
     ReactiveFormsModule,
     RouterModule.forRoot(appRoutes),
-    BsDropdownModule.forRoot(),
     MdButtonModule,
     MdCheckboxModule,
+    MdGridListModule,
     MdIconModule,
     MdInputModule,
     MdListModule,
-    MdGridListModule,
     MdProgressSpinnerModule,
     MdRadioModule,
+    MdSelectModule,
     MdStepperModule,
     MdTooltipModule,
-    MdSelectModule,
-    BrowserAnimationsModule,
+    Ng2ImgMaxModule,
   ],
   providers: [AuthService],
   bootstrap: [AppComponent]
