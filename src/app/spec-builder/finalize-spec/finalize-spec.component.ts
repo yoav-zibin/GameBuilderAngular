@@ -99,7 +99,7 @@ export class FinalizeSpecComponent implements OnChanges {
   			'x': piece['xPos'],
   			'y': piece['yPos'],
   			'zDepth': piece['zPos'],
-  			'currentImageIndex': piece['zPos'],
+  			'currentImageIndex': piece['index'],
   			//'cardVisibilitiy': [],
   			//'drawing'
   		},
