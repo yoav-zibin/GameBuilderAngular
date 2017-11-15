@@ -237,13 +237,15 @@ export class BuildSpecComponent {
 		[xPos, yPos] = this.scaleCoord(xPos, yPos);
 		console.log("final: " + xPos + " " + yPos);
 
+		//TODO : toggle deck images
 		let piece = {
     		"el_key": data["key"],
     		"url": data["url"],
     		"xPos": xPos,
     		"yPos": yPos,
     		"zPos": this.zPos,
-    		"index": this.elementImageIndex.get(data["key"])["current"]
+    		"index": this.elementImageIndex.get(data["key"])["current"],
+    		"deckIndex": null
     	}
 
 		this.piecesMap.set(elementID, piece);

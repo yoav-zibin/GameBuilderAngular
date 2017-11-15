@@ -12,12 +12,21 @@ import constants from '../../../constants.js'
   styleUrls: ['./select-board.component.css']
 })
 export class SelectBoardComponent {
-	images: FirebaseListObservable<any[]>;
+	imagesRef: FirebaseListObservable<any[]>;
+	images: object[] = new Array();
+	all_images: object[] = new Array();
+	my_images: object[] = new Array();
 	selected: boolean;
 	selectedBoardUrl: string;
 	selectedBoardKey: string;
 	selectedBoardName: string;
 	@Output() onSelected = new EventEmitter<object>();
+
+	currentFilter = 'all';
+	options = [
+		{value: 'all', viewValue: 'All Boards'},
+		{value: 'mine', viewValue: 'My Boards'},
+	]
 
 	constructor(
 		private db: AngularFireDatabase,
@@ -25,13 +34,36 @@ export class SelectBoardComponent {
 	) {
 
 		if(this.auth.authenticated) {
-			this.images = db.list(constants.IMAGES_PATH, {
+			this.imagesRef = db.list(constants.IMAGES_PATH, {
 				query: {
-					orderByChild: 'isBoardImage',
+					orderByChild: "isBoardImage",
 					equalTo: true,
-				}
+				},
+				preserveSnapshot: true,
+			});
+
+			this.imagesRef.subscribe(snapshot => {
+				console.log('creating image array');
+				snapshot.forEach(data => {
+					this.images.push(data.val());
+					this.all_images.push(data.val());
+					if(data.val()['uploaderUid'] == this.auth.currentUserId)
+						this.my_images.push(data.val());
+				});
 			});
 		}
+	}
+
+	onChange(value){
+		this.currentFilter = value;
+		console.log("current filter: " + this.currentFilter);
+
+		if(value == "mine")
+			this.images = this.my_images;
+		else
+			this.images = this.all_images;
+
+
 	}
 
 	selectBoard(board) {

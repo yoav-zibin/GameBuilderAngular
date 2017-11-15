@@ -1,13 +1,21 @@
+<div id="filter-boards">
+  <md-select placeholder="Filter boards" [(ngModel)]="currentFilter" name="opt" (ngModelChange)="onChange($event)">
+    <md-option *ngFor="let opt of options" [value]="opt.value">
+      {{ opt.viewValue }}
+    </md-option>
+  </md-select>
+</div>
+
 <md-grid-list cols="2" rowHeight="135px">
-	  <md-grid-tile
-	      *ngFor="let image of images | async"
-	      	[colspan]="1"
-	      	[rowspan]="2">
-	      	<input class="board-image" type="image" src="{{image.downloadURL}}" alt="could not find image" id="selected-board" value="{{image.name}}" (click)="selectBoard(image)"/>
-		    <div class="overlay">
-		      	<div class="overlay-text">
-		      		{{image.name}}
-		      	</div>
-		    </div>
-	  </md-grid-tile>
+  <md-grid-tile
+      *ngFor="let image of images"
+      	[colspan]="1"
+      	[rowspan]="2">
+      	<input class="board-image" type="image" src="{{image.downloadURL}}" alt="could not find image" id="selected-board" value="{{image.name}}" (click)="selectBoard(image)"/>
+	    <div class="overlay">
+	      	<div class="overlay-text">
+	      		{{image.name}}
+	      	</div>
+	    </div>
+  </md-grid-tile>
 </md-grid-list>
