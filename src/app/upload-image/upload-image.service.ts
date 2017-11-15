@@ -42,12 +42,20 @@ export class UploadService {
                         "width": upload.width.toString()
                     }
                 };
-                storagetRef.child(`${this.storagePath}/${upload.$key}${upload.type}`).updateMetadata(metadata);
-                console.log("Image metadata updated.");
+                storagetRef.child(`${this.storagePath}/${upload.$key}${upload.type}`).updateMetadata(metadata)
+                    .then(() => {
+                        console.log("Image metadata updated.");
+                    }).catch(error => {
+                        console.log(error);
+                    });
                 upload.downloadURL = this.uploadTask.snapshot.downloadURL;
-                console.log(this.getImageInfo(upload));
-                this.af.database.ref(`${this.databasePath}${upload.$key}`).update(this.getImageInfo(upload));
-                console.log("Image data uploaded to DB.")
+                //console.log(this.getImageInfo(upload));
+                this.af.database.ref(`${this.databasePath}${upload.$key}`).update(this.getImageInfo(upload))
+                    .then(() => {
+                        console.log("Image data uploaded to DB.");
+                    }).catch(error => {
+                        console.log(error);
+                    });
             }
         );
         return upload.$key;

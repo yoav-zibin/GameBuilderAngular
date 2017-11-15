@@ -209,7 +209,7 @@ export class CreateElementComponent implements OnInit {
   }
 
   testResize() {
-    return this.modifyElement.resizeElement("-Kx5y4lVe-ju223xVfel", 90, 100);
+    return this.modifyElement.resizeElement("-KysBtKvi8k2q7xeu5GA", 90, 100);
   }
 
 }
