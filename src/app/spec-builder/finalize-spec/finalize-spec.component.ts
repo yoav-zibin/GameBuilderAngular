@@ -100,10 +100,10 @@ export class FinalizeSpecComponent implements OnChanges {
   			'y': piece['yPos'],
   			'zDepth': piece['zPos'],
   			'currentImageIndex': piece['index'],
-  			//'cardVisibilitiy': [],
-  			//'drawing'
+  			'cardVisibilitiy': [],
+  			'drawing': [],
   		},
-  		'deckPieceIndex': -1,
+  		'deckPieceIndex': (piece['deckIndex'] || -1),
   	};
   	return pieceSpec
   }
