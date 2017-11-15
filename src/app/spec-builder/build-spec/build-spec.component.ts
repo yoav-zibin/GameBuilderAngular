@@ -193,6 +193,7 @@ export class BuildSpecComponent {
 		console.log("drop");
 		
 		let elem, xPos, yPos, styleString;
+		let resize = false;
 
 		let data = event.dataTransfer.getData("data");
         data = JSON.parse(data);
@@ -224,12 +225,13 @@ export class BuildSpecComponent {
       	if(this.fromSource(elementID)) {
       		elem = this.copyElement(data, elementID);
       		elementID = (elem as HTMLElement).id;
+      		resize = true;
+
       	}
       	else
       		elem = document.getElementById(elementID);
 
-		
-		elem = this.updateStyle(elem, xPos, yPos);
+		elem = this.updateStyle(elem, xPos, yPos, resize);
 
 		//scale coordinates for range (0,0)
 		[xPos, yPos] = this.scaleCoord(xPos, yPos);
@@ -332,10 +334,20 @@ export class BuildSpecComponent {
 		return [xPos, yPos];
 	}
 
-	updateStyle(elem, xPos, yPos) {
-		let styleString = "position:absolute; top:" + yPos + "px;" +
-				"left:" + xPos + "px; width:50px; height:50px; " +
-				"z-index:" + (++this.zPos);
+	updateStyle(elem, xPos, yPos, resize) {
+		let width = Number((elem as HTMLImageElement).width);
+		let height = Number((elem as HTMLImageElement).height);
+		if(resize) {
+			width = width / 2;
+			height = height / 2;
+		}
+		console.log("width: " + width + " height:" + height);
+		let styleString = "position:absolute;"
+			+ "top:" + yPos + "px;"
+			+ "left:" + xPos + "px;"
+			+ "width:" +  width + "px;" 
+			+ "height:" + height + "px;"
+			+ "z-index:" + (++this.zPos);
 		console.log('zpos=' + this.zPos);
 		(elem as HTMLElement).setAttribute('style', styleString);
 
