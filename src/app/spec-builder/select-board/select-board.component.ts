@@ -45,12 +45,16 @@ export class SelectBoardComponent {
 			this.imagesRef.subscribe(snapshot => {
 				console.log('creating image array');
 				snapshot.forEach(data => {
-					this.images.push(data.val());
-					this.all_images.push(data.val());
-					if(data.val()['uploaderUid'] == this.auth.currentUserId)
-						this.my_images.push(data.val());
+					let board = data.val();
+					board['key'] = data.key;
+					console.log(board);
+					this.all_images.push(board);
+					if(board['uploaderUid'] == this.auth.currentUserId)
+						this.my_images.push(board);
 				});
 			});
+
+			this.images = this.all_images;
 		}
 	}
 
@@ -71,7 +75,7 @@ export class SelectBoardComponent {
 		console.log(board);
 		this.onSelected.emit(
 			{
-				'key': board.$key,
+				'key': board.key,
 				'name': board.name,
 				'url': board.downloadURL
 			}
