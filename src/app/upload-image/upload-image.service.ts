@@ -15,7 +15,8 @@ export class UploadService {
     ) { }
 
     pushUpload(upload: Upload) {
-        upload.name = upload.file.name;
+        var fileName: string = upload.file.name;
+        upload.name = fileName.substring(0, fileName.length - upload.type.length + 1);
         upload.uploaderEmail = this.afauth.auth.currentUser.email;
         upload.uploaderPhone = this.afauth.auth.currentUser.phoneNumber;
         upload.uploaderUid = this.afauth.auth.currentUser.uid;
@@ -44,7 +45,9 @@ export class UploadService {
                 };
                 storagetRef.child(`${this.storagePath}/${upload.$key}${upload.type}`).updateMetadata(metadata);
                 upload.downloadURL = this.uploadTask.snapshot.downloadURL;
-                this.af.database.ref(`${this.databasePath}${upload.$key}`).update(this.getImageInfo(upload));
+                var info = this.getImageInfo(upload);
+                //console.log(info);
+                this.af.database.ref(`${this.databasePath}${upload.$key}`).update(info);
             }      
         )
     }

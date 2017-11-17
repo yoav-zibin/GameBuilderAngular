@@ -16,6 +16,7 @@ export class UploadImageComponent implements OnInit {
   isBoard: boolean
   selectedFiles: FileList
   height: number
+  type: string;
   width: number
   uploadSucceds: boolean;
   userEmailEmpty: boolean;
@@ -50,9 +51,14 @@ export class UploadImageComponent implements OnInit {
       thisClass.width = img.width;
     }
     img.src = _URL.createObjectURL(file);
+    this.type = file.type.substring(("image/").length);
+    if (this.type == "jpeg") {
+      this.type = "jpg";
+    }
   }
 
   reset() {
+    this.isBoard = false;
     this.certified = false;
     this.imageName = "No file chosen";
     this.uploadSucceds = false;
@@ -63,14 +69,22 @@ export class UploadImageComponent implements OnInit {
   }
 
   uploadImage() {
-    let file = this.selectedFiles.item(0);
-    let upload: Upload = new Upload(file);
-    upload.isBoardImage = this.isBoard;
-    upload.height = this.height;
-    upload.width = this.width;
-    upload.sizeInBytes = file.size;
-    upload.type = "." + file.type.substring(("image/").length);
-    this.uploadService.pushUpload(upload);
-    this.uploadSucceds = true;
+    if (this.height < 0 || this.height > 1024 || this.width < 0 || this.width > 1024) {
+      window.alert("Width and height should fall in range 0 ~ 1024.");
+
+    } else if (this.isBoard && (this.height != 1024 && this.width != 1024)) {
+      window.alert("Board image: either height = 1024 or width = 1024.");
+
+    } else {
+      let file = this.selectedFiles.item(0);
+      let upload: Upload = new Upload(file);
+      upload.isBoardImage = this.isBoard;
+      upload.height = this.height;
+      upload.width = this.width;
+      upload.sizeInBytes = file.size;
+      upload.type = "." + this.type;
+      this.uploadService.pushUpload(upload);
+      this.uploadSucceds = true;
+    }
   }
 }
