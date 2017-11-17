@@ -69,7 +69,7 @@ export class UploadImageComponent implements OnInit {
   }
 
   uploadImage() {
-    if (this.height < 0 || this.height > 1024 || this.width < 0 || this.width > 1024) {
+    if (this.height < 10 || this.height > 1024 || this.width < 10 || this.width > 1024) {
       window.alert("Width and height should fall in range 0 ~ 1024.");
 
     } else if (this.isBoard && (this.height != 1024 && this.width != 1024)) {

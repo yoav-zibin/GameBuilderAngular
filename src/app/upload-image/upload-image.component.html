@@ -30,8 +30,8 @@
     <section>
       <md-checkbox color="warn" [(ngModel)]="certified">I certify that I have the rights to use this image in an open source project</md-checkbox>
     </section>
-    <button md-raised-button [disabled]="!selectedFiles || !certified || height < 10 || height > 1024 ||
-        type != 'gif' && type != 'png' && type != 'jpg'" (click)="uploadImage()">Submit</button>
+    <button md-raised-button [disabled]="!selectedFiles || !certified || type != 'gif' && type != 'png' && type != 'jpg'"
+        (click)="uploadImage()">Submit</button>
   </div>
 
 </div>
