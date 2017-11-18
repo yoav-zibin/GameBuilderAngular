@@ -79,9 +79,16 @@
     <div class="listElements">
       <md-grid-list cols='1' rowHeight='100px'>
         <md-grid-tile *ngFor="let element of elements | async as asdf; let i = index">
-          <button md-icon-button color="primary" (click)="selectElement(element)">
-            <md-icon aria-label="Pick/Unpick">shopping_cart</md-icon>
-          </button>
+          <span *ngIf="element.name == null" mdTooltip="No name" mdTooltipPosition="above">
+            <button md-icon-button color="primary" (click)="selectElement(element)">
+              <md-icon aria-label="Pick/Unpick">shopping_cart</md-icon>
+            </button>
+          </span>
+          <span *ngIf="element.name != null" mdTooltip="{{element.name}}" mdTooltipPosition="above">
+            <button md-icon-button color="primary" (click)="selectElement(element)">
+              <md-icon aria-label="Pick/Unpick">shopping_cart</md-icon>
+            </button>
+          </span>
           <div *ngFor="let image of images | async">
             <div *ngIf="(element.images)[0]['imageId'] == image?.$key">
               <img [src]="image?.downloadURL" width="100px">
@@ -120,9 +127,16 @@
     <div class="listSelectedElements">
       <md-grid-list cols='1' rowHeight='100px'>
         <md-grid-tile *ngFor="let card of selectedCards">
-          <button md-icon-button color="warn" (click)="selectElement(card)">
-            <md-icon aria-label="Unpick">remove_shopping_cart</md-icon>
-          </button>
+          <span *ngIf="card.name == null" mdTooltip="No name" mdTooltipPosition="above">
+            <button md-icon-button color="warn" (click)="selectElement(card)">
+              <md-icon aria-label="Unpick">remove_shopping_cart</md-icon>
+            </button>
+          </span>
+          <span *ngIf="card.name != null" mdTooltip="{{card.name}}" mdTooltipPosition="above">
+            <button md-icon-button color="warn" (click)="selectElement(card)">
+              <md-icon aria-label="Unpick">remove_shopping_cart</md-icon>
+            </button>
+          </span>
           <div *ngFor="let image of images | async">
             <div *ngIf="(card.images)[0]['imageId'] == image?.$key">
               <img [src]="image?.downloadURL" width="100px">
