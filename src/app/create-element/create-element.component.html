@@ -3,6 +3,7 @@
 <div [hidden]="userIsAnonymous || userEmailEmpty || elementCreated">
   <!-- Page for picking images -->
   <div [hidden]="showElements">
+
     <div class="listImages">
       <md-grid-list cols='2' rowHeight='100px'>
         <md-grid-tile *ngFor="let image of images | async" [colspan]='1' [rowspan]='1'>
@@ -11,6 +12,23 @@
           </span>
         </md-grid-tile>
       </md-grid-list>
+    </div>
+
+    <p id="note">Note: Only non-board images are listed.</p>
+
+    <div class="filter">
+      <md-select placeholder="Filter images" [(ngModel)]="filter" (ngModelChange)="onFilterChange($event)">
+        <md-option value="all">All Images</md-option>
+        <md-option value="myUploads">My Uploads</md-option>
+        <md-option value="mostRecent">Most Recent</md-option>
+        <md-option value="searchByName">Name Search</md-option>
+      </md-select>
+    </div>
+
+    <div class="searchByName">
+      <md-input-container *ngIf="searchByName">
+        <input mdInput type="text" placeholder="Image name" [(ngModel)]="searchTerm" (ngModelChange)="onSearchTermChange($event)"/>
+      </md-input-container>
     </div>
 
     <div class="buttons">
@@ -56,18 +74,14 @@
   <!-- Page for picking cards -->
   <div [hidden]="!showElements">
 
-    <p id="notice"> You have selected {{selectedElements.length}} cards.</p>
-
-    <button id="submit" md-raised-button [disabled]="hideSubmitButton" (click)="submit()">Submit</button>
-
-    <div [hidden]="!hideSubmitButton" class="warning">
-      <font color="red"> Warning: Please select at least 2 cards.</font>
-    </div>
+    <p id="notice"> You have selected {{selectedCardIds.length}} cards.</p>
 
     <div class="listElements">
       <md-grid-list cols='1' rowHeight='100px'>
         <md-grid-tile *ngFor="let element of elements | async as asdf; let i = index">
-          <md-checkbox color="primary" (click)="selectElement(element)"></md-checkbox>
+          <button md-icon-button color="primary" (click)="selectElement(element)">
+            <md-icon aria-label="Pick/Unpick">shopping_cart</md-icon>
+          </button>
           <div *ngFor="let image of images | async">
             <div *ngIf="(element.images)[0]['imageId'] == image?.$key">
               <img [src]="image?.downloadURL" width="100px">
@@ -79,6 +93,48 @@
           </md-grid-tile>
       </md-grid-list>
     </div>
+    
+    <p id="note">Note: Only cards are listed.</p>
+
+    <div class="filter">
+      <md-select placeholder="Filter cards" [(ngModel)]="filter" (ngModelChange)="onFilterChange($event)">
+        <md-option value="all">All Cards</md-option>
+        <md-option value="myUploads">My Uploads</md-option>
+        <md-option value="mostRecent">Most Recent</md-option>
+        <md-option value="searchByName">Name Search</md-option>
+      </md-select>
+    </div>
+
+    <div class="searchByName">
+      <md-input-container *ngIf="searchByName">
+        <input mdInput type="text" placeholder="Image name" [(ngModel)]="searchTerm" (ngModelChange)="onSearchTermChange($event)"/>
+      </md-input-container>
+    </div>
+
+    <button id="submit" md-raised-button [disabled]="hideSubmitButton" (click)="submit()">Submit</button>
+
+    <div [hidden]="!hideSubmitButton" class="warning">
+      <font color="red"> Warning: Please select at least 2 cards.</font>
+    </div>
+
+    <div class="listSelectedElements">
+      <md-grid-list cols='1' rowHeight='100px'>
+        <md-grid-tile *ngFor="let card of selectedCards">
+          <button md-icon-button color="warn" (click)="selectElement(card)">
+            <md-icon aria-label="Unpick">remove_shopping_cart</md-icon>
+          </button>
+          <div *ngFor="let image of images | async">
+            <div *ngIf="(card.images)[0]['imageId'] == image?.$key">
+              <img [src]="image?.downloadURL" width="100px">
+            </div>
+            <div *ngIf="(card.images)[1]['imageId'] == image?.$key">
+              <img [src]="image?.downloadURL" width="100px">
+            </div>
+          </div>
+        </md-grid-tile>
+      </md-grid-list>
+    </div>
+
   </div>
 </div>
 

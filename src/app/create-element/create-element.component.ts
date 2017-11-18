@@ -8,6 +8,13 @@ import 'rxjs/add/operator/take';
 import * as _ from 'lodash';
 import * as firebase from 'firebase';
 
+enum Filters {
+  all,
+  myUploads,
+  mostRecent,
+  searchByName
+}
+
 enum Types {
   card,
   cardsDeck,
@@ -34,14 +41,17 @@ export class CreateElementComponent implements OnInit {
   isDraggable: boolean = false;
   isDrawable: boolean = false;
   rotatableDegrees: number = 360;
+  searchTerm: string = "";
 
   // Images and elements(cards).
   elements: any;
   images: any;
-  selectedElements: any = [];
+  selectedCards: any = [];
+  selectedCardIds: string[] = [];
   selectedImages: any = [];
 
   // Visability control.
+  searchByName: boolean = false;
   hideNextButton: boolean = true;
   hideSubmitButton: boolean = true;
   showElements: boolean = false;
@@ -64,7 +74,47 @@ export class CreateElementComponent implements OnInit {
       this.userEmailEmpty = this.afauth.auth.currentUser.email == null;
     }
     if (!this.userIsAnonymous && !this.userEmailEmpty) {
-      this.images = this.imageSelectionService.getImages();
+      this.images = this.imageSelectionService.getNonBoardImages();
+    }
+  }
+
+  onFilterChange(value) {
+    this.searchByName = false;
+    this.searchTerm = "";
+    if (value == Filters[Filters.all]) {
+      if (this.showElements) {
+        this.elements = this.imageSelectionService.getAllCards();
+      } else {
+        this.images = this.imageSelectionService.getNonBoardImages();
+      }
+
+    } else if (value == Filters[Filters.myUploads]) {
+      const uid: string = this.afauth.auth.currentUser.uid;
+      if (this.showElements) {
+        this.elements = this.imageSelectionService.getMyCardUploads(uid);
+      } else {
+        this.images = this.imageSelectionService.getMyNonBoardImageUploads(uid);
+      }
+
+    } else if (value == Filters[Filters.mostRecent]) {
+      if (this.showElements) {
+        this.elements = this.imageSelectionService.getMostRecentCards();
+      } else {
+        this.images = this.imageSelectionService.getMostRecentNonBoardImages();
+      }
+
+    } else if (value == Filters[Filters.searchByName]) {
+      this.searchByName = true;
+    }
+  }
+
+  onSearchTermChange(value) {
+    if (this.showElements) {
+      this.elements = value == "" ? this.imageSelectionService.getAllCards() :
+          this.imageSelectionService.getCardsByName(value);
+    } else {
+      this.images = value == "" ? this.imageSelectionService.getNonBoardImages() : 
+          this.imageSelectionService.getNonBoardImagesByName(value);
     }
   }
 
@@ -93,7 +143,7 @@ export class CreateElementComponent implements OnInit {
     if (!this.isDeck()) {
       this.submit();
     } else {
-      this.elements = this.imageSelectionService.getElements();
+      this.elements = this.imageSelectionService.getAllCards();
       this.showElements = true;
     }
   }
@@ -108,12 +158,15 @@ export class CreateElementComponent implements OnInit {
     this.isDraggable = false;
     this.isDrawable = false;
     this.rotatableDegrees = 360;
+    this.searchTerm = "";
   
     // Images and elements(cards).
-    this.selectedElements = [];
+    this.selectedCards = [];
+    this.selectedCardIds = [];
     this.selectedImages = [];
   
     // Visability control.
+    this.searchByName = false;
     this.hideNextButton = true;
     this.hideSubmitButton = true;
     this.showElements = false;
@@ -121,10 +174,12 @@ export class CreateElementComponent implements OnInit {
 
   selectElement(element) {
     let elementId: string = element.$key;
-    if (this.selectedElements.indexOf(elementId) == -1) {
-      this.selectedElements.push(elementId);
+    if (this.selectedCardIds.indexOf(elementId) == -1) {
+      this.selectedCardIds.push(elementId);
+      this.selectedCards.push(element);
     } else {
-      this.selectedElements.splice(this.selectedElements.indexOf(elementId), 1);
+      this.selectedCardIds.splice(this.selectedCardIds.indexOf(elementId), 1);
+      this.selectedCards.splice(this.selectedCards.indexOf(element), 1);
     }
     this.validateElements();
   }
@@ -149,7 +204,7 @@ export class CreateElementComponent implements OnInit {
   submit() {
     if (this.isDeck()) {
       let deckInfo = {};
-      this.selectedElements.forEach((elementId, index) => {
+      this.selectedCardIds.forEach((elementId, index) => {
         deckInfo[String(index)] = 
           {
             "deckMemberElementId": elementId
@@ -197,7 +252,7 @@ export class CreateElementComponent implements OnInit {
   }
 
   private validateElements() {
-    this.hideSubmitButton = this.selectedElements.length < 2;
+    this.hideSubmitButton = this.selectedCardIds.length < 2;
   }
 
   private validateImages() {
