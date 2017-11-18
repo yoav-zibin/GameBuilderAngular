@@ -149,6 +149,13 @@ export class CreateElementComponent implements OnInit {
     }
   }
 
+  removeElement(element) {
+    let elementId: string = element.$key;
+    this.selectedCardIds.splice(this.selectedCardIds.indexOf(elementId), 1);
+    this.selectedCards.splice(this.selectedCards.indexOf(element), 1);
+    this.validateElements();
+  }
+
   reset() {
     this.elementCreated = false;
     this.elementInfo = {};
@@ -175,13 +182,8 @@ export class CreateElementComponent implements OnInit {
 
   selectElement(element) {
     let elementId: string = element.$key;
-    if (this.selectedCardIds.indexOf(elementId) == -1) {
-      this.selectedCardIds.push(elementId);
-      this.selectedCards.push(element);
-    } else {
-      this.selectedCardIds.splice(this.selectedCardIds.indexOf(elementId), 1);
-      this.selectedCards.splice(this.selectedCards.indexOf(element), 1);
-    }
+    this.selectedCardIds.push(elementId);
+    this.selectedCards.push(element);
     this.validateElements();
   }
 
