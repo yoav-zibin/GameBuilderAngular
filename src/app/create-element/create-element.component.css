@@ -34,18 +34,25 @@
     top: 350px;
 }
 
-#submit {
+#elementName {
     position: absolute;
 	margin: 0 auto;
     left: 550px;
     top: 500px;
 }
 
+#submit {
+    position: absolute;
+	margin: 0 auto;
+    left: 550px;
+    top: 550px;
+}
+
 .warning {
     position: absolute;
     margin: 0 auto;
     left: 430px;
-    top: 570px;
+    top: 600px;
 }
 
 .selectedImages {

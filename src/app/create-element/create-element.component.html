@@ -34,6 +34,9 @@
     </div>
 
     <button id="submit" md-raised-button [disabled]="hideNextButton" (click)="next()">Submit</button>
+    <md-input-container id="elementName" *ngIf="!hideNextButton">
+      <input mdInput type="text" placeholder="Element name" [(ngModel)]="elementName"/>
+    </md-input-container>
 
     <div [hidden]="!hideNextButton" class="warning">
       <font *ngIf="elementType == 'toggable' || elementType == 'dice'" color="red"> Warning: Please select at least {{faceNumber}} images with same dimensions. </font>

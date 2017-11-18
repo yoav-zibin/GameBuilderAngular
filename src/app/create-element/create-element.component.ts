@@ -27,6 +27,7 @@ export class CreateElementComponent implements OnInit {
   basePath: string = "gameBuilder/elements/";
   elementCreated: boolean = false;
   elementInfo: Object = {};
+  elementName: string = "";
   elementTypeAndFaceNumber: string;
   elementType: string;
   faceNumber: number = null;
@@ -69,8 +70,11 @@ export class CreateElementComponent implements OnInit {
 
   next() {
     if (this.rotatableDegrees < 1 || this.rotatableDegrees > 360) {
-      window.alert("Rotatable degrees must fall in range 1 ~ 360");
+      window.alert("Rotatable degrees must fall in range 1 ~ 360.");
       return;
+    }
+    if (this.elementName.length >= 100) {
+      window.alert("Element's name should have less than 100 characters.");
     }
     let images = {};
     this.selectedImages.forEach((image, index) => {
@@ -80,6 +84,11 @@ export class CreateElementComponent implements OnInit {
         };
     });
     Object.assign(this.elementInfo, this.getBasicElementInfo(), {"images": images});
+    if (this.elementName != "") {
+      let infoWithName = {}
+      Object.assign(infoWithName, this.elementInfo, {"name": this.elementName});
+      this.elementInfo = infoWithName;
+    }
 
     if (!this.isDeck()) {
       this.submit();
@@ -92,7 +101,9 @@ export class CreateElementComponent implements OnInit {
   reset() {
     this.elementCreated = false;
     this.elementInfo = {};
+    this.elementName = "";
     this.elementType = null;
+    this.elementTypeAndFaceNumber = null;
     this.faceNumber = null;
     this.isDraggable = false;
     this.isDrawable = false;

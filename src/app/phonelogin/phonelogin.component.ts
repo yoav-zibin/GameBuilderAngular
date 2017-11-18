@@ -103,7 +103,6 @@ export class PhoneloginComponent implements OnInit {
                 "googleId": '',
                 "twitterId": '',
                 "githubId": '',
-                "pushNotificationsToken": '',
             }
          }
          return userInfo;
