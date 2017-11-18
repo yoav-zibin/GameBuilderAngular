@@ -37,6 +37,7 @@ export class CreateElementComponent implements OnInit {
   elementName: string = "";
   elementTypeAndFaceNumber: string;
   elementType: string;
+  filter: string;
   faceNumber: number = null;
   isDraggable: boolean = false;
   isDrawable: boolean = false;
