@@ -28,9 +28,8 @@ export class BuildSpecComponent {
 	elementsRef: FirebaseListObservable<any[]>;
 	imagesRef: FirebaseListObservable<any[]>;
 
-	currentFilter = 'all';
+	currentFilter = 'standard';
 	options = [
-		{value: 'all', viewValue: 'All Elements'},
 		{value: 'mine', viewValue: 'My Uploads'},
 		{value: 'standard', viewValue: 'Standard'},
 		{value: 'toggable', viewValue: 'Toggable'},
@@ -75,6 +74,7 @@ export class BuildSpecComponent {
 				console.log(msg);
 				
 				this.elementsRef = db.list(constants.ELEMENTS_PATH, {
+					query: this.buildQuery(),
 					preserveSnapshot: true
 				})
 
@@ -181,6 +181,7 @@ export class BuildSpecComponent {
 			event.dataTransfer.dropEffect = "copy";
 		else
 			event.dataTransfer.dropEffect = "move";
+
 	}
 
 	@HostListener('dragleave', ['$event'])
@@ -205,13 +206,17 @@ export class BuildSpecComponent {
         	event.stopPropagation();
 
         if(event.target.id !== 'board-overlay') {
-        	if(event.target.id === "trash-can") {
-				console.log("deleting piece");
+        	let parent = event.target.parentElement;
+
+        	if(event.target.id === 'trash-can') {
+				console.log('deleting piece');
 				this.deleteElement(data, elementID);
+				return
         	}
-			else
-				console.log("abandoning drop")
-			return
+			else if(parent.id !== 'board-overlay') {
+				console.log('abandoning drop')
+				return
+			}
 		}
 
         console.log('data: ' + data);
@@ -383,11 +388,7 @@ export class BuildSpecComponent {
 	}
 
 	buildQuery() {
-		if(this.currentFilter === 'all')
-			return {
-				orderByChild: 'elementKind'
-			}
-		else if(this.currentFilter === 'mine')
+		if(this.currentFilter === 'mine')
 			return {
 				orderByChild: 'uploaderUid',
 				equalTo: this.auth.currentUserId,

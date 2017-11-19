@@ -68,7 +68,7 @@ export class FinalizeSpecComponent implements OnChanges {
   		'gameIcon50x50': this.icon_50,
   		'gameIcon512x512': this.icon_512,
   		'wikipediaUrl': (this.wiki || 'https://no-wiki.com'),
-  		'tutorialYoutubeVideo': (this.tutorial || 'no_vid_here'),
+  		'tutorialYoutubeVideo': (this.tutorial.substr(-11) || 'no_vid_here'),
   		'board': this.createBoardSpec(),
   		'pieces': this.createPiecesSpecArray(),
   	};

@@ -47,7 +47,6 @@ export class SelectBoardComponent {
 				snapshot.forEach(data => {
 					let board = data.val();
 					board['key'] = data.key;
-					console.log(board);
 					this.all_images.push(board);
 					if(board['uploaderUid'] == this.auth.currentUserId)
 						this.my_images.push(board);
@@ -72,7 +71,6 @@ export class SelectBoardComponent {
 
 	selectBoard(board) {
 		console.log("sending board...")
-		console.log(board);
 		this.onSelected.emit(
 			{
 				'key': board.key,
