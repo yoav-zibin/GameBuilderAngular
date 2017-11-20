@@ -38,6 +38,7 @@ import { BuildSpecComponent } from './spec-builder/build-spec/build-spec.compone
 import { FinalizeSpecComponent } from './spec-builder/finalize-spec/finalize-spec.component';
 import { CreateElementComponent } from './create-element/create-element.component';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import { SpecViewerComponent } from './spec-viewer/spec-viewer.component';
 
 export const firebaseConfig = { 
 	  apiKey: "AIzaSyDA5tCzxNzykHgaSv1640GanShQze3UK-M",
@@ -85,6 +86,7 @@ export const appRoutes: Routes = [
     BuildSpecComponent,
     FinalizeSpecComponent,
     CreateElementComponent,
+    SpecViewerComponent,
   ],
   exports: [
   	AppComponent

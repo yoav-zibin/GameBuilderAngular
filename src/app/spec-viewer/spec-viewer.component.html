@@ -1,0 +1,13 @@
+<div [hidden]="blocked" style="text-align: center">
+	<div id="spec-selector">
+	  <md-select placeholder="Select game spec"  [(ngModel)]="currentSpec" (ngModelChange)="onChange($event)">
+	    <md-option *ngFor="let spec of specs | async" value={{spec.$key}}>
+	      {{ spec.gameName }}
+	    </md-option>
+	  </md-select>
+	</div>
+</div>
+
+<div [hidden]="!blocked" style="text-align:center">
+    Please login with Google, phone, or email to use this function.
+</div>
