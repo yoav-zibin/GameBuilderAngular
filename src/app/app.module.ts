@@ -73,6 +73,7 @@ export const appRoutes: Routes = [
   {path: 'phonelogin', component: PhoneloginComponent},
   {path: 'uploadImage', component: UploadImageComponent},
   {path: 'user', component: UserInfoComponent},
+  {path: 'viewSpec', component: SpecViewerComponent},
 ];
 
 @NgModule({
