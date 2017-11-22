@@ -71,6 +71,7 @@ export class SelectBoardComponent {
 
 	selectBoard(board) {
 		console.log("sending board...")
+		// console.log(board)
 		this.onSelected.emit(
 			{
 				'key': board.key,
