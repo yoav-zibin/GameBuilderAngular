@@ -16,7 +16,7 @@ export class UploadService {
 
     pushUpload(upload: Upload) {
         var fileName: string = upload.file.name;
-        upload.name = fileName.substring(0, fileName.length - upload.type.length + 1);
+        upload.name = fileName.substring(0, fileName.length - upload.type.length);
         upload.uploaderEmail = this.afauth.auth.currentUser.email;
         upload.uploaderPhone = this.afauth.auth.currentUser.phoneNumber;
         upload.uploaderUid = this.afauth.auth.currentUser.uid;
