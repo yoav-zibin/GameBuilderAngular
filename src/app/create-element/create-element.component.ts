@@ -79,8 +79,7 @@ export class CreateElementComponent implements OnInit {
     }
   }
 
-  ascendCard(cardId) {
-    const index: number = this.selectedCardIds.indexOf(cardId);
+  ascendCard(index: number) {
     if (index > 0) {
       const tmpCard = this.selectedCards[index - 1];
       this.selectedCards[index - 1] = this.selectedCards[index];
@@ -92,8 +91,7 @@ export class CreateElementComponent implements OnInit {
     }
   }
 
-  ascendImage(imageId) {
-    const index: number = this.findImageIndex(imageId);
+  ascendImage(index: number) {
     if (index > 0) {
       const tmpImage = this.selectedImages[index - 1];
       this.selectedImages[index - 1] = this.selectedImages[index];
@@ -101,8 +99,7 @@ export class CreateElementComponent implements OnInit {
     }
   }
 
-  descendCard(cardId) {
-    const index: number = this.selectedCardIds.indexOf(cardId);
+  descendCard(index: number) {
     if (index < this.selectedCards.length - 1) {
       const tmpCard = this.selectedCards[index + 1];
       this.selectedCards[index + 1] = this.selectedCards[index];
@@ -114,23 +111,12 @@ export class CreateElementComponent implements OnInit {
     }
   }
 
-  descendImage(imageId) {
-    const index: number = this.findImageIndex(imageId);
+  descendImage(index: number) {
     if (index < this.selectedImages.length - 1) {
       const tmpImage = this.selectedImages[index + 1];
       this.selectedImages[index + 1] = this.selectedImages[index];
       this.selectedImages[index] = tmpImage;
     }
-  }
-
-  findImageIndex(imageId: string) {
-    let result: number = -1;
-    this.selectedImages.forEach((image, index) => {
-      if (image.$key == imageId) {
-        result = index;
-      }
-    });
-    return result;
   }
 
   onFilterChange(value) {

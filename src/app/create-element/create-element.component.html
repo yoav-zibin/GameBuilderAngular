@@ -50,14 +50,14 @@
 
       <md-list class="selectedImages">  
         <h3 md-subheader>Selected images</h3>
-        <md-list-item *ngFor="let selectedImage of selectedImages">
+        <md-list-item *ngFor="let selectedImage of selectedImages; let i = index">
           <button md-icon-button color="warn" (click)="removeImage(image)">
             <md-icon aria-label="remove">cancel</md-icon>
           </button>
-          <button md-icon-button color="primary" *ngIf="selectedImages.length >= 2" (click)="ascendImage(selectedImage.$key)">
+          <button md-icon-button color="primary" *ngIf="selectedImages.length >= 2" (click)="ascendImage(i)">
             <md-icon aria-label="move up">arrow_upward</md-icon>
           </button>
-          <button md-icon-button color="primary" *ngIf="selectedImages.length >= 2" (click)="descendImage(selectedImage.$key)">
+          <button md-icon-button color="primary" *ngIf="selectedImages.length >= 2" (click)="descendImage(i)">
             <md-icon aria-label="move down">arrow_downward</md-icon>
           </button>
           <div *ngIf="selectedImage.height > selectedImage.width">
@@ -101,7 +101,7 @@
 
     <div class="listElements">
       <md-grid-list cols='1' rowHeight='100px'>
-        <md-grid-tile *ngFor="let element of elements | async as asdf; let i = index">
+        <md-grid-tile *ngFor="let element of elements | async">
           <span *ngIf="element.name == null" mdTooltip="No name" mdTooltipPosition="above">
             <button md-icon-button color="primary" (click)="selectElement(element)">
               <md-icon aria-label="Pick/Unpick">add_shopping_cart</md-icon>
@@ -159,7 +159,7 @@
 
     <div class="listSelectedElements">
       <md-grid-list cols='1' rowHeight='100px'>
-        <md-grid-tile *ngFor="let card of selectedCards">
+        <md-grid-tile *ngFor="let card of selectedCards; let i = index">
           <span *ngIf="card.name == null" mdTooltip="No name" mdTooltipPosition="above">
             <button md-icon-button color="primary" (click)="removeElement(card)">
               <md-icon aria-label="Unpick">remove_shopping_cart</md-icon>
@@ -188,10 +188,10 @@
               </div>
             </div>
           </div>
-          <button md-icon-button color="accent" *ngIf="selectedCards.length >= 2" (click)="ascendCard(card.$key)">
+          <button md-icon-button color="accent" *ngIf="selectedCards.length >= 2" (click)="ascendCard(i)">
             <md-icon aria-label="move up">arrow_upward</md-icon>
           </button>
-          <button md-icon-button color="accent" *ngIf="selectedCards.length >= 2" (click)="descendCard(card.$key)">
+          <button md-icon-button color="accent" *ngIf="selectedCards.length >= 2" (click)="descendCard(i)">
             <md-icon aria-label="move down">arrow_downward</md-icon>
           </button>
         </md-grid-tile>
