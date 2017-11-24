@@ -6,6 +6,7 @@ import { AngularFireModule} from 'angularfire2';
 import { AngularFireDatabaseModule } from 'angularfire2/database';
 import { AngularFireAuthModule } from 'angularfire2/auth';
 import { RouterModule, Routes } from '@angular/router';
+import { provideRoutes } from '@angular/router';
 import {AppRoutingModule} from './app-routing.module';
 import {AuthService} from './auth/auth.service';
 
@@ -85,9 +86,6 @@ export const appRoutes: Routes = [
     BuildSpecComponent,
     FinalizeSpecComponent,
     CreateElementComponent,
-  ],
-  exports: [
-  	AppComponent
   ],
   imports: [
     AngularFireModule.initializeApp(firebaseConfig),
