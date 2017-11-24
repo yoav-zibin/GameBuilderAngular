@@ -79,6 +79,60 @@ export class CreateElementComponent implements OnInit {
     }
   }
 
+  ascendCard(cardId) {
+    const index: number = this.selectedCardIds.indexOf(cardId);
+    if (index > 0) {
+      const tmpCard = this.selectedCards[index - 1];
+      this.selectedCards[index - 1] = this.selectedCards[index];
+      this.selectedCards[index] = tmpCard;
+
+      const tmpCardId = this.selectedCardIds[index - 1];
+      this.selectedCardIds[index - 1] = this.selectedCardIds[index];
+      this.selectedCardIds[index] = tmpCardId;
+    }
+  }
+
+  ascendImage(imageId) {
+    const index: number = this.findImageIndex(imageId);
+    if (index > 0) {
+      const tmpImage = this.selectedImages[index - 1];
+      this.selectedImages[index - 1] = this.selectedImages[index];
+      this.selectedImages[index] = tmpImage;
+    }
+  }
+
+  descendCard(cardId) {
+    const index: number = this.selectedCardIds.indexOf(cardId);
+    if (index < this.selectedCards.length - 1) {
+      const tmpCard = this.selectedCards[index + 1];
+      this.selectedCards[index + 1] = this.selectedCards[index];
+      this.selectedCards[index] = tmpCard;
+
+      const tmpCardId = this.selectedCardIds[index + 1];
+      this.selectedCardIds[index + 1] = this.selectedCardIds[index];
+      this.selectedCardIds[index] = tmpCardId;
+    }
+  }
+
+  descendImage(imageId) {
+    const index: number = this.findImageIndex(imageId);
+    if (index < this.selectedImages.length - 1) {
+      const tmpImage = this.selectedImages[index + 1];
+      this.selectedImages[index + 1] = this.selectedImages[index];
+      this.selectedImages[index] = tmpImage;
+    }
+  }
+
+  findImageIndex(imageId: string) {
+    let result: number = -1;
+    this.selectedImages.forEach((image, index) => {
+      if (image.$key == imageId) {
+        result = index;
+      }
+    });
+    return result;
+  }
+
   onFilterChange(value) {
     this.searchByName = false;
     this.searchTerm = "";
@@ -156,6 +210,10 @@ export class CreateElementComponent implements OnInit {
     this.validateElements();
   }
 
+  removeImage(image) {
+    this.selectedImages.splice(this.selectedImages.indexOf(image), 1);
+  }
+
   reset() {
     this.elementCreated = false;
     this.elementInfo = {};
@@ -192,13 +250,13 @@ export class CreateElementComponent implements OnInit {
       if (this.selectedImages.length < this.faceNumber && this.selectedImages.indexOf(image) == -1) {
         this.selectedImages.push(image);
       } else if (this.selectedImages.length <= this.faceNumber && this.selectedImages.indexOf(image) != -1) {
-        this.selectedImages.splice(this.selectedImages.indexOf(image), 1);
+        this.removeImage(image);
       }
     } else {
       if (this.selectedImages.indexOf(image) == -1) {
         this.selectedImages.push(image);
       } else {
-        this.selectedImages.splice(this.selectedImages.indexOf(image), 1);
+        this.removeImage(image);
       }
     }
     this.validateImages();

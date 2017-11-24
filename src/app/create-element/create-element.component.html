@@ -8,7 +8,14 @@
       <md-grid-list cols='2' rowHeight='100px'>
         <md-grid-tile *ngFor="let image of images | async" [colspan]='1' [rowspan]='1'>
           <span mdTooltip="{{image?.name}} ({{image?.height}}x{{image?.width}})" mdTooltipPosition="above">
-            <a (click)="selectImage(image)"> <img [src]="image?.downloadURL" width="100px"></a>
+            <a (click)="selectImage(image)">
+              <div *ngIf="image.height > image.width">
+                <img [src]="image?.downloadURL" height="100px">
+              </div>
+              <div *ngIf="image.height <= image.width">
+                <img [src]="image?.downloadURL" width="100px">
+              </div>
+            </a>
           </span>
         </md-grid-tile>
       </md-grid-list>
@@ -44,10 +51,26 @@
       <md-list class="selectedImages">  
         <h3 md-subheader>Selected images</h3>
         <md-list-item *ngFor="let selectedImage of selectedImages">
-          <md-icon md-list-icon>photo</md-icon>
-          <h4 md-line>{{selectedImage.name}}</h4>
-          <p md-line> {{selectedImage.height}} x {{selectedImage.width}}</p>
-        </md-list-item>   
+          <button md-icon-button color="warn" (click)="removeImage(image)">
+            <md-icon aria-label="remove">cancel</md-icon>
+          </button>
+          <button md-icon-button color="primary" *ngIf="selectedImages.length >= 2" (click)="ascendImage(selectedImage.$key)">
+            <md-icon aria-label="move up">arrow_upward</md-icon>
+          </button>
+          <button md-icon-button color="primary" *ngIf="selectedImages.length >= 2" (click)="descendImage(selectedImage.$key)">
+            <md-icon aria-label="move down">arrow_downward</md-icon>
+          </button>
+          <div *ngIf="selectedImage.height > selectedImage.width">
+            <img [src]="selectedImage.downloadURL" height="30px">
+          </div>
+          <div *ngIf="selectedImage.height <= selectedImage.width">
+            <img [src]="selectedImage.downloadURL" width="30px">
+          </div>
+          <div>
+            <h4 md-line>{{selectedImage.name}}</h4>
+            <p md-line> {{selectedImage.height}} x {{selectedImage.width}}</p>
+          </div>
+        </md-list-item>
       </md-list>
     </div>
 
@@ -91,10 +114,20 @@
           </span>
           <div *ngFor="let image of images | async">
             <div *ngIf="(element.images)[0]['imageId'] == image?.$key">
-              <img [src]="image?.downloadURL" width="100px">
+              <div *ngIf="image.height > image.width">
+                <img [src]="image?.downloadURL" height="100px">
+              </div>
+              <div *ngIf="image.height <= image.width">
+                <img [src]="image?.downloadURL" width="100px">
+              </div>
             </div>
             <div *ngIf="(element.images)[1]['imageId'] == image?.$key">
-              <img [src]="image?.downloadURL" width="100px">
+              <div *ngIf="image.height > image.width">
+                <img [src]="image?.downloadURL" height="100px">
+              </div>
+              <div *ngIf="image.height <= image.width">
+                <img [src]="image?.downloadURL" width="100px">
+              </div>
             </div>
           </div>
           </md-grid-tile>
@@ -139,12 +172,28 @@
           </span>
           <div *ngFor="let image of images | async">
             <div *ngIf="(card.images)[0]['imageId'] == image?.$key">
-              <img [src]="image?.downloadURL" width="100px">
+              <div *ngIf="image.height > image.width">
+                <img [src]="image?.downloadURL" height="100px">
+              </div>
+              <div *ngIf="image.height <= image.width">
+                <img [src]="image?.downloadURL" width="100px">
+              </div>
             </div>
             <div *ngIf="(card.images)[1]['imageId'] == image?.$key">
-              <img [src]="image?.downloadURL" width="100px">
+              <div *ngIf="image.height > image.width">
+                <img [src]="image?.downloadURL" height="100px">
+              </div>
+              <div *ngIf="image.height <= image.width">
+                <img [src]="image?.downloadURL" width="100px">
+              </div>
             </div>
           </div>
+          <button md-icon-button color="accent" *ngIf="selectedCards.length >= 2" (click)="ascendCard(card.$key)">
+            <md-icon aria-label="move up">arrow_upward</md-icon>
+          </button>
+          <button md-icon-button color="accent" *ngIf="selectedCards.length >= 2" (click)="descendCard(card.$key)">
+            <md-icon aria-label="move down">arrow_downward</md-icon>
+          </button>
         </md-grid-tile>
       </md-grid-list>
     </div>
