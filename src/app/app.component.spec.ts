@@ -1,11 +1,11 @@
-import { TestBed, async } from '@angular/core/testing';
-import { By } from '@angular/platform-browser';
+import { TestBed, async, inject } from '@angular/core/testing';
 import { AngularFireModule} from 'angularfire2';
 import { AngularFireDatabaseModule } from 'angularfire2/database';
 import { AngularFireAuthModule } from 'angularfire2/auth';
 import { AppComponent } from './app.component';
 import { AuthService } from './auth/auth.service'
 import { RouterTestingModule } from '@angular/router/testing';
+import {Router, Routes} from "@angular/router";
 
 const firebaseConfig = { 
     apiKey: "AIzaSyDA5tCzxNzykHgaSv1640GanShQze3UK-M",
@@ -16,13 +16,19 @@ const firebaseConfig = {
     messagingSenderId: "144595629077"
 };
 
+const appRoutes: Routes = [
+  {path: '', redirectTo: '/', pathMatch: 'full'},
+];
+
 
 describe('AppComponent', () => {
+  let fixture, app, debug, service, router;
+  
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [AppComponent],
       imports: [
-        RouterTestingModule,
+        RouterTestingModule.withRoutes(appRoutes),
         AngularFireModule.initializeApp(firebaseConfig),
         AngularFireDatabaseModule,
         AngularFireAuthModule,
@@ -31,35 +37,53 @@ describe('AppComponent', () => {
     }).compileComponents();
   }));
 
+  beforeEach(inject([AuthService], s => {
+    service = s;
+    fixture = TestBed.createComponent(AppComponent);
+    app = fixture.componentInstance;
+    debug = fixture.debugElement;
+    router = TestBed.get(Router);
+  }));
+
+
   it('should create the app', (done) => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.debugElement.componentInstance;
     expect(app).toBeTruthy();
     done();
   });
 
   it(`should have as title 'GameBuilder'`, (done) => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.debugElement.componentInstance;
     expect(app.title).toEqual('GameBuilder');
     done();
   });
 
   
   it('should display login if not logged in', async(() => {
-    const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
-    const compiled = fixture.debugElement.nativeElement;
-    expect(compiled.querySelector('#login').textContent).toMatch('Login');
+    expect(debug.nativeElement.querySelector('#login').textContent)
+      .toMatch('Login');
   }));
 
+
   it('should display logout if not logged in', async(() => {
-    const fixture = TestBed.createComponent(AppComponent);
-    /*
-    ** get anon login link; click, then check if logout button visible
-    */
+    app.user.subscribe(x => {
+        expect(x.isAnonymous).toBeTruthy();
+    });    
+    
+    expect(app.user.isAnonymous).toBeFalsy();
+    service.loginAnonymously();
     fixture.detectChanges();
-    const compiled = fixture.debugElement.nativeElement;
-    expect(compiled.querySelector('#logout').textContent).toMatch('Logout');
+    
+    fixture.whenStable().then(() => {
+      expect(service.authenticated).toBeTruthy();
+      router.navigate(['']);
+    });
+
+    fixture.whenStable().then(() => {
+      fixture.detectChanges();
+      expect(debug.nativeElement.querySelector('#logout').textContent)
+        .toMatch('Logout');
+    });
+    
   }));
+
 });
