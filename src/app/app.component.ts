@@ -35,6 +35,7 @@ export class AppComponent {
 
 	loginAnonymously() {
 		this.auth.loginAnonymously();
+		this.router.navigate(['/']);
 	}
 
 	loginWithEmail() {
@@ -51,6 +52,7 @@ export class AppComponent {
 
 	logout() {
 		this.auth.signOut();
+		this.router.navigate(['/']);
 	}
 
 	uploadImage() {

@@ -27,7 +27,7 @@
             <li role="menuitem"><a class="dropdown-item" href="javascript:void(0)" (click)="loginWithGoogle()">Google</a></li>
             	<li role="menuitem"><a class="dropdown-item" href="javascript:void(0)" (click)="loginWithEmail()">E-mail</a></li>
             	<li role="menuitem"><a class="dropdown-item" href="javascript:void(0)" (click)="loginWithPhoneNumber()">Phone</a></li>
-            	<li id="anon-login" role="menuitem"><a class="dropdown-item" href="javascript:void(0)" (click)="loginAnonymously()">Anonymous</a></li>
+            	<li role="menuitem"><a class="dropdown-item" href="javascript:void(0)" (click)="loginAnonymously()">Anonymous</a></li>
           	</ul>
 		    	</li>
         	<li id="logout" *ngIf="(user | async)?.uid"><a href="javascript:void(0)" (click)="logout()">Logout</a></li>
