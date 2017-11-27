@@ -3,12 +3,11 @@ import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/databa
 import {AngularFireAuth} from 'angularfire2/auth';
 import { Observable } from 'rxjs/Observable';
 import * as firebase from 'firebase/app';
-import constants from '../../constants.js'
+import constants from '../../config.js';
 
 @Injectable()
 export class AuthService {
 
-  public _authState: Observable<firebase.User>;
   private _user: firebase.User = null;
 
   constructor(
@@ -16,8 +15,7 @@ export class AuthService {
     public db: AngularFireDatabase, 
   )
     {
-      this._authState = this.afAuth.authState;
-      this._authState.subscribe((auth) => {
+      this.afAuth.authState.subscribe((auth) => {
         this._user = auth;
     });
   }
@@ -46,7 +44,7 @@ export class AuthService {
   }
 
   get authState(): any {
-    return this._authState;
+    return this.afAuth.authState;
   }
 
   get authenticated(): boolean {
