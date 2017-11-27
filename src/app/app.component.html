@@ -22,7 +22,7 @@
 
         <ul class="nav navbar-nav navbar-right">
           <li dropdown placement="bottom right" *ngIf="!(user | async)?.uid">
-          	<a dropdownToggle type="button" href="javascript:void(0)">Login<span class="caret"></span></a>
+          	<a id="login" dropdownToggle type="button" href="javascript:void(0)">Login<span class="caret"></span></a>
           	<ul *dropdownMenu class="dropdown-menu dropdown-menu-right" role="menu">
             <li role="menuitem"><a class="dropdown-item" href="javascript:void(0)" (click)="loginWithGoogle()">Google</a></li>
             	<li role="menuitem"><a class="dropdown-item" href="javascript:void(0)" (click)="loginWithEmail()">E-mail</a></li>
@@ -30,7 +30,7 @@
             	<li role="menuitem"><a class="dropdown-item" href="javascript:void(0)" (click)="loginAnonymously()">Anonymous</a></li>
           	</ul>
 		    	</li>
-        	<li *ngIf="(user | async)?.uid"><a href="javascript:void(0)" (click)="logout()">Logout</a></li>
+        	<li id="logout" *ngIf="(user | async)?.uid"><a href="javascript:void(0)" (click)="logout()">Logout</a></li>
         </ul>
       </div><!--/.nav-collapse -->
     </div><!--/.container-fluid -->

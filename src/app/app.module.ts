@@ -6,8 +6,10 @@ import { AngularFireModule} from 'angularfire2';
 import { AngularFireDatabaseModule } from 'angularfire2/database';
 import { AngularFireAuthModule } from 'angularfire2/auth';
 import { RouterModule, Routes } from '@angular/router';
+import { provideRoutes } from '@angular/router';
 import {AppRoutingModule} from './app-routing.module';
 import {AuthService} from './auth/auth.service';
+import firebaseConfig from '../config.js';
 
 //import * as firebase from 'firebase/app';
 
@@ -38,15 +40,6 @@ import { BuildSpecComponent } from './spec-builder/build-spec/build-spec.compone
 import { FinalizeSpecComponent } from './spec-builder/finalize-spec/finalize-spec.component';
 import { CreateElementComponent } from './create-element/create-element.component';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-
-export const firebaseConfig = { 
-	  apiKey: "AIzaSyDA5tCzxNzykHgaSv1640GanShQze3UK-M",
-  	authDomain: "universalgamemaker.firebaseapp.com",
-  	databaseURL: "https://universalgamemaker.firebaseio.com",
-  	projectId: "universalgamemaker",
-  	storageBucket: "universalgamemaker.appspot.com",
-  	messagingSenderId: "144595629077"
-};
 
 /*
 //OLD SPEC CONFIG
@@ -85,9 +78,6 @@ export const appRoutes: Routes = [
     BuildSpecComponent,
     FinalizeSpecComponent,
     CreateElementComponent,
-  ],
-  exports: [
-  	AppComponent
   ],
   imports: [
     AngularFireModule.initializeApp(firebaseConfig),
