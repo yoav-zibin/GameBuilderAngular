@@ -34,6 +34,7 @@ import {
   MdStepperModule,
   MdTooltipModule,
   MdSelectModule,
+  MdSnackBarModule,
 } from '@angular/material';
 import { SelectBoardComponent } from './spec-builder/select-board/select-board.component';
 import { BuildSpecComponent } from './spec-builder/build-spec/build-spec.component';
@@ -99,6 +100,7 @@ export const appRoutes: Routes = [
     MdStepperModule,
     MdTooltipModule,
     MdSelectModule,
+    MdSnackBarModule,
     BrowserAnimationsModule,
   ],
   providers: [AuthService],
