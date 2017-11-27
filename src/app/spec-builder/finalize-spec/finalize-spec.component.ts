@@ -1,7 +1,9 @@
 import { Component, Input, OnChanges } from '@angular/core';
 import { AuthService } from '../../auth/auth.service';
 import { Router } from '@angular/router';
+import { MdSnackBar } from '@angular/material';
 import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
+import { Observable } from 'rxjs/Observable';
 import constants from '../../../constants.js'
 import * as firebase from 'firebase/app';
 
@@ -15,8 +17,9 @@ export class FinalizeSpecComponent implements OnChanges {
 	@Input() piecesMap: Map<string, object>;
   @Input() piecesSet: boolean;
   pieces: object[] = new Array<object>();
+  specsRef: FirebaseListObservable<any[]>;
   count:number = 0;
-
+  unique:boolean;
 	generated: boolean = false;
 	gameSpec: object;
 	
@@ -39,7 +42,8 @@ export class FinalizeSpecComponent implements OnChanges {
   constructor(
   	private auth: AuthService,
   	private db: AngularFireDatabase,
-  	private router: Router
+  	private router: Router,
+    private snackBar: MdSnackBar
   ) { }
 
   ngOnChanges() {
@@ -109,6 +113,10 @@ export class FinalizeSpecComponent implements OnChanges {
   }
 
   uploadGameSpec() {
+    if(!this.unique) {
+      this.submitWarning("This game name already exists. Please choose another.");
+      return;
+    }
   	console.log("uploading...")
   	this.db.database.ref(constants.SPECS_PATH).push(this.gameSpec)
   		.then(result => {
@@ -122,12 +130,43 @@ export class FinalizeSpecComponent implements OnChanges {
   		})
   }
 
-
   isValid() {
+    let valid = true;
     this.gameName =
       (<HTMLInputElement>document.getElementById("gameName")).value;
-    console.log(this.gameName);
-    return this.gameName !== "";
+    if(this.gameName === "") {
+      this.submitWarning("Game name must contain at least one character.");
+      valid = false;
+    }
+    
+    /* run async check for duplicate names */
+    this.isUnique()
+
+    return valid;
   }
+
+  isUnique() {
+    this.unique = false;
+
+    this.specsRef = this.db.list(constants.SPECS_PATH, {
+        query: {
+          orderByChild: "gameName",
+          equalTo: this.gameName,
+        },
+        preserveSnapshot: true
+    });
+
+    this.specsRef.subscribe(snapshot => {
+      if(snapshot.length === 0)
+        this.unique = true;
+    });
+
+  }
+
+  submitWarning(message) {
+      this.snackBar.open(message, 'Close', { duration: 1000 });
+  }
+
+
 
 }
