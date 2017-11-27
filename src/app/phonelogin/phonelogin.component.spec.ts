@@ -1,7 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { PhoneloginComponent } from './phonelogin.component';
-/*
+
 describe('PhoneloginComponent', () => {
   let component: PhoneloginComponent;
   let fixture: ComponentFixture<PhoneloginComponent>;
@@ -23,4 +23,3 @@ describe('PhoneloginComponent', () => {
     expect(component).toBeTruthy();
   });
 });
-*/
