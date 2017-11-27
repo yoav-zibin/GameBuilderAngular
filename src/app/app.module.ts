@@ -9,8 +9,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { provideRoutes } from '@angular/router';
 import {AppRoutingModule} from './app-routing.module';
 import {AuthService} from './auth/auth.service';
-import firebaseConfig from '../config.js';
-
+//import firebaseConfig from '../config.js';
 //import * as firebase from 'firebase/app';
 
 import { AppComponent } from './app.component';
@@ -53,6 +52,15 @@ export const firebaseConfig = {
     messagingSenderId: "424710997339"
 };
 */
+
+export const firebaseConfig = { 
+    apiKey: "AIzaSyDA5tCzxNzykHgaSv1640GanShQze3UK-M",
+    authDomain: "universalgamemaker.firebaseapp.com",
+    databaseURL: "https://universalgamemaker.firebaseio.com",
+    projectId: "universalgamemaker",
+    storageBucket: "universalgamemaker.appspot.com",
+    messagingSenderId: "144595629077"
+};
 
 export const appRoutes: Routes = [
   {path: '', redirectTo: '/', pathMatch: 'full'},
