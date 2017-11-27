@@ -1,23 +1,22 @@
 import {Injectable} from '@angular/core';
-import {Router} from '@angular/router';
 import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
 import {AngularFireAuth} from 'angularfire2/auth';
 import { Observable } from 'rxjs/Observable';
 import * as firebase from 'firebase/app';
-import constants from '../../constants.js'
+import constants from '../../config.js';
 
 @Injectable()
 export class AuthService {
 
-  private authState: any = null;
+  private _user: firebase.User = null;
 
   constructor(
     private afAuth: AngularFireAuth,
     public db: AngularFireDatabase, 
-    private router: Router)
+  )
     {
       this.afAuth.authState.subscribe((auth) => {
-        this.authState = auth;
+        this._user = auth;
     });
   }
 
@@ -44,28 +43,32 @@ export class AuthService {
      return userInfo
   }
 
+  get authState(): any {
+    return this.afAuth.authState;
+  }
+
   get authenticated(): boolean {
-    return this.authState !== null;
+    return this._user !== null;
   }
   
   get isAnonymous(): boolean {
-    return (this.authState !== null) ? this.authState.isAnonymous : false
+    return (this._user !== null) ? this._user.isAnonymous : false
   }
 
   get currentUserId(): string {
-    return (this.authState !== null) ? this.authState.uid : ''
+    return (this._user !== null) ? this._user.uid : ''
   }
 
   get currentUserName(): string {
-    return this.authState['email']
+    return this._user['email']
   }
 
   get currentUser(): any {
-    return (this.authState !== null) ? this.authState : null;
+    return (this._user !== null) ? this._user : null;
   }
 
   get isUserEmailLoggedIn(): boolean {
-    if ((this.authState !== null) && (!this.isAnonymous)) {
+    if ((this._user !== null) && (!this.isAnonymous)) {
       return true
     } else {
       return false
@@ -75,7 +78,7 @@ export class AuthService {
   signUpWithEmail(email: string, password: string) {
     return this.afAuth.auth.createUserWithEmailAndPassword(email, password)
       .then((result) => {
-        this.authState = result
+        this._user = result
         console.log(result);
         this.db.database.ref('users/' + result.uid)
         .set(this.createUserInfo(result));
@@ -89,7 +92,7 @@ export class AuthService {
   loginWithEmail(email: string, password: string) {
     return this.afAuth.auth.signInWithEmailAndPassword(email, password)
       .then((result) => {
-        this.authState = result
+        this._user = result
       })
       .catch(error => {
         // console.log(error)
@@ -101,7 +104,7 @@ export class AuthService {
       this.afAuth.auth.signInWithPopup(
         new firebase.auth.GoogleAuthProvider()
       ).then(result => {
-          this.authState = result;
+          this._user = result;
           let exists: boolean;
           let users = this.db.database.ref('users/' + result.user.uid);
           
@@ -117,7 +120,7 @@ export class AuthService {
           }).then(temp => {
             if(exists){
               this.db.database
-                .ref('users/' + this.authState.uid + '/publicFields')
+                .ref('users/' + this._user.uid + '/publicFields')
                   .update(
                     {
                       isConnected: true,
@@ -125,7 +128,7 @@ export class AuthService {
                     });
             }
             else {
-              users.set(this.createUserInfo(this.authState));
+              users.set(this.createUserInfo(this._user));
             }
           });
     })
@@ -136,18 +139,16 @@ export class AuthService {
   }
 
   loginAnonymously() {
-        this.afAuth.auth.signInAnonymously();
-        this.router.navigate(['']);
-    }
+      this.afAuth.auth.signInAnonymously();
+  }
 
   signOut(): void {
     if(!this.isAnonymous) {
       this.db.database
-          .ref('users/' + this.authState.uid + '/publicFields')
+          .ref('users/' + this._user.uid + '/publicFields')
               .update({isConnected: false});
     }
     this.afAuth.auth.signOut();
-    this.authState = null;
-    this.router.navigate([''])
+    this._user = null;
   }
 }

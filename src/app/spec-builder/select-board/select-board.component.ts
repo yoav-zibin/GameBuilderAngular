@@ -3,7 +3,7 @@ import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/databa
 import { Observable } from 'rxjs/Observable';
 import { AuthService } from '../../auth/auth.service';
 import * as firebase from 'firebase/app';
-import constants from '../../../constants.js'
+import constants from '../../../config.js'
 
 
 @Component({
