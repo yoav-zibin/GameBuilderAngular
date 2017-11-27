@@ -3,15 +3,7 @@ import { AngularFireModule} from 'angularfire2';
 import { AngularFireDatabaseModule } from 'angularfire2/database';
 import { AngularFireAuthModule } from 'angularfire2/auth';
 import { AuthService } from './auth.service';
-
-const firebaseConfig = { 
-    apiKey: "AIzaSyDA5tCzxNzykHgaSv1640GanShQze3UK-M",
-    authDomain: "universalgamemaker.firebaseapp.com",
-    databaseURL: "https://universalgamemaker.firebaseio.com",
-    projectId: "universalgamemaker",
-    storageBucket: "universalgamemaker.appspot.com",
-    messagingSenderId: "144595629077"
-};
+import firebaseConfig from '../../config.js';
 
 describe('AuthService', () => {
 	let service;
@@ -40,13 +32,14 @@ describe('AuthService', () => {
   	expect(service.authenticated).toBeFalsy();
   }));
 
-  it('should return true if authenticated', async(() => {
-  	service.authState.subscribe(x => {
-        expect(x).toBeTruthy();
-    }); 
-  	
+  it('should return true if authenticated', (done) => {
   	expect(service.authenticated).toBeFalsy();
   	service.loginAnonymously();
-  }));
+
+    service.authState.subscribe(x => {
+      expect(x).toBeTruthy();
+    });
+    done(); 
+  });
 
 });

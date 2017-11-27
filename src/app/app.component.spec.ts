@@ -6,19 +6,7 @@ import { AppComponent } from './app.component';
 import { AuthService } from './auth/auth.service'
 import { RouterTestingModule } from '@angular/router/testing';
 import {Router, Routes} from "@angular/router";
-
-const firebaseConfig = { 
-    apiKey: "AIzaSyDA5tCzxNzykHgaSv1640GanShQze3UK-M",
-    authDomain: "universalgamemaker.firebaseapp.com",
-    databaseURL: "https://universalgamemaker.firebaseio.com",
-    projectId: "universalgamemaker",
-    storageBucket: "universalgamemaker.appspot.com",
-    messagingSenderId: "144595629077"
-};
-
-const appRoutes: Routes = [
-  {path: '', redirectTo: '/', pathMatch: 'full'},
-];
+import firebaseConfig from '../config.js';
 
 
 describe('AppComponent', () => {
@@ -28,7 +16,8 @@ describe('AppComponent', () => {
     TestBed.configureTestingModule({
       declarations: [AppComponent],
       imports: [
-        RouterTestingModule.withRoutes(appRoutes),
+        RouterTestingModule
+          .withRoutes([{path: '', redirectTo: '/', pathMatch: 'full'}]),
         AngularFireModule.initializeApp(firebaseConfig),
         AngularFireDatabaseModule,
         AngularFireAuthModule,
@@ -64,7 +53,7 @@ describe('AppComponent', () => {
   }));
 
 
-  it('should display logout if not logged in', async(() => {
+  it('should display logout if logged in', async(() => {
     app.user.subscribe(x => {
         expect(x.isAnonymous).toBeTruthy();
     });    
