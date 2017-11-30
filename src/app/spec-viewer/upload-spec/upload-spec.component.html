@@ -1,0 +1,12 @@
+
+<form id="user-input">
+    <input type="text" id="gameName" placeholder="" ngRequired>
+    <input type="text" id="wikiURL" placeholder="">
+    <input type="text" id="youtubeURL" placeholder="">
+    <input type="submit" id = "update" value="Update Spec" (click)="isValid() && createGameSpec()">
+  </form>
+  
+  <div *ngIf="generated">
+    <pre style="text-align: left">{{ gameSpec | json }}</pre>
+    <button (click)=uploadGameSpec()>Upload Spec</button>
+  </div>

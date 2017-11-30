@@ -49,7 +49,9 @@ export class SpecBuilderComponent implements OnInit {
 
   	onSelected(board: object) {
       this.selected = true;
-  		this.selectedBoard = board;
+			this.selectedBoard = board;
+			console.log('get selected board')
+			console.log(this.selectedBoard)
       this.firstFormGroup = this._formBuilder.group({
         firstCtrl: ['validated', Validators.required]
       });
@@ -67,6 +69,7 @@ export class SpecBuilderComponent implements OnInit {
   	}
 
   	getSelectedBoard() {
+			
   		return this.selectedBoard;
   	}
 

@@ -40,6 +40,10 @@ import { BuildSpecComponent } from './spec-builder/build-spec/build-spec.compone
 import { FinalizeSpecComponent } from './spec-builder/finalize-spec/finalize-spec.component';
 import { CreateElementComponent } from './create-element/create-element.component';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import { SpecViewerComponent } from './spec-viewer/spec-viewer.component';
+import { SpecSelectorComponent } from './spec-viewer/spec-selector/spec-selector.component';
+import { ViewSpecComponent } from './spec-viewer/view-spec/view-spec.component';
+import { UploadSpecComponent } from './spec-viewer/upload-spec/upload-spec.component';
 
 /*
 //OLD SPEC CONFIG
@@ -72,6 +76,7 @@ export const appRoutes: Routes = [
   {path: 'phonelogin', component: PhoneloginComponent},
   {path: 'uploadImage', component: UploadImageComponent},
   {path: 'user', component: UserInfoComponent},
+  {path: 'viewSpec', component: SpecViewerComponent},
 ];
 
 @NgModule({
@@ -87,6 +92,10 @@ export const appRoutes: Routes = [
     BuildSpecComponent,
     FinalizeSpecComponent,
     CreateElementComponent,
+    SpecViewerComponent,
+    SpecSelectorComponent,
+    ViewSpecComponent,
+    UploadSpecComponent,
   ],
   imports: [
     AngularFireModule.initializeApp(firebaseConfig),
