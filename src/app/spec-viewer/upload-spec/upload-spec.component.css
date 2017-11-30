@@ -1,0 +1,9 @@
+#user-input input {
+	display: block;
+}
+
+#user-input {
+	text-align: center;
+	margin: 0 auto; 
+	width:250px;
+}

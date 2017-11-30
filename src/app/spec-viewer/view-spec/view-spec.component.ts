@@ -1,25 +1,27 @@
-import { Component, Input, Output, HostListener, EventEmitter } from '@angular/core';
+import { Component, Input, Output, HostListener, EventEmitter, OnInit, ElementRef, ViewChild, OnChanges} from '@angular/core';
 import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
 import { AuthService } from '../../auth/auth.service';
-import { MdSnackBar } from '@angular/material';
 import { Observable } from 'rxjs/Observable';
 import * as firebase from 'firebase/app';
 import constants from '../../../constants.js';
 import 'rxjs/add/observable/forkJoin';
 
 @Component({
-  selector: 'app-build-spec',
-  templateUrl: './build-spec.component.html',
-  styleUrls: ['./build-spec.component.css']
+  selector: 'app-view-spec',
+  templateUrl: './view-spec.component.html',
+  styleUrls: ['./view-spec.component.css']
 })
-export class BuildSpecComponent {
-	@Input() selectedBoard: object;
+export class ViewSpecComponent{
+
+  @Input() selectedBoard: object;
+  // @Input() pieceSpec: Array<object>;
+  @Input() piecesMap: Map<string, object>;
 	@Output() onPiecesSet = new EventEmitter<Map<string, object>>();
 
 	zPos:number = 2;
 	uniqueID: number = 0;
 	dragged: boolean = false;
-	piecesMap = new Map<string, object>();
+	// piecesMap = new Map<string, object>();
 	pieces: object[] = new Array();
 	images: object[] = new Array();
 	elements: object[] = new Array();
@@ -28,6 +30,7 @@ export class BuildSpecComponent {
 	elementImageIndex = new Map<string, object>();
 	elementsRef: FirebaseListObservable<any[]>;
 	imagesRef: FirebaseListObservable<any[]>;
+
 
 	currentFilter = 'standard';
 	options = [
@@ -42,8 +45,7 @@ export class BuildSpecComponent {
 
 	constructor(
 		private auth: AuthService, 
-		private db: AngularFireDatabase,
-		private snackBar: MdSnackBar
+		private db: AngularFireDatabase
 	) {
   		if(this.auth.authenticated) {
   			console.log('got here');
@@ -68,7 +70,9 @@ export class BuildSpecComponent {
 						});
 						if(this.imageData.size === snapshot.length)
 							resolve("Got images!");
-					})
+          })
+          
+          
 				})
 			});
 
@@ -78,7 +82,7 @@ export class BuildSpecComponent {
 				console.log(msg);
 				
 				this.elementsRef = db.list(constants.ELEMENTS_PATH, {
-					query: this.buildQuery(),
+					// query: this.buildQuery(),
 					preserveSnapshot: true
 				})
 
@@ -100,14 +104,65 @@ export class BuildSpecComponent {
 								'max': (element.images.length - 1),
 							});
 						}
-					})
-					console.log(this.elements);
+          })
+          
+          
+          // console.log(this.elements);
+          // console.log(document)
 				});
 			}).catch( (error) => {
 				console.log("something went wrong... " + error);
 			})
 		}
-	}
+  }
+  
+  ngOnChanges() {
+    
+    if(this.piecesMap !== undefined){
+    let piecesArr = Array.from(this.piecesMap.values());
+    console.log(piecesArr.length)
+      piecesArr.forEach(p => {
+        console.log(p)
+        if(p !== undefined){
+        let elem = document.createElement("img");
+        this.piecesMap.set("piece1copy" +this.uniqueID, this.piecesMap.get(p['el_key']));
+        this.piecesMap.delete(p['el_key']);
+        (elem as HTMLElement).setAttribute("id", "piece1copy" + this.uniqueID);
+        (elem as HTMLElement).setAttribute("src", p["url"][p['index']]);
+        (elem as HTMLElement).setAttribute("alt", p["el_key"]);
+        // (elem as HTMLElement).setAttribute("class", "piece-image");
+        (elem as HTMLElement).classList.remove('currentlyDragged');
+        let xPos, yPos
+        [xPos, yPos] = this.descaleCoord(p['xPos'], p['yPos'])
+        this.updateStyle(elem, xPos, yPos, true)
+        let currentDiv = document.getElementById("board-overlay"); 
+        this.uniqueID++;
+        currentDiv.appendChild(elem)
+        }
+        // this.board.nativeElement.appendChild(elem);
+      });
+      
+  }
+  // else{
+  //   let currentDiv = document.getElementById("board-overlay"); 
+  //   while(currentDiv.childElementCount > 0){
+  //     currentDiv.removeChild(currentDiv.childNodes[0])
+  //   }
+  // }
+  }
+
+  descaleCoord(xPos, yPos) {
+		xPos = (xPos / 100) * 512;
+		yPos = (yPos / 100) * 512;
+		return [xPos, yPos];
+  }
+
+  reset(){
+    let currentDiv = document.getElementById("board-overlay"); 
+      while(currentDiv.childElementCount > 0){
+        currentDiv.removeChild(currentDiv.childNodes[0])
+      }
+  }
 
 
 	onChange(value){
@@ -223,12 +278,12 @@ export class BuildSpecComponent {
 			}
 		}
 
-        // console.log('data: ' + data);
-        // console.log('id:' + elementID);
+        console.log('data: ' + data);
+        console.log('id:' + elementID);
 
         [xPos, yPos] = this.calculatePosition(event);
-        // console.log('x:' + xPos);
-        // console.log('y:' + yPos);
+        console.log('x:' + xPos);
+        console.log('y:' + yPos);
 
 
       	if(this.fromSource(elementID)) {
@@ -258,8 +313,10 @@ export class BuildSpecComponent {
     	}
 
 		this.piecesMap.set(elementID, piece);
-		// console.log(this.piecesMap);
+		console.log(this.piecesMap);
         this.onPiecesSet.emit(this.piecesMap);
+        console.log('target')
+        console.log(event.target)
 
         if (event.target.nodeName !== "IMG") {
         	console.log('ok to drop here.')
@@ -278,14 +335,19 @@ export class BuildSpecComponent {
 			this.dragged = false;
 			return;
 		}
-
-		if(event.target.id.indexOf('piece') === -1 ) {
+    console.log(event.target.id)
+    if(event.target.id === 'reset'){
+      this.reset()
+      return
+    }
+		if(event.target.id.indexOf('piece') === -1) {
 			console.log("can't click here");
 			return;
 		}
 
-		console.log('toggling!');
-		let element = document.getElementById(event.target.id);
+    console.log('toggling!');
+    console.log(event.target.id)
+    let element = document.getElementById(event.target.id);
 		let key = element.getAttribute('alt');
 		let index = this.getImageIndex(key);
 		let images = this.elementData.get(key)['images'];
@@ -294,10 +356,11 @@ export class BuildSpecComponent {
 			this.imageData.get(images[index]['imageId'])['downloadURL']
 		);
 
-		let piece = this.piecesMap.get(event.target.id);
+    let piece = this.piecesMap.get(event.target.id);
+    console.log(piece)
 		piece['index'] = this.elementImageIndex.get(key)["current"];
 		this.piecesMap.set(event.target.id, piece);
-		// console.log(this.piecesMap);
+		console.log(this.piecesMap);
         this.onPiecesSet.emit(this.piecesMap);
 
 	}
@@ -376,20 +439,19 @@ export class BuildSpecComponent {
         (elem as HTMLElement).setAttribute("alt", data["key"]);
         (elem as HTMLElement).classList.remove('currentlyDragged');
         this.uniqueID++;
-
+    console.log(elem)
         return elem;
 	}
 
 	deleteElement(data, id) {
 		if(this.fromSource(id))
 			return
-		console.log(data);
+		
 		this.piecesMap.delete(id);
 		console.log(this.piecesMap);
         this.onPiecesSet.emit(this.piecesMap);
         document.getElementById('board-overlay').removeChild(
         	document.getElementById(id));
-        this.deleteWarning(data);
 	}
 
 	buildQuery() {
@@ -406,10 +468,8 @@ export class BuildSpecComponent {
 		}
 	}
 
-	deleteWarning(piece) {
-    	this.snackBar.open("Removed " + piece['key'] + " from spec",
-    		'Close', { duration: 1000 }
-    	);
+	deleteWarning(){
+		return "Warning! You're about to delete this piece!"
 	}
 
 }

@@ -1,19 +1,58 @@
 <div [hidden]="blocked" style="text-align: center">
-	<div id="spec-selector">
-	  <md-select placeholder="Select game spec"  [(ngModel)]="currentSpec" (ngModelChange)="onChange($event)">
-	    <md-option *ngFor="let spec of specs | async" value={{spec.$key}}>
-	      {{ spec.gameName }}
-	    </md-option>
-	  </md-select>
-	</div>
+  <md-horizontal-stepper [linear]="isLinear">
+    <md-step [stepControl]="firstFormGroup">
+      <form [formGroup]="firstFormGroup">
+        <ng-template mdStepLabel>Select a spec</ng-template>
+          <div *ngIf="selected">Selected {{selectedBoard['name']}}</div>
+        <div id="board-selector">
+					<app-spec-selector #child
+					(onPiecesSet)="onPiecesSet($event)"
+					(onSelected)="onSelected($event)"
+					(onInfo)="onInfo($event)">
+					</app-spec-selector>
+        </div>
+        <div id="nav-button">
+          <button md-button mdStepperNext (click)="child.ngOnChanges()">Next</button>
+        </div>
+      </form>
+    </md-step>
+    <md-step [stepControl]="secondFormGroup">
+      <form [formGroup]="secondFormGroup">
+        <ng-template mdStepLabel>View game spec</ng-template>
+        <div id="build-container">
+          <app-view-spec #child
+						[selectedBoard]=getSelectedBoard()
+						[piecesMap]=getPieces()
+            (onPiecesSet)="onPiecesSet($event)">
+          </app-view-spec>
+        </div>
+        <div id="nav-button">
+					<button md-button mdStepperPrevious (click)="child.reset()">Back</button>
+					<!-- <button md-button mdStepperPrevious>Back</button> -->
+          <button md-button mdStepperNext (click)="toFinalStage()">Next</button>
+        </div>
+      </form>
+    </md-step>
+    <md-step [stepControl]="thirdFormGroup">
+      <form [formGroup]="thirdFormGroup">
+        <ng-template mdStepLabel>Upload spec</ng-template>
+          <app-upload-spec
+            [selectedBoard]=getSelectedBoard()
+            [piecesMap]=getPieces()
+						[piecesSet]=getPiecesSet()
+						[info]=getInfo()>
+						
+          </app-upload-spec>
+        <div id="nav-button">
+          <button md-button mdStepperPrevious>Back</button>
+          <!-- <button md-button mdStepperNext>Finish</button> -->
+        </div>
+      </form>
+    </md-step>
+  </md-horizontal-stepper>
 </div>
+
 
 <div [hidden]="!blocked" style="text-align:center">
     Please login with Google, phone, or email to use this function.
-</div>
-
-<div id="board-container">
-	image:{{imageURL}}
-	<img id="board" src="{{imageURL}}">
-	<div id="board-overlay"></div>
 </div>

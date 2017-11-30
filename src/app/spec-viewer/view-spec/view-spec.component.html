@@ -1,0 +1,46 @@
+
+
+<div id="piece-selector">
+    <md-grid-list cols="2" rowHeight="75px">
+      <md-grid-tile
+          *ngFor="let element of elements; let i = index;"
+            [colspan]="1"
+            [rowspan]="1">
+            <img id="piece-{{i}}" class="piece-image" src="{{element.downloadURL}}" alt="{{element._key}}"/>
+          <div class="overlay">
+              <div class="overlay-text">
+                {{element.name}}
+              </div>
+          </div>
+      </md-grid-tile>
+    </md-grid-list>
+  </div>
+  
+  
+  <div id="filter-and-trash">
+    <div id="filter">
+      <md-select placeholder="Filter elements" [(ngModel)]="currentFilter" name="opt" (ngModelChange)="onChange($event)">
+        <md-option *ngFor="let opt of options" [value]="opt.value">
+          {{ opt.viewValue }}
+        </md-option>
+      </md-select>
+    </div>
+  
+    <div id="trash">
+      <img id="trash-can" src='/assets/trash_100.png' alt='trash can'>
+    </div>
+  </div>
+  
+  
+  <div id="board-container">
+    <img id="board" src="{{selectedBoard['url']}}">
+    <div id="board-overlay"></div>
+  </div>
+  
+  <div id="resetDiv">
+    <button id= "reset">reset</button>
+  </div>
+
+  <div class="clear"></div>
+  
+  
