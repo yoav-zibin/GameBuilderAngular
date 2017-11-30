@@ -118,29 +118,7 @@ export class ViewSpecComponent{
   
   ngOnChanges() {
     
-    if(this.piecesMap !== undefined){
-    let piecesArr = Array.from(this.piecesMap.values());
-    console.log(piecesArr.length)
-      piecesArr.forEach(p => {
-        console.log(p)
-        if(p !== undefined){
-        let elem = document.createElement("img");
-        this.piecesMap.set("piece1copy" +this.uniqueID, this.piecesMap.get(p['el_key']));
-        this.piecesMap.delete(p['el_key']);
-        (elem as HTMLElement).setAttribute("id", "piece1copy" + this.uniqueID);
-        (elem as HTMLElement).setAttribute("src", p["url"][p['index']]);
-        (elem as HTMLElement).setAttribute("alt", p["el_key"]);
-        // (elem as HTMLElement).setAttribute("class", "piece-image");
-        (elem as HTMLElement).classList.remove('currentlyDragged');
-        let xPos, yPos
-        [xPos, yPos] = this.descaleCoord(p['xPos'], p['yPos'])
-        this.updateStyle(elem, xPos, yPos, true)
-        let currentDiv = document.getElementById("board-overlay"); 
-        this.uniqueID++;
-        currentDiv.appendChild(elem)
-        }
-        // this.board.nativeElement.appendChild(elem);
-      });
+    
       
   }
   // else{
@@ -149,7 +127,40 @@ export class ViewSpecComponent{
   //     currentDiv.removeChild(currentDiv.childNodes[0])
   //   }
   // }
+  
+
+  addPieces(){
+	if(this.piecesMap !== undefined){
+		// let piecesArr = Array.from(this.piecesMap.values());
+		let piecesArr = Array.from(this.piecesMap.keys());
+		let count = 0
+		
+		console.log(this.piecesMap)
+		  piecesArr.forEach(pi => {
+			let p = this.piecesMap.get(pi)
+			console.log(pi)
+			if(p !== undefined){
+			let elem = document.createElement("img");
+			// this.piecesMap.set("piece100copy" +count, this.piecesMap.get(count + ""));
+			// this.piecesMap.delete(count + "");
+			(elem as HTMLElement).setAttribute("id", pi + "");
+			(elem as HTMLElement).setAttribute("src", p["url"][p['index']]);
+			(elem as HTMLElement).setAttribute("alt", p["el_key"]);
+			// (elem as HTMLElement).setAttribute("class", "piece-image");
+			(elem as HTMLElement).classList.remove('currentlyDragged');
+			let xPos, yPos
+			[xPos, yPos] = this.descaleCoord(p['xPos'], p['yPos'])
+			this.updateStyle(elem, xPos, yPos, true)
+			let currentDiv = document.getElementById("board-overlay"); 
+			this.uniqueID++;
+			count++
+			currentDiv.appendChild(elem)
+			}
+			// console.log(this.piecesMap)
+			// this.board.nativeElement.appendChild(elem);
+		  });
   }
+}
 
   descaleCoord(xPos, yPos) {
 		xPos = (xPos / 100) * 512;

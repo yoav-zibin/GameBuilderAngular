@@ -162,7 +162,7 @@ export class SpecSelectorComponent {
         "deckIndex": element["deckPieceIndex"]
       }
       // console.log(piece)
-      piecesMap.set(count + "", piece);
+      piecesMap.set("piece" + count + "copy" + count + "", piece);
       count++
     });
     console.log(count)
