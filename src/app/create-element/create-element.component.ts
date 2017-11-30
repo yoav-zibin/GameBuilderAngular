@@ -32,13 +32,14 @@ enum Types {
 })
 export class CreateElementComponent implements OnInit {
   basePath: string = "gameBuilder/elements/";
+  cardFilter: string;
   elementCreated: boolean = false;
   elementInfo: Object = {};
   elementName: string = "";
   elementTypeAndFaceNumber: string;
   elementType: string;
-  filter: string;
   faceNumber: number = null;
+  imageFilter: string;
   isDraggable: boolean = false;
   isDrawable: boolean = false;
   rotatableDegrees: number = 360;
@@ -52,9 +53,9 @@ export class CreateElementComponent implements OnInit {
   selectedImages: any = [];
 
   // Visability control.
-  searchByName: boolean = false;
   hideNextButton: boolean = true;
   hideSubmitButton: boolean = true;
+  searchByName: boolean = false;
   showElements: boolean = false;
   
   // For auth use.
@@ -119,31 +120,31 @@ export class CreateElementComponent implements OnInit {
     }
   }
 
-  onFilterChange(value) {
+  onCardFilterChange(value) {
     this.searchByName = false;
     this.searchTerm = "";
     if (value == Filters[Filters.all]) {
-      if (this.showElements) {
-        this.elements = this.imageSelectionService.getAllCards();
-      } else {
-        this.images = this.imageSelectionService.getNonBoardImages();
-      }
-
+      this.elements = this.imageSelectionService.getAllCards();
     } else if (value == Filters[Filters.myUploads]) {
       const uid: string = this.afauth.auth.currentUser.uid;
-      if (this.showElements) {
-        this.elements = this.imageSelectionService.getMyCardUploads(uid);
-      } else {
-        this.images = this.imageSelectionService.getMyNonBoardImageUploads(uid);
-      }
-
+      this.elements = this.imageSelectionService.getMyCardUploads(uid);
     } else if (value == Filters[Filters.mostRecent]) {
-      if (this.showElements) {
-        this.elements = this.imageSelectionService.getMostRecentCards();
-      } else {
-        this.images = this.imageSelectionService.getMostRecentNonBoardImages();
-      }
+      this.elements = this.imageSelectionService.getMostRecentCards();
+    } else if (value == Filters[Filters.searchByName]) {
+      this.searchByName = true;
+    }
+  }
 
+  onImageFilterChange(value) {
+    this.searchByName = false;
+    this.searchTerm = "";
+    if (value == Filters[Filters.all]) {
+      this.images = this.imageSelectionService.getNonBoardImages();
+    } else if (value == Filters[Filters.myUploads]) {
+      const uid: string = this.afauth.auth.currentUser.uid;
+      this.images = this.imageSelectionService.getMyNonBoardImageUploads(uid);
+    } else if (value == Filters[Filters.mostRecent]) {
+      this.images = this.imageSelectionService.getMostRecentNonBoardImages();
     } else if (value == Filters[Filters.searchByName]) {
       this.searchByName = true;
     }
@@ -184,7 +185,8 @@ export class CreateElementComponent implements OnInit {
     if (!this.isDeck()) {
       this.submit();
     } else {
-      this.elements = this.imageSelectionService.getAllCards();
+      this.onImageFilterChange("all");
+      this.onCardFilterChange("all");
       this.showElements = true;
     }
   }

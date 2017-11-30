@@ -24,7 +24,7 @@
     <p id="note">Note: Only non-board images are listed.</p>
 
     <div class="filter">
-      <md-select placeholder="Filter images" [(ngModel)]="filter" (ngModelChange)="onFilterChange($event)">
+      <md-select placeholder="Filter images" [(ngModel)]="ImageFilter" (ngModelChange)="onImageFilterChange($event)">
         <md-option value="all">All Images</md-option>
         <md-option value="myUploads">My Uploads</md-option>
         <md-option value="mostRecent">Most Recent</md-option>
@@ -137,7 +137,7 @@
     <p id="note">Note: Only cards are listed.</p>
 
     <div class="filter">
-      <md-select placeholder="Filter cards" [(ngModel)]="filter" (ngModelChange)="onFilterChange($event)">
+      <md-select placeholder="Filter cards" [(ngModel)]="CardFilter" (ngModelChange)="onCardFilterChange($event)">
         <md-option value="all">All Cards</md-option>
         <md-option value="myUploads">My Uploads</md-option>
         <md-option value="mostRecent">Most Recent</md-option>
@@ -147,7 +147,7 @@
 
     <div class="searchByName">
       <md-input-container *ngIf="searchByName">
-        <input mdInput type="text" placeholder="Image name" [(ngModel)]="searchTerm" (ngModelChange)="onSearchTermChange($event)"/>
+        <input mdInput type="text" placeholder="Card name" [(ngModel)]="searchTerm" (ngModelChange)="onSearchTermChange($event)"/>
       </md-input-container>
     </div>
 
