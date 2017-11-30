@@ -1,19 +1,19 @@
-import { Component, Input, OnChanges } from '@angular/core';
+import { Component, OnInit, OnChanges, Input } from '@angular/core';
 import { AuthService } from '../../auth/auth.service';
 import { Router } from '@angular/router';
 import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
 import constants from '../../../constants.js'
 import * as firebase from 'firebase/app';
-
 @Component({
-  selector: 'app-finalize-spec',
-  templateUrl: './finalize-spec.component.html',
-  styleUrls: ['./finalize-spec.component.css']
+  selector: 'app-upload-spec',
+  templateUrl: './upload-spec.component.html',
+  styleUrls: ['./upload-spec.component.css']
 })
-export class FinalizeSpecComponent implements OnChanges {
-	@Input() selectedBoard: object;
+export class UploadSpecComponent implements OnChanges {
+  @Input() selectedBoard: object;
 	@Input() piecesMap: Map<string, object>;
   @Input() piecesSet: boolean;
+  @Input() info: Map<string, string>;
   pieces: object[] = new Array<object>();
   count:number = 0;
 
@@ -46,6 +46,16 @@ export class FinalizeSpecComponent implements OnChanges {
 
   ngOnChanges() {
     this.convertPiecesMapToArray();
+    if(this.info !== undefined){
+    console.log(this.info);
+    (<HTMLInputElement>document.getElementById("gameName")).setAttribute('value',this.info.get('name'));
+    (<HTMLInputElement>document.getElementById("wikiURL")).setAttribute('value',this.info.get('wiki'));
+    (<HTMLInputElement>document.getElementById("youtubeURL")).setAttribute('value',this.info.get('youtube'));
+    console.log(this.auth.currentUserId + " " + this.info.get('uid'))
+    if(this.auth.currentUserId !== this.info.get('uid')){
+      (<HTMLInputElement>document.getElementById("update")).disabled = true;
+    }
+    }
   }
 
   convertPiecesMapToArray() {
@@ -110,6 +120,10 @@ export class FinalizeSpecComponent implements OnChanges {
   	return pieceSpec
   }
 
+  // updateGameSpec(){
+
+  // }
+
   uploadGameSpec() {
   	console.log("uploading...")
   	this.db.database.ref(constants.SPECS_PATH).push(this.gameSpec)
@@ -131,5 +145,4 @@ export class FinalizeSpecComponent implements OnChanges {
     console.log(this.gameName);
     return this.gameName !== "";
   }
-
 }

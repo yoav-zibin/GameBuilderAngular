@@ -1,9 +1,12 @@
-import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, ViewChild } from '@angular/core';
 import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
 import { AuthService } from '../auth/auth.service';
 import { Observable } from 'rxjs/Observable';
 import * as firebase from 'firebase/app';
 import constants from '../../constants.js';
+import {ViewSpecComponent} from './view-spec/view-spec.component';
+
+import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 
 @Component({
 	selector: 'app-spec-viewer',
@@ -11,121 +14,103 @@ import constants from '../../constants.js';
 	styleUrls: ['./spec-viewer.component.css']
 })
 export class SpecViewerComponent implements OnInit {
+	isLinear = true;
+	selected = false;
+	piecesSet = false;
+	firstFormGroup: FormGroup;
+	secondFormGroup: FormGroup;
+	thirdFormGroup: FormGroup;
+	selectedBoard: object = new Object();
+	pieces: Map<string, object>;
+	blocked: boolean;
+
+	@ViewChild('viewSpec')
+	viewSpec: ViewSpecComponent;
 
 	specs: FirebaseListObservable<any[]>;
 	spec: Object;
-	blocked: boolean;
 	currentSpec: string;
-	imagesRef: FirebaseListObservable<any[]>;
-	images: object[] = new Array();
-	imageData = new Map<string, object>();
-	map = new Map<String, String>()
-	elementData = new Map<string, object>();
-	elementImageIndex = new Map<string, object>();
-	elementsRef: FirebaseListObservable<any[]>;
-	elements: object[] = new Array();
 
-	pieceData = new Map<String, Object>();
-	piecesRef: FirebaseListObservable<any[]>;
-	pieces: object[] = new Array();
-	imageURL: String;
+	board: Object;
+	pieceSet: Object;
+	piecesArray: Array<Object>;
 
-	constructor(
-		private auth: AuthService,
-		private db: AngularFireDatabase
-	) {
-		if (this.auth.authenticated) {
-			console.log('got here');
+	pieceSpec: Object[] = new Array();
 
-			this.specs = db.list(constants.SPECS_PATH);
-
-			let p = new Promise((resolve, reject) => {
-
-				this.imagesRef = db.list(constants.IMAGES_PATH, {
-					query: {
-						orderByChild: 'isBoardImage',
-						equalTo: true,
-					},
-					preserveSnapshot: true
-				});
-
-				this.imagesRef.subscribe(snapshot => {
-					console.log('creating image array');
-					snapshot.forEach(data => {
-						this.images.push(data.val());
-						// this.imageData.set(data.key, {
-						// 	'downloadURL': data.val().downloadURL,
-						// 	'name': data.val().name
-						// });
-						// console.log(data.val())
-						this.imageData.set(data.key, {
-							'downloadURL': data.val().downloadURL,
-							'name': data.val().name
-						});
-						this.map.set(data.key, data.val().downloadURL)
-						if (this.imageData.size === snapshot.length)
-							resolve("Got images!");
-						// console.log(data.key)
-					})
-				})
+	info: Map<string, string>;
+  
+	  constructor(
+		  private auth: AuthService,
+		  private _formBuilder: FormBuilder,
+		  public db: AngularFireDatabase
+	  ) {	
+		this.specs = db.list(constants.SPECS_PATH);
+		// console.log(this.specs)
+	  }
+  
+	  ngOnInit() {
+		this.blocked = this.auth.isAnonymous || !this.auth.authenticated;
+			this.firstFormGroup = this._formBuilder.group({
+				firstCtrl: ['', Validators.required]
 			});
-
-			p = new Promise((resolve, reject) => {
-
-				this.piecesRef = db.list(constants.IMAGES_PATH, {
-					query: {
-						orderByChild: 'isBoardImage',
-						equalTo: false,
-					},
-					preserveSnapshot: true
-				});
-
-				this.piecesRef.subscribe(snapshot => {
-					console.log('creating pieces array');
-					snapshot.forEach(data => {
-						this.pieces.push(data.val());
-						// console.log(data.val())
-						this.pieceData.set(data.key, {
-							'downloadURL': data.val().downloadURL,
-							'name': data.val().name
-						});
-						if (this.pieceData.size === snapshot.length)
-							resolve("Got images!");
-						// console.log(data.key)
-					})
-				})
+			this.secondFormGroup = this._formBuilder.group({
+			secondCtrl: ['', Validators.required]
+			});
+			this.thirdFormGroup = this._formBuilder.group({
+				thirdCtrl: ['', Validators.required]
 			});
 		}
-	}
 
-	ngOnInit() {
-		this.blocked = this.auth.isAnonymous || !this.auth.authenticated;
-	}
+		Select(piecesArr: Array<Object>){
+			this.piecesArray = piecesArr;
+		}
+  
+		onSelected(board: object) {
+			this.selected = true;
+			this.selectedBoard = board;
+			this.firstFormGroup = this._formBuilder.group({
+				firstCtrl: ['validated', Validators.required]
+		});
+			console.log("receiving board");
+		}
+  
+		onPiecesSet(pieces: Map<string, object>) {
+			this.pieces = pieces;
+			this.secondFormGroup = this._formBuilder.group({
+		  		secondCtrl: ['validated', Validators.required]
+		});
+			console.log("updating pieces");
+		}
+  
+		getSelectedBoard() {
+			return this.selectedBoard;
+		}
+  
+		getPieces() {
+			return this.pieces;
+		}
+  
+		getPiecesSet() {
+		return this.piecesSet;
+		}
+  
+		toFinalStage() {
+			this.piecesSet = true;
+		}
 
-	onChange(value) {
-		// console.log(this.imageData.keys())
-		// console.log(this.images[0]['downloadURL'])
-		// console.log(this.map)
-		this.currentSpec = value;
-		// console.log(this.currentSpec);
+		clean(){
+			// this.pieces = new Map<string, object>();
+			// console.log(this.pieces)
+			this.viewSpec.reset()
+		}
 
-		this.db.object(constants.SPECS_PATH + '/' + value, {
-			preserveSnapshot: true
-		})
-			.subscribe(snap => {
-				this.spec = snap.val();
-			});
-
-		console.log(this.spec)
-
-		let imageId = this.spec['board']['imageId']
-		this.imageURL = this.imageData.get(imageId)['downloadURL']
-
+		onInfo(inf: Map<string, string>){
+			this.info = inf
+		}
 		
-		// console.log(this.map.get(this.spec['board']['imageId']))
-		// console.log(this.imageURL)
-
-	}
-
-
+		getInfo(){
+			// console.log('info')
+			// console.log(this.info)
+			return this.info
+		}
 }
