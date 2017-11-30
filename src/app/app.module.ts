@@ -6,9 +6,10 @@ import { AngularFireModule} from 'angularfire2';
 import { AngularFireDatabaseModule } from 'angularfire2/database';
 import { AngularFireAuthModule } from 'angularfire2/auth';
 import { RouterModule, Routes } from '@angular/router';
+import { provideRoutes } from '@angular/router';
 import {AppRoutingModule} from './app-routing.module';
 import {AuthService} from './auth/auth.service';
-
+//import firebaseConfig from '../config.js';
 //import * as firebase from 'firebase/app';
 
 import { AppComponent } from './app.component';
@@ -32,6 +33,7 @@ import {
   MdStepperModule,
   MdTooltipModule,
   MdSelectModule,
+  MdSnackBarModule,
 } from '@angular/material';
 import { SelectBoardComponent } from './spec-builder/select-board/select-board.component';
 import { BuildSpecComponent } from './spec-builder/build-spec/build-spec.component';
@@ -42,15 +44,6 @@ import { SpecViewerComponent } from './spec-viewer/spec-viewer.component';
 import { SpecSelectorComponent } from './spec-viewer/spec-selector/spec-selector.component';
 import { ViewSpecComponent } from './spec-viewer/view-spec/view-spec.component';
 import { UploadSpecComponent } from './spec-viewer/upload-spec/upload-spec.component';
-
-export const firebaseConfig = { 
-	  apiKey: "AIzaSyDA5tCzxNzykHgaSv1640GanShQze3UK-M",
-  	authDomain: "universalgamemaker.firebaseapp.com",
-  	databaseURL: "https://universalgamemaker.firebaseio.com",
-  	projectId: "universalgamemaker",
-  	storageBucket: "universalgamemaker.appspot.com",
-  	messagingSenderId: "144595629077"
-};
 
 /*
 //OLD SPEC CONFIG
@@ -63,6 +56,15 @@ export const firebaseConfig = {
     messagingSenderId: "424710997339"
 };
 */
+
+export const firebaseConfig = { 
+    apiKey: "AIzaSyDA5tCzxNzykHgaSv1640GanShQze3UK-M",
+    authDomain: "universalgamemaker.firebaseapp.com",
+    databaseURL: "https://universalgamemaker.firebaseio.com",
+    projectId: "universalgamemaker",
+    storageBucket: "universalgamemaker.appspot.com",
+    messagingSenderId: "144595629077"
+};
 
 export const appRoutes: Routes = [
   {path: '', redirectTo: '/', pathMatch: 'full'},
@@ -95,9 +97,6 @@ export const appRoutes: Routes = [
     ViewSpecComponent,
     UploadSpecComponent,
   ],
-  exports: [
-  	AppComponent
-  ],
   imports: [
     AngularFireModule.initializeApp(firebaseConfig),
     AngularFireDatabaseModule,
@@ -118,6 +117,7 @@ export const appRoutes: Routes = [
     MdStepperModule,
     MdTooltipModule,
     MdSelectModule,
+    MdSnackBarModule,
     BrowserAnimationsModule,
   ],
   providers: [AuthService],

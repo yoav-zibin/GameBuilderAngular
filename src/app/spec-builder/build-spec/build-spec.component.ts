@@ -1,6 +1,7 @@
 import { Component, Input, Output, HostListener, EventEmitter } from '@angular/core';
 import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
 import { AuthService } from '../../auth/auth.service';
+import { MdSnackBar } from '@angular/material';
 import { Observable } from 'rxjs/Observable';
 import * as firebase from 'firebase/app';
 import constants from '../../../constants.js';
@@ -41,7 +42,8 @@ export class BuildSpecComponent {
 
 	constructor(
 		private auth: AuthService, 
-		private db: AngularFireDatabase
+		private db: AngularFireDatabase,
+		private snackBar: MdSnackBar
 	) {
   		if(this.auth.authenticated) {
   			console.log('got here');
@@ -381,12 +383,13 @@ export class BuildSpecComponent {
 	deleteElement(data, id) {
 		if(this.fromSource(id))
 			return
-		
+		console.log(data);
 		this.piecesMap.delete(id);
 		console.log(this.piecesMap);
         this.onPiecesSet.emit(this.piecesMap);
         document.getElementById('board-overlay').removeChild(
         	document.getElementById(id));
+        this.deleteWarning(data);
 	}
 
 	buildQuery() {
@@ -403,8 +406,10 @@ export class BuildSpecComponent {
 		}
 	}
 
-	deleteWarning(){
-		return "Warning! You're about to delete this piece!"
+	deleteWarning(piece) {
+    	this.snackBar.open("Removed " + piece['key'] + " from spec",
+    		'Close', { duration: 1000 }
+    	);
 	}
 
 }

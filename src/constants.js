@@ -32,5 +32,4 @@ const constants = {
   ACCEPTED_IMAGE_FORMATS: '.png,.jpg,.jpeg,.svg,.gif',
   DEFAULT_AVATAR: "https://firebasestorage.googleapis.com/v0/b/universalgamemaker.appspot.com/o/images%2F-KwBrfAk0MiQ_s1jBS60.png?alt=media&token=d2f830bf-0b4b-48ca-a232-5a84e7433032"
 }
-
 export default constants;
