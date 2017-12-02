@@ -184,6 +184,7 @@ export class CreateElementComponent implements OnInit {
     }
 
     if (!this.isDeck()) {
+      this.images = this.imageSelectionService.getNonBoardImages();
       this.submit();
     } else {
       this.onCardFilterChange("all");
@@ -208,19 +209,20 @@ export class CreateElementComponent implements OnInit {
   }
 
   reset() {
+    this.cardFilter = null;
     this.elementCreated = false;
     this.elementInfo = {};
     this.elementName = "";
     this.elementType = null;
     this.elementTypeAndFaceNumber = null;
     this.faceNumber = null;
+    this.imageFilter = null;
     this.isDraggable = false;
     this.isDrawable = false;
     this.rotatableDegrees = 360;
     this.searchTerm = "";
   
     // Images and elements(cards).
-    this.onImageFilterChange("all");
     this.imageData = {};
     this.selectedCards = [];
     this.selectedCardIds = [];
