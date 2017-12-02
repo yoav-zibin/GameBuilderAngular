@@ -48,6 +48,7 @@ export class CreateElementComponent implements OnInit {
   // Images and elements(cards).
   elements: any;
   images: any;
+  imageData: any = {};
   selectedCards: any = [];
   selectedCardIds: string[] = [];
   selectedImages: any = [];
@@ -185,10 +186,14 @@ export class CreateElementComponent implements OnInit {
     if (!this.isDeck()) {
       this.submit();
     } else {
-      this.onImageFilterChange("all");
       this.onCardFilterChange("all");
       this.showElements = true;
     }
+  }
+
+  saveImageData(imageId: string, imageURL: string, height: number, width: number) {
+    this.imageData[imageId] = [imageURL, height, width];
+    return imageURL;
   }
 
   removeElement(element) {
@@ -215,6 +220,8 @@ export class CreateElementComponent implements OnInit {
     this.searchTerm = "";
   
     // Images and elements(cards).
+    this.onImageFilterChange("all");
+    this.imageData = {};
     this.selectedCards = [];
     this.selectedCardIds = [];
     this.selectedImages = [];

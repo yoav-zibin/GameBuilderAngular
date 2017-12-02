@@ -7,13 +7,18 @@
     <div class="listImages">
       <md-grid-list cols='2' rowHeight='100px'>
         <md-grid-tile *ngFor="let image of images | async" [colspan]='1' [rowspan]='1'>
-          <span mdTooltip="{{image?.name}} ({{image?.height}}x{{image?.width}})" mdTooltipPosition="above">
+          <span mdTooltip="{{image?.name}} ({{image?.height}}x{{image?.width}})"
+              mdTooltipPosition="above">
             <a (click)="selectImage(image)">
               <div *ngIf="image.height > image.width">
-                <img [src]="image?.downloadURL" height="100px">
+                <img
+                    [src]="saveImageData(image.$key, image?.downloadURL, image.height, image.width)"
+                    height="100px">
               </div>
               <div *ngIf="image.height <= image.width">
-                <img [src]="image?.downloadURL" width="100px">
+                <img 
+                    [src]="saveImageData(image.$key, image?.downloadURL, image.height, image.width)"
+                    width="100px">
               </div>
             </a>
           </span>
@@ -24,7 +29,8 @@
     <p id="note">Note: Only non-board images are listed.</p>
 
     <div class="filter">
-      <md-select placeholder="Filter images" [(ngModel)]="imageFilter" (ngModelChange)="onImageFilterChange($event)">
+      <md-select placeholder="Filter images" [(ngModel)]="imageFilter"
+          (ngModelChange)="onImageFilterChange($event)">
         <md-option value="all">All Images</md-option>
         <md-option value="myUploads">My Uploads</md-option>
         <md-option value="mostRecent">Most Recent</md-option>
@@ -34,7 +40,8 @@
 
     <div class="searchByName">
       <md-input-container *ngIf="searchByName">
-        <input mdInput type="text" placeholder="Image name" [(ngModel)]="searchTerm" (ngModelChange)="onSearchTermChange($event)"/>
+        <input mdInput type="text" placeholder="Image name" [(ngModel)]="searchTerm"
+            (ngModelChange)="onSearchTermChange($event)"/>
       </md-input-container>
     </div>
 
@@ -54,10 +61,12 @@
           <button md-icon-button color="warn" (click)="removeImage(image)">
             <md-icon aria-label="remove">cancel</md-icon>
           </button>
-          <button md-icon-button color="primary" *ngIf="selectedImages.length >= 2" (click)="ascendImage(i)">
+          <button md-icon-button color="primary" *ngIf="selectedImages.length >= 2"
+              (click)="ascendImage(i)">
             <md-icon aria-label="move up">arrow_upward</md-icon>
           </button>
-          <button md-icon-button color="primary" *ngIf="selectedImages.length >= 2" (click)="descendImage(i)">
+          <button md-icon-button color="primary" *ngIf="selectedImages.length >= 2"
+              (click)="descendImage(i)">
             <md-icon aria-label="move down">arrow_downward</md-icon>
           </button>
           <div *ngIf="selectedImage.height > selectedImage.width">
@@ -74,31 +83,43 @@
       </md-list>
     </div>
 
-    <button id="submit" md-raised-button [disabled]="hideNextButton" (click)="next()">Submit</button>
     <md-input-container id="elementName" *ngIf="!hideNextButton">
       <input mdInput type="text" placeholder="Element name" [(ngModel)]="elementName"/>
     </md-input-container>
 
+    <button id="submit" md-raised-button [disabled]="hideNextButton"
+        (click)="next()">
+      Submit
+    </button>
+
     <div [hidden]="!hideNextButton" class="warning">
-      <font *ngIf="elementType == 'toggable' || elementType == 'dice'" color="red"> Warning: Please select at least {{faceNumber}} images with same dimensions. </font>
-      <font *ngIf="!(elementType == 'toggable' || elementType == 'dice') && faceNumber != 1" color="red"> Warning: Please select {{faceNumber}} images with same dimensions. </font>
+      <font *ngIf="elementType == 'toggable' || elementType == 'dice'" color="red">
+        Warning: Please select at least {{faceNumber}} images with same dimensions.
+      </font>
+      <font *ngIf="!(elementType == 'toggable' || elementType == 'dice') && faceNumber != 1"
+        color="red">
+          Warning: Please select {{faceNumber}} images with same dimensions.
+      </font>
       <font *ngIf="faceNumber == 1" color="red"> Warning: Please select 1 image. </font>
     </div>
 
     <div class="features">
       <md-checkbox color="primary" [(ngModel)]="isDraggable">Draggable</md-checkbox><br>
-      <md-checkbox color="primary"  *ngIf="elementType=='standard' || elementType=='card'" [(ngModel)]="isDrawable">Drawable</md-checkbox><br>
+      <md-checkbox color="primary"  *ngIf="elementType=='standard' || elementType=='card'"
+        [(ngModel)]="isDrawable">Drawable
+      </md-checkbox>
+      <br>
       <md-input-container *ngIf="elementType=='standard'">
-        <input mdInput type="number" min="1" max="360" placeholder="Rotatable Degrees" [(ngModel)]="rotatableDegrees"/>
+        <input mdInput type="number" min="1" max="360" placeholder="Rotatable Degrees"
+            [(ngModel)]="rotatableDegrees"/>
       </md-input-container>
     </div>
   </div>
 
   <!-- Page for picking cards -->
   <div [hidden]="!showElements">
-
     <p id="notice"> You have selected {{selectedCardIds.length}} cards.</p>
-
+    
     <div class="listElements">
       <md-grid-list cols='1' rowHeight='100px'>
         <md-grid-tile *ngFor="let element of elements | async">
@@ -107,29 +128,31 @@
               <md-icon aria-label="Pick/Unpick">add_shopping_cart</md-icon>
             </button>
           </span>
-          <span *ngIf="element.name != null" mdTooltip="{{element.name}}" mdTooltipPosition="above">
+          <span *ngIf="element.name != null" mdTooltip="{{element.name}}"
+              mdTooltipPosition="above">
             <button md-icon-button color="primary" (click)="selectElement(element)">
               <md-icon aria-label="Pick/Unpick">add_shopping_cart</md-icon>
             </button>
           </span>
-          <div *ngFor="let image of images | async">
-            <div *ngIf="(element.images)[0]['imageId'] == image?.$key">
-              <div *ngIf="image.height > image.width">
-                <img [src]="image?.downloadURL" height="100px">
-              </div>
-              <div *ngIf="image.height <= image.width">
-                <img [src]="image?.downloadURL" width="100px">
-              </div>
-            </div>
-            <div *ngIf="(element.images)[1]['imageId'] == image?.$key">
-              <div *ngIf="image.height > image.width">
-                <img [src]="image?.downloadURL" height="100px">
-              </div>
-              <div *ngIf="image.height <= image.width">
-                <img [src]="image?.downloadURL" width="100px">
-              </div>
-            </div>
+
+          <div *ngIf="imageData[(element.images)[0]['imageId']][1] >
+              imageData[(element.images)[0]['imageId']][2]">
+            <img [src]="imageData[(element.images)[0]['imageId']][0]" height="100px">
           </div>
+          <div *ngIf="imageData[(element.images)[0]['imageId']][1] <=
+              imageData[(element.images)[0]['imageId']][2]">
+            <img [src]="imageData[(element.images)[0]['imageId']][0]" width="100px">
+          </div>
+
+          <div *ngIf="imageData[(element.images)[1]['imageId']][1] >
+              imageData[(element.images)[1]['imageId']][2]">
+            <img [src]="imageData[(element.images)[1]['imageId']][0]" height="100px">
+          </div>
+          <div *ngIf="imageData[(element.images)[1]['imageId']][1] <=
+              imageData[(element.images)[1]['imageId']][2]">
+            <img [src]="imageData[(element.images)[1]['imageId']][0]" width="100px">
+          </div>
+
           </md-grid-tile>
       </md-grid-list>
     </div>
@@ -137,7 +160,8 @@
     <p id="note">Note: Only cards are listed.</p>
 
     <div class="filter">
-      <md-select placeholder="Filter cards" [(ngModel)]="cardFilter" (ngModelChange)="onCardFilterChange($event)">
+      <md-select placeholder="Filter cards" [(ngModel)]="cardFilter"
+          (ngModelChange)="onCardFilterChange($event)">
         <md-option value="all">All Cards</md-option>
         <md-option value="myUploads">My Uploads</md-option>
         <md-option value="mostRecent">Most Recent</md-option>
@@ -147,11 +171,15 @@
 
     <div class="searchByName">
       <md-input-container *ngIf="searchByName">
-        <input mdInput type="text" placeholder="Card name" [(ngModel)]="searchTerm" (ngModelChange)="onSearchTermChange($event)"/>
+        <input mdInput type="text" placeholder="Card name" [(ngModel)]="searchTerm"
+            (ngModelChange)="onSearchTermChange($event)"/>
       </md-input-container>
     </div>
 
-    <button id="submit" md-raised-button [disabled]="hideSubmitButton" (click)="submit()">Submit</button>
+    <button id="submit" md-raised-button [disabled]="hideSubmitButton"
+        (click)="submit()">
+      Submit
+    </button>
 
     <div [hidden]="!hideSubmitButton" class="warning">
       <font color="red"> Warning: Please select at least 2 cards.</font>
@@ -170,28 +198,27 @@
               <md-icon aria-label="Unpick">remove_shopping_cart</md-icon>
             </button>
           </span>
-          <div *ngFor="let image of images | async">
-            <div *ngIf="(card.images)[0]['imageId'] == image?.$key">
-              <div *ngIf="image.height > image.width">
-                <img [src]="image?.downloadURL" height="100px">
-              </div>
-              <div *ngIf="image.height <= image.width">
-                <img [src]="image?.downloadURL" width="100px">
-              </div>
-            </div>
-            <div *ngIf="(card.images)[1]['imageId'] == image?.$key">
-              <div *ngIf="image.height > image.width">
-                <img [src]="image?.downloadURL" height="100px">
-              </div>
-              <div *ngIf="image.height <= image.width">
-                <img [src]="image?.downloadURL" width="100px">
-              </div>
-            </div>
+          
+          <div *ngIf="card.height > card.width">
+            <img [src]="imageData[(card.images)[0]['imageId']][0]" height="100px">
           </div>
-          <button md-icon-button color="accent" *ngIf="selectedCards.length >= 2" (click)="ascendCard(i)">
+          <div *ngIf="card.height <= card.width">
+            <img [src]="imageData[(card.images)[0]['imageId']][0]" width="100px">
+          </div>
+
+          <div *ngIf="card.height > card.width">
+            <img [src]="imageData[(card.images)[1]['imageId']][0]" height="100px">
+          </div>
+          <div *ngIf="card.height <= card.width">
+            <img [src]="imageData[(card.images)[1]['imageId']][0]" width="100px">
+          </div>
+
+          <button md-icon-button color="accent" *ngIf="selectedCards.length >= 2"
+              (click)="ascendCard(i)">
             <md-icon aria-label="move up">arrow_upward</md-icon>
           </button>
-          <button md-icon-button color="accent" *ngIf="selectedCards.length >= 2" (click)="descendCard(i)">
+          <button md-icon-button color="accent" *ngIf="selectedCards.length >= 2"
+              (click)="descendCard(i)">
             <md-icon aria-label="move down">arrow_downward</md-icon>
           </button>
         </md-grid-tile>
@@ -202,7 +229,8 @@
 </div>
 
 
-<div class="reset" [hidden]="userEmailEmpty || userIsAnonymous || !elementCreated" style="text-align: center">
+<div class="reset" [hidden]="userEmailEmpty || userIsAnonymous || !elementCreated"
+    style="text-align: center">
   <h2>
     Element created.
   </h2>
