@@ -15,14 +15,14 @@ import 'rxjs/add/observable/forkJoin';
 })
 export class BuildSpecComponent {
 	@Input() selectedBoard: object;
-	@Output() onPiecesSet = new EventEmitter<Map<string, object>>();
+	@Output() onPiecesSet = new EventEmitter<Map<number, object>>();
 
 	zPos:number = 2;
 	container:string = 'board-overlay';
 	uniqueID: number = 0;
 	newStage: boolean = true;
 	dragged: boolean = false;
-	piecesMap = new Map<string, object>();
+	piecesMap = new Map<number, object>();
 	pieces: object[] = new Array();
 	images: object[] = new Array();
 	elements: object[] = new Array();
@@ -50,6 +50,10 @@ export class BuildSpecComponent {
 		private konva: KonvaService
 	) {
   		if(this.auth.authenticated) {
+
+  			konva.specUpdateObs$.subscribe( stage => {
+  				this.updateSpec(stage);
+  			});
 
   			let p = new Promise( (resolve, reject) => {
 
@@ -146,6 +150,42 @@ export class BuildSpecComponent {
 		})
 	}
 
+	updateSpec(pieces) {
+		console.log('updating pieces');
+		console.log(pieces);
+		console.log(this.piecesMap);
+
+		for(let newPiece of pieces) {
+			
+			let curPiece = this.piecesMap.get(newPiece.index);
+			let xPos = newPiece.attrs['x'];
+			let yPos = newPiece.attrs['y'];
+
+			[xPos, yPos] = this.scaleCoord(xPos, yPos);
+			console.log("final: " + xPos + " " + yPos);
+
+			curPiece['xPos'] = xPos; curPiece['yPos'] = yPos;
+			
+			/*
+			//TODO : toggle deck images
+			let piece = {
+	    		"el_key": data["key"],
+	    		"url": data["url"],
+	    		"xPos": xPos,
+	    		"yPos": yPos,
+	    		"zPos": this.zPos,
+	    		"index": this.elementImageIndex.get(data["key"])["current"],
+	    		"deckIndex": deckIndex || -1
+	    	}
+	    	*/
+    	}
+
+		//this.piecesMap.set(this.uniqueID++, piece);
+		console.log(this.piecesMap);
+        this.onPiecesSet.emit(this.piecesMap);
+
+	}
+
 	@HostListener('dragstart', ['$event'])
 	onDragStart(event) {
 		if(this.newStage) {
@@ -174,7 +214,7 @@ export class BuildSpecComponent {
 	@HostListener('dragend', ['$event'])
     onDragEnd(event) {
     	console.log(event);
-    	this.konva.onDragEnd(event);
+    	//this.konva.onDragEnd(event);
     	console.log("dragend");
         //event.target.classList.remove('currentlyDragged');
 	}
@@ -207,7 +247,6 @@ export class BuildSpecComponent {
 		console.log("drop");
 		
 		let elem, xPos, yPos, width, height, deckIndex;
-		//let resize = false;
 
 		let data = event.dataTransfer.getData("data");
         data = JSON.parse(data);
@@ -234,11 +273,7 @@ export class BuildSpecComponent {
 		}
 		*/
 
-        // console.log('data: ' + data);
-        // console.log('id:' + elementID);
         [xPos, yPos] = this.calculatePosition(event);
-        // console.log('x:' + xPos);
-        // console.log('y:' + yPos);
 
         /*
       	if(this.fromSource(elementID)) {
@@ -253,12 +288,23 @@ export class BuildSpecComponent {
 		elem = document.getElementById(elementID);
 		[width, height] = this.resizeImage(elem);
 
-		//scale coordinates for range (0,0)
-		//[xPos, yPos] = this.scaleCoord(xPos, yPos);
-		//console.log("final: " + xPos + " " + yPos);
+		/*
+		** Add piece to Konva canvas
+		*/
+		let imageObj = {
+        	'xPos': xPos,
+        	'yPos': yPos,
+        	'src': data['url'], 
+        	'width': width,
+        	'height': height
+        }
+        this.konva.onDrop(imageObj);
 
+
+        //scale coordinates for range (0,0)
+		[xPos, yPos] = this.scaleCoord(xPos, yPos);
+		console.log("final: " + xPos + " " + yPos);
 		
-		console.log(data['url']);
 		//TODO : toggle deck images
 		let piece = {
     		"el_key": data["key"],
@@ -270,18 +316,11 @@ export class BuildSpecComponent {
     		"deckIndex": deckIndex || -1
     	}
 
-		this.piecesMap.set(data["key"], piece);
-		// console.log(this.piecesMap);
+		this.piecesMap.set(this.uniqueID++, piece);
+		console.log(this.piecesMap);
         this.onPiecesSet.emit(this.piecesMap);
 
-        let imageObj = {
-        	'xPos': xPos,
-        	'yPos': yPos,
-        	'src': data['url'], 
-        	'width': width,
-        	'height': height
-        }
-        this.konva.onDrop(imageObj);
+        
 
         /*
         if (event.target.nodeName !== "IMG") {
@@ -383,32 +422,12 @@ export class BuildSpecComponent {
 		return [width, height];
 
 	}
-	/*
-	updateStyle(elem, xPos, yPos) {
-		let width = Number((elem as HTMLImageElement).width);
-		let height = Number((elem as HTMLImageElement).height);
-		//if(resize) {
-			width = width / 2;
-			height = height / 2;
-		//}
-		console.log("width: " + width + " height:" + height);
-		let styleString = "position:absolute;"
-			+ "top:" + yPos + "px;"
-			+ "left:" + xPos + "px;"
-			+ "width:" +  width + "px;" 
-			+ "height:" + height + "px;"
-			+ "z-index:" + (++this.zPos);
-		console.log('zpos=' + this.zPos);
-		//(elem as HTMLElement).setAttribute('style', styleString);
-
-		return elem;
-	}
-	*/
 
 	fromSource(id) {
 		return (id.indexOf('copy') > -1) ? false : true;
 	}
 
+	/*
 	copyElement(data, id) {
 		let elem = document.getElementById(id).cloneNode(true);
 		(elem as HTMLElement).id = (elem as HTMLElement).id + 'copy' + this.uniqueID;
@@ -430,6 +449,7 @@ export class BuildSpecComponent {
         	document.getElementById(id));
         this.deleteWarning(data);
 	}
+	*/
 
 	buildQuery() {
 		if(this.currentFilter === 'mine')

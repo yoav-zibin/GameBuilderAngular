@@ -1,13 +1,29 @@
 import { Injectable } from '@angular/core';
+import { Subject }    from 'rxjs/Subject';
 import * as Konva from 'konva';
+
+let instance;
+function eventHandler(type, event) {
+  if(type === 'dragstart') {
+    instance.onDragStart(event);
+  }
+  else if(type === 'dragend') {
+    instance.onDragEnd(event);
+  }
+}
 
 @Injectable()
 export class KonvaService {
-    stage;
-    layer;
-    dragLayer;
+    private stage;
+    private layer;
+    private dragLayer;
+    private specUpdateSubj = new Subject<any>();
 
-    constructor() {}
+    specUpdateObs$ = this.specUpdateSubj.asObservable();
+
+    constructor() {
+      instance = this;
+    }
 
     buildImage(imageObj, xPos, yPos) {
       let img = new Konva.Image({
@@ -32,9 +48,10 @@ export class KonvaService {
         });
 
         this.layer = new Konva.Layer();
-        this.dragLayer = new Konva.Layer();
+        //this.dragLayer = new Konva.Layer();
 
-        
+        /*
+        //TESTING w/ CIRCLE
         var circle = new Konva.Circle({
               x: this.stage.getWidth() / 2,
               y: this.stage.getHeight() / 2,
@@ -44,12 +61,18 @@ export class KonvaService {
               strokeWidth: 4,
               draggable: true,
             });
-
         this.layer.add(circle);
-        this.stage.add(this.layer, this.dragLayer);
+        */
+
+        this.stage.add(this.layer);
+        //this.stage.add(this.layer, this.dragLayer);
 
         this.stage.on('dragstart', function(event) {
-          console.log(this);
+            eventHandler('dragstart', event);
+        });
+
+        this.stage.on('dragend', function(event) {
+            eventHandler('dragend', event);
         });
 
     }
@@ -68,9 +91,6 @@ export class KonvaService {
 
     onDragStart(event) {
       console.log("konva dragstart");
-
-      console.log(event.target);
-
       /*
       // moving to another layer will improve dragging performance ??
       event.target.moveTo(this.dragLayer)
@@ -79,13 +99,19 @@ export class KonvaService {
     }
 
     onDragEnd(event) {
-      console.log("konva dragend");
+      console.log('konva dragend');
+      this.sendUpdatedPieceSet()
 
-      console.log(event.target);
       /*
       event.target.moveTo(this.layer);
       this.layer.draw();
       this.dragLayer.draw();
       */
     }
+
+    sendUpdatedPieceSet() {
+      let pieces = this.stage.children[0].children;
+      this.specUpdateSubj.next(pieces);
+    }
+
 }

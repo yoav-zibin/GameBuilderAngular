@@ -24,7 +24,7 @@ export class SpecBuilderComponent implements OnInit {
 	secondFormGroup: FormGroup;
 	thirdFormGroup: FormGroup;
 	selectedBoard: object = {};
-	pieces: Map<string, object> = new Map<string, object>();
+	pieces: Map<number, object> = new Map<number, object>();
   blocked: boolean;
 
 	constructor(
@@ -58,7 +58,7 @@ export class SpecBuilderComponent implements OnInit {
   		console.log("receiving board");
   	}
 
-  	onPiecesSet(pieces: Map<string, object>) {
+  	onPiecesSet(pieces: Map<number, object>) {
   		this.pieces = pieces;
       if(this.pieces.size > 0) {
         this.secondFormGroup = this._formBuilder.group({
