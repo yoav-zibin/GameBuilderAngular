@@ -3,12 +3,15 @@ import { Subject }    from 'rxjs/Subject';
 import * as Konva from 'konva';
 
 let instance;
-function eventHandler(type, event) {
+function eventHandler(type, event, obj?) {
   if(type === 'dragstart') {
     instance.onDragStart(event);
   }
   else if(type === 'dragend') {
     instance.onDragEnd(event);
+  }
+  else if(type === 'click') {
+    instance.onClick(event, obj);
   }
 }
 
@@ -18,6 +21,7 @@ export class KonvaService {
     private layer;
     private dragLayer;
     private specUpdateSubj = new Subject<any>();
+    private elements;
 
     specUpdateObs$ = this.specUpdateSubj.asObservable();
 
@@ -33,10 +37,20 @@ export class KonvaService {
           draggable: true,
       });
 
+      img.on('click', function(event) {
+        eventHandler('click', event, this);
+      })
       // this doesn't work with cross-origin image sources
       //img.cache();
       //img.drawHitFromCache(0);
       return img;
+    }
+
+    updateImage(index, url) {
+      let img = this.stage.children[0].children[index];
+      let image = img.attrs.image;
+      image['src'] = url
+      this.stage.draw();
     }
 
     buildStage(container) {
@@ -109,9 +123,15 @@ export class KonvaService {
       */
     }
 
-    sendUpdatedPieceSet() {
+    onClick(event, obj) {
+      let toggled = obj.index
+      this.sendUpdatedPieceSet(toggled);
+    }
+
+    sendUpdatedPieceSet(toggled?) {
       let pieces = this.stage.children[0].children;
-      this.specUpdateSubj.next(pieces);
+      let pkg = [ pieces, toggled ];
+      this.specUpdateSubj.next(pkg);
     }
 
 }

@@ -51,8 +51,8 @@ export class BuildSpecComponent {
 	) {
   		if(this.auth.authenticated) {
 
-  			konva.specUpdateObs$.subscribe( stage => {
-  				this.updateSpec(stage);
+  			konva.specUpdateObs$.subscribe( data => {
+  				this.updateSpec(data);
   			});
 
   			let p = new Promise( (resolve, reject) => {
@@ -150,16 +150,29 @@ export class BuildSpecComponent {
 		})
 	}
 
-	updateSpec(pieces) {
+	updateSpec(data) {
 		console.log('updating pieces');
-		console.log(pieces);
+		console.log(data);
 		console.log(this.piecesMap);
 
-		for(let newPiece of pieces) {
+		for(let newPiece of data[0]) {
 			
 			let curPiece = this.piecesMap.get(newPiece.index);
 			let xPos = newPiece.attrs['x'];
 			let yPos = newPiece.attrs['y'];
+
+			/* Handling Toggling */
+			if(data[1] !== undefined && data[1] === newPiece.index) {
+				let key = this.piecesMap.get(data[1])['el_key'];
+				let index = this.getImageIndex(key);
+				let images = this.elementData.get(key)['images'];
+
+				let newURL = this.imageData.get(images[index]['imageId'])['downloadURL'];
+				curPiece['url'] = newURL;
+				curPiece['index'] = this.elementImageIndex.get(key)["current"];
+
+				this.konva.updateImage(newPiece.index, newURL);
+			}
 
 			[xPos, yPos] = this.scaleCoord(xPos, yPos);
 			console.log("final: " + xPos + " " + yPos);
@@ -336,10 +349,10 @@ export class BuildSpecComponent {
 
 	}
 
-	/*
 	@HostListener('click', ['$event'])
 	onClick(event) {
-
+		console.log('component click handler');
+		/*
 		if(this.dragged) {
 			this.dragged = false;
 			return;
@@ -367,9 +380,8 @@ export class BuildSpecComponent {
 		this.piecesMap.set(event.target.id, piece);
 		// console.log(this.piecesMap);
         this.onPiecesSet.emit(this.piecesMap);
-
+		*/
 	}
-	*/
 
 	getImageIndex(key) {
 		console.log(key);
