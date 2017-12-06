@@ -44,10 +44,18 @@ export class ImageSelectionService {
 
     getMostRecentNonBoardImages() {
         let query = {
-            orderByChild: "createOn"
+            orderByChild: "createdOn"
         };
         return this.db.list(this.IMAGES_PATH, {query})
                 .map(images => images.reverse().filter(image => !image.isBoardImage));
+    }
+
+    getMostRecentBoardImages() {
+        let query = {
+            orderByChild: "createdOn"
+        };
+        return this.db.list(this.IMAGES_PATH, {query})
+                .map(images => images.reverse().filter(image => image.isBoardImage));
     }
 
     getMyCardUploads(uid: string) {
@@ -68,6 +76,15 @@ export class ImageSelectionService {
             .map(images => images.filter(image => !image.isBoardImage));
     }
 
+    getMyBoardImageUploads(uid: string) {
+        let query = {
+            orderByChild: "uploaderUid",
+            equalTo: uid
+        };
+        return this.db.list(this.IMAGES_PATH, {query})
+            .map(images => images.filter(image => image.isBoardImage));
+    }
+
     getNonBoardImages() {
         let query = {
             orderByChild: "isBoardImage",
@@ -76,10 +93,27 @@ export class ImageSelectionService {
         return this.db.list(this.IMAGES_PATH, {query});
     }
 
+    getBoardImages() {
+        let query = {
+            orderByChild: "isBoardImage",
+            equalTo: true
+        };
+        return this.db.list(this.IMAGES_PATH, {query});
+    }
+
     getNonBoardImagesByName(searchTerm: string) {
         let query = {
             orderByChild: "isBoardImage",
             equalTo: false
+        }
+        return this.db.list(this.IMAGES_PATH, {query})
+                .map(images => images.filter(image => image.name.toLowerCase().indexOf(searchTerm.toLowerCase()) != -1));
+    }
+
+    getBoardImagesByName(searchTerm: string) {
+        let query = {
+            orderByChild: "isBoardImage",
+            equalTo: true
         }
         return this.db.list(this.IMAGES_PATH, {query})
                 .map(images => images.filter(image => image.name.toLowerCase().indexOf(searchTerm.toLowerCase()) != -1));

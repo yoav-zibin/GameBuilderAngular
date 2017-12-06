@@ -3,6 +3,7 @@ import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/databa
 import { AuthService } from '../../auth/auth.service';
 import { MdSnackBar } from '@angular/material';
 import { Observable } from 'rxjs/Observable';
+import { KonvaService } from '../../konva/konva.service'
 import * as firebase from 'firebase/app';
 import constants from '../../../constants.js';
 import 'rxjs/add/observable/forkJoin';
@@ -17,7 +18,9 @@ export class BuildSpecComponent {
 	@Output() onPiecesSet = new EventEmitter<Map<string, object>>();
 
 	zPos:number = 2;
+	container:string = 'board-overlay';
 	uniqueID: number = 0;
+	newStage: boolean = true;
 	dragged: boolean = false;
 	piecesMap = new Map<string, object>();
 	pieces: object[] = new Array();
@@ -43,10 +46,10 @@ export class BuildSpecComponent {
 	constructor(
 		private auth: AuthService, 
 		private db: AngularFireDatabase,
-		private snackBar: MdSnackBar
+		private snackBar: MdSnackBar,
+		private konva: KonvaService
 	) {
   		if(this.auth.authenticated) {
-  			console.log('got here');
 
   			let p = new Promise( (resolve, reject) => {
 
@@ -71,8 +74,6 @@ export class BuildSpecComponent {
 					})
 				})
 			});
-
-			
 
 			p.then( (msg) => {
 				console.log(msg);
@@ -109,7 +110,6 @@ export class BuildSpecComponent {
 		}
 	}
 
-
 	onChange(value){
 		this.currentFilter = value;
 		console.log("current filter: " + this.currentFilter);
@@ -126,33 +126,41 @@ export class BuildSpecComponent {
 			this.elementsRef.subscribe(snapshot => {
 				console.log('updating element array');
 				snapshot.forEach(data => {
-						let element = data.val();
-						element['_key'] = data.key;
-						let key = element.images[0]['imageId'];
-						let img = this.imageData.get(key);
-						
-						if(img !== undefined) {
-							element['downloadURL'] = img['downloadURL'];
-							element['name'] = img['name'];
-							this.elements.push(element);
-							this.elementData.set(data.key, element);
-							this.elementImageIndex.set(data.key, {
-								'current': 0,
-								'max': (element.images.length - 1),
-							});
-						}
-					})
-				// console.log(this.elements);
+					let element = data.val();
+					element['_key'] = data.key;
+					let key = element.images[0]['imageId'];
+					let img = this.imageData.get(key);
+					
+					if(img !== undefined) {
+						element['downloadURL'] = img['downloadURL'];
+						element['name'] = img['name'];
+						this.elements.push(element);
+						this.elementData.set(data.key, element);
+						this.elementImageIndex.set(data.key, {
+							'current': 0,
+							'max': (element.images.length - 1),
+						});
+					}
+				})
 			});
 		})
 	}
 
 	@HostListener('dragstart', ['$event'])
 	onDragStart(event) {
-		console.log("hello");
+		if(this.newStage) {
+			this.newStage = false;
+			this.konva.buildStage(this.container);
+		}
+		if(event.target.parentElement === this.container) {
+			this.konva.onDragStart(event);
+			return;
+		}
+
+		console.log("outer dragstart");
 		this.dragged = true;
 		
-        event.target.classList.add('currentlyDragged');
+        //event.target.classList.add('currentlyDragged');
         let url = event.target.getAttribute('src');
         let key = event.target.getAttribute('alt');
 
@@ -164,8 +172,9 @@ export class BuildSpecComponent {
 
 	@HostListener('dragend', ['$event'])
     onDragEnd(event) {
+    	this.konva.onDragEnd(event);
     	console.log("dragend");
-        event.target.classList.remove('currentlyDragged');
+        //event.target.classList.remove('currentlyDragged');
 	}
 
 	@HostListener('dragenter', ['$event'])
@@ -175,17 +184,12 @@ export class BuildSpecComponent {
 
 	@HostListener('dragover', ['$event'])
 	onDragOver(event) {
+
 		if(event.preventDefault) {
     		console.log("prevent dragover!");
     		event.preventDefault();
     	}
     	console.log(event.clientX + " " + event.clientY);
-
-        if(this.fromSource(event.dataTransfer.getData("text")))
-			event.dataTransfer.dropEffect = "copy";
-		else
-			event.dataTransfer.dropEffect = "move";
-
 	}
 
 	@HostListener('dragleave', ['$event'])
@@ -195,10 +199,11 @@ export class BuildSpecComponent {
 
   	@HostListener('drop', ['$event'])
 	onDrop(event) {
+		console.log(event.target);
 		console.log("drop");
 		
-		let elem, xPos, yPos, styleString;
-		let resize = false;
+		let elem, xPos, yPos, width, height, deckIndex;
+		//let resize = false;
 
 		let data = event.dataTransfer.getData("data");
         data = JSON.parse(data);
@@ -209,7 +214,8 @@ export class BuildSpecComponent {
         if(event.stopPropagation)
         	event.stopPropagation();
 
-        if(event.target.id !== 'board-overlay') {
+        /*
+        if(event.target.id !== this.container) {
         	let parent = event.target.parentElement;
 
         	if(event.target.id === 'trash-can') {
@@ -217,20 +223,20 @@ export class BuildSpecComponent {
 				this.deleteElement(data, elementID);
 				return
         	}
-			else if(parent.id !== 'board-overlay') {
+			else if(parent.id !== this.container) {
 				console.log('abandoning drop')
 				return
 			}
 		}
+		*/
 
         // console.log('data: ' + data);
         // console.log('id:' + elementID);
-
         [xPos, yPos] = this.calculatePosition(event);
         // console.log('x:' + xPos);
         // console.log('y:' + yPos);
 
-
+        /*
       	if(this.fromSource(elementID)) {
       		elem = this.copyElement(data, elementID);
       		elementID = (elem as HTMLElement).id;
@@ -239,13 +245,16 @@ export class BuildSpecComponent {
       	}
       	else
       		elem = document.getElementById(elementID);
-
-		elem = this.updateStyle(elem, xPos, yPos, resize);
+		*/
+		elem = document.getElementById(elementID);
+		[width, height] = this.resizeImage(elem);
 
 		//scale coordinates for range (0,0)
-		[xPos, yPos] = this.scaleCoord(xPos, yPos);
-		console.log("final: " + xPos + " " + yPos);
+		//[xPos, yPos] = this.scaleCoord(xPos, yPos);
+		//console.log("final: " + xPos + " " + yPos);
 
+		
+		console.log(data['url']);
 		//TODO : toggle deck images
 		let piece = {
     		"el_key": data["key"],
@@ -254,13 +263,23 @@ export class BuildSpecComponent {
     		"yPos": yPos,
     		"zPos": this.zPos,
     		"index": this.elementImageIndex.get(data["key"])["current"],
-    		"deckIndex": null
+    		"deckIndex": deckIndex || -1
     	}
 
-		this.piecesMap.set(elementID, piece);
+		this.piecesMap.set(data["key"], piece);
 		// console.log(this.piecesMap);
         this.onPiecesSet.emit(this.piecesMap);
 
+        let imageObj = {
+        	'xPos': xPos,
+        	'yPos': yPos,
+        	'src': data['url'], 
+        	'width': width,
+        	'height': height
+        }
+        this.konva.onDrop(imageObj);
+
+        /*
         if (event.target.nodeName !== "IMG") {
         	console.log('ok to drop here.')
     		event.target.appendChild(elem);
@@ -269,7 +288,9 @@ export class BuildSpecComponent {
 			console.log('dropping in parent');
 			event.target.parentNode.appendChild(elem);
 		}
-        
+		*/
+
+
 	}
 
 	@HostListener('click', ['$event'])
@@ -345,13 +366,23 @@ export class BuildSpecComponent {
 		return [xPos, yPos];
 	}
 
-	updateStyle(elem, xPos, yPos, resize) {
+	resizeImage(elem) {
 		let width = Number((elem as HTMLImageElement).width);
 		let height = Number((elem as HTMLImageElement).height);
-		if(resize) {
+
+		width = width / 2;
+		height = height / 2;
+		return [width, height];
+
+	}
+	/*
+	updateStyle(elem, xPos, yPos) {
+		let width = Number((elem as HTMLImageElement).width);
+		let height = Number((elem as HTMLImageElement).height);
+		//if(resize) {
 			width = width / 2;
 			height = height / 2;
-		}
+		//}
 		console.log("width: " + width + " height:" + height);
 		let styleString = "position:absolute;"
 			+ "top:" + yPos + "px;"
@@ -360,10 +391,11 @@ export class BuildSpecComponent {
 			+ "height:" + height + "px;"
 			+ "z-index:" + (++this.zPos);
 		console.log('zpos=' + this.zPos);
-		(elem as HTMLElement).setAttribute('style', styleString);
+		//(elem as HTMLElement).setAttribute('style', styleString);
 
 		return elem;
 	}
+	*/
 
 	fromSource(id) {
 		return (id.indexOf('copy') > -1) ? false : true;
@@ -387,7 +419,7 @@ export class BuildSpecComponent {
 		this.piecesMap.delete(id);
 		console.log(this.piecesMap);
         this.onPiecesSet.emit(this.piecesMap);
-        document.getElementById('board-overlay').removeChild(
+        document.getElementById(this.container).removeChild(
         	document.getElementById(id));
         this.deleteWarning(data);
 	}
