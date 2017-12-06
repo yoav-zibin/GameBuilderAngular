@@ -2,10 +2,8 @@
 
 <div id="piece-selector">
 	<md-grid-list cols="2" rowHeight="75px">
-	  <md-grid-tile
-	      *ngFor="let element of elements; let i = index;"
-	      	[colspan]="1"
-	      	[rowspan]="1">
+	  <md-grid-tile id="source" *ngFor="let element of elements; let i = index;"
+	  	[colspan]="1" [rowspan]="1">
 	      	<img id="piece-{{i}}" class="piece-image" src="{{element.downloadURL}}" alt="{{element._key}}"/>
 		    <div class="overlay">
 		      	<div class="overlay-text">
@@ -34,7 +32,7 @@
 
 <div id="board-container">
 	<img id="board" src="{{selectedBoard['url']}}">
-	<div id="board-overlay"></div>
+	<div id="board-overlay" ondragover="event.preventDefault()"></div>
 </div>
 
 <div class="clear"></div>

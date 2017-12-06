@@ -152,7 +152,8 @@ export class BuildSpecComponent {
 			this.newStage = false;
 			this.konva.buildStage(this.container);
 		}
-		if(event.target.parentElement === this.container) {
+
+		if(event.target.parentElement.parentElement.id !== 'source') {
 			this.konva.onDragStart(event);
 			return;
 		}
@@ -172,6 +173,7 @@ export class BuildSpecComponent {
 
 	@HostListener('dragend', ['$event'])
     onDragEnd(event) {
+    	console.log(event);
     	this.konva.onDragEnd(event);
     	console.log("dragend");
         //event.target.classList.remove('currentlyDragged');
@@ -182,6 +184,7 @@ export class BuildSpecComponent {
 		console.log("drag enter");
 	}
 
+	/*
 	@HostListener('dragover', ['$event'])
 	onDragOver(event) {
 
@@ -191,6 +194,7 @@ export class BuildSpecComponent {
     	}
     	console.log(event.clientX + " " + event.clientY);
 	}
+	*/
 
 	@HostListener('dragleave', ['$event'])
 	onDragLeave(event) {
@@ -293,17 +297,21 @@ export class BuildSpecComponent {
 
 	}
 
+	/*
 	@HostListener('click', ['$event'])
 	onClick(event) {
+
 		if(this.dragged) {
 			this.dragged = false;
 			return;
 		}
-
+		
 		if(event.target.id.indexOf('piece') === -1 ) {
 			console.log("can't click here");
 			return;
 		}
+
+		console.log(event.target);
 
 		console.log('toggling!');
 		let element = document.getElementById(event.target.id);
@@ -322,7 +330,7 @@ export class BuildSpecComponent {
         this.onPiecesSet.emit(this.piecesMap);
 
 	}
-
+	*/
 
 	getImageIndex(key) {
 		console.log(key);
@@ -406,7 +414,6 @@ export class BuildSpecComponent {
 		(elem as HTMLElement).id = (elem as HTMLElement).id + 'copy' + this.uniqueID;
         (elem as HTMLElement).setAttribute("src", data["url"]);
         (elem as HTMLElement).setAttribute("alt", data["key"]);
-        (elem as HTMLElement).classList.remove('currentlyDragged');
         this.uniqueID++;
 
         return elem;
