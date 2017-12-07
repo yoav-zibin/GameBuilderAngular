@@ -5,10 +5,10 @@ import * as Konva from 'konva';
 let instance;
 function eventHandler(type, event, obj?) {
   if(type === 'dragstart') {
-    instance.onDragStart(event);
+    instance.onDragStart(event, obj);
   }
   else if(type === 'dragend') {
-    instance.onDragEnd(event);
+    instance.onDragEnd(event, obj);
   }
   else if(type === 'click') {
     instance.onClick(event, obj);
@@ -39,7 +39,13 @@ export class KonvaService {
 
       img.on('click', function(event) {
         eventHandler('click', event, this);
-      })
+      });
+      img.on('dragstart', function(event) {
+        eventHandler('dragstart', event, this);
+      });
+      img.on('dragend', function(event) {
+        eventHandler('dragend', event, this);
+      });
       // this doesn't work with cross-origin image sources
       //img.cache();
       //img.drawHitFromCache(0);
@@ -67,6 +73,7 @@ export class KonvaService {
         this.stage.add(this.layer);
         //this.stage.add(this.layer, this.dragLayer);
 
+        /*
         this.stage.on('dragstart', function(event) {
             eventHandler('dragstart', event);
         });
@@ -74,22 +81,22 @@ export class KonvaService {
         this.stage.on('dragend', function(event) {
             eventHandler('dragend', event);
         });
-
+        */
     }
 
-    onDrop(obj) {
-        this._onDrop(obj);
+    onDrop(img) {
+        this._onDrop(img);
         this.stage.draw();
     }
 
-    _onDrop(obj) {
+    _onDrop(img) {
         console.log('konva drop!');
         
-        let imageObj = new Image(obj['width'], obj['height']);
-        imageObj.src = obj['src'];
+        let imageObj = new Image(img['width'], img['height']);
+        imageObj.src = img['src'];
         
-        let img = this.buildImage(imageObj, obj['xPos'], obj['yPos']);
-        img.moveTo(this.layer)
+        let image = this.buildImage(imageObj, img['xPos'], img['yPos']);
+        image.moveTo(this.layer)
     }
 
     onCardDeckDrop(deck, x, y) {
@@ -125,8 +132,9 @@ export class KonvaService {
 
     }
 
-    onDragStart(event) {
+    onDragStart(event, img) {
       console.log("konva dragstart");
+      img.setZIndex(img.getAbsoluteZIndex() + 1);
       /*
       // moving to another layer will improve dragging performance ??
       event.target.moveTo(this.dragLayer)
@@ -134,9 +142,9 @@ export class KonvaService {
       */
     }
 
-    onDragEnd(event) {
+    onDragEnd(event, img) {
       console.log('konva dragend');
-      this.sendUpdatedPieceSet()
+      this.sendUpdatedPieceSet(img.index, 'dragged');
 
       /*
       event.target.moveTo(this.layer);
@@ -145,14 +153,13 @@ export class KonvaService {
       */
     }
 
-    onClick(event, obj) {
-      let toggled = obj.index;
-      this.sendUpdatedPieceSet(toggled);
+    onClick(event, img) {
+      this.sendUpdatedPieceSet(img.index, 'toggled');
     }
 
-    sendUpdatedPieceSet(toggled?) {
+    sendUpdatedPieceSet(id, message) {
       let pieces = this.stage.children[0].children;
-      let pkg = [ pieces, toggled ];
+      let pkg = [ pieces, id, message];
       this.specUpdateSubj.next(pkg);
     }
 

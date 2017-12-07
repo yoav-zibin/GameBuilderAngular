@@ -163,8 +163,7 @@ export class BuildSpecComponent {
 			let yPos = newPiece.attrs['y'];
 
 			/* Handling Toggling */
-			console.log(this.pieces);
-			if(data[1] !== undefined && data[1] === newPiece.index) {
+			if(data[2] === 'toggled') {
 				let key = this.nonDeckPieces[data[1]]['el_key'];
 				let index = this.getImageIndex(key);
 				let images = this.elementData.get(key)['images'];
@@ -174,6 +173,9 @@ export class BuildSpecComponent {
 				curPiece['index'] = this.elementImageIndex.get(key)["current"];
 
 				this.konva.updateImage(newPiece.index, newURL);
+			}
+			else { // data[2] === 'dragged'
+				curPiece['zPos'] = this.zPos++;
 			}
 
 			[xPos, yPos] = this.scaleCoord(xPos, yPos);
@@ -196,11 +198,6 @@ export class BuildSpecComponent {
 			this.konva.buildStage(this.container);
 		}
 
-		if(event.target.parentElement.parentElement.id !== 'source') {
-			this.konva.onDragStart(event);
-			return;
-		}
-
 		console.log("component dragstart");
 		this.dragged = true;
 		
@@ -209,17 +206,15 @@ export class BuildSpecComponent {
         let key = event.target.getAttribute('alt');
 
         console.log('key:' + key + ' url:' + url);
-        event.dataTransfer.setData("data",
-        	JSON.stringify({'key': key, 'url': url}));
-        event.dataTransfer.setData("text", event.target.id);
+        event.dataTransfer.setData(
+        	"data", JSON.stringify({'key': key, 'url': url})
+        );
 	}
 
 	@HostListener('dragend', ['$event'])
     onDragEnd(event) {
-    	console.log(event);
-    	//this.konva.onDragEnd(event);
     	console.log("dragend");
-        //event.target.classList.remove('currentlyDragged');
+
 	}
 
 	@HostListener('dragenter', ['$event'])
@@ -245,7 +240,6 @@ export class BuildSpecComponent {
 
 		let data = event.dataTransfer.getData("data");
         data = JSON.parse(data);
-        //let elementID = event.dataTransfer.getData("text");
         elem = this.elementData.get(data['key']);
         type = elem['elementKind'];
 
