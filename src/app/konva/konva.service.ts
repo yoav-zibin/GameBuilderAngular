@@ -50,6 +50,8 @@ export class KonvaService {
       let img = this.stage.children[0].children[index];
       let image = img.attrs.image;
       image['src'] = url
+      console.log(image);
+      console.log(url);
       this.stage.draw();
     }
 
@@ -63,20 +65,6 @@ export class KonvaService {
 
         this.layer = new Konva.Layer();
         //this.dragLayer = new Konva.Layer();
-
-        /*
-        //TESTING w/ CIRCLE
-        var circle = new Konva.Circle({
-              x: this.stage.getWidth() / 2,
-              y: this.stage.getHeight() / 2,
-              radius: 70,
-              fill: 'red',
-              stroke: 'black',
-              strokeWidth: 4,
-              draggable: true,
-            });
-        this.layer.add(circle);
-        */
 
         this.stage.add(this.layer);
         //this.stage.add(this.layer, this.dragLayer);
@@ -92,15 +80,57 @@ export class KonvaService {
     }
 
     onDrop(obj) {
+        this._onDrop(obj);
+        this.stage.draw();
+    }
+
+    _onDrop(obj) {
         console.log('konva drop!');
-        console.log(obj);
         
         let imageObj = new Image(obj['width'], obj['height']);
         imageObj.src = obj['src'];
         
         let img = this.buildImage(imageObj, obj['xPos'], obj['yPos']);
         img.moveTo(this.layer)
-        this.stage.draw();
+    }
+
+    onCardDeckDrop(deck, x, y) {
+        let count = deck.length;
+        for(let el of deck) {
+            // don't add 'deck' to board
+            console.log(el);
+
+            let imageObj = {
+                'xPos': x,
+                'yPos': y,
+                'src': el['downloadURL'], 
+                'width': el['width'],
+                'height': el['height']
+            }
+            console.log('DECK DROP');
+            console.log(imageObj);
+            this._onDrop(imageObj);
+            this.stage.draw();
+        }
+    }
+
+    onPiecesDeckDrop(deck, x, y) {
+        let count = deck.length;
+        for(let el of deck) {
+
+            let imageObj = {
+                'xPos': (x += 2),
+                'yPos': (y += 2),
+                'src': el['downloadURL'], 
+                'width': el['width'],
+                'height': el['height']
+            }
+            console.log('DECK DROP');
+            console.log(imageObj);
+            this._onDrop(imageObj);
+            this.stage.draw();
+        }
+
     }
 
     onDragStart(event) {
@@ -124,7 +154,7 @@ export class KonvaService {
     }
 
     onClick(event, obj) {
-      let toggled = obj.index
+      let toggled = obj.index;
       this.sendUpdatedPieceSet(toggled);
     }
 

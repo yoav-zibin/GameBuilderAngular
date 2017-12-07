@@ -15,15 +15,14 @@ import 'rxjs/add/observable/forkJoin';
 })
 export class BuildSpecComponent {
 	@Input() selectedBoard: object;
-	@Output() onPiecesSet = new EventEmitter<Map<number, object>>();
+	@Output() onPiecesSet = new EventEmitter<object[]>();
 
 	zPos:number = 2;
 	container:string = 'board-overlay';
-	uniqueID: number = 0;
 	newStage: boolean = true;
 	dragged: boolean = false;
 	piecesMap = new Map<number, object>();
-	pieces: object[] = new Array();
+	pieces: object[] = new Array()
 	images: object[] = new Array();
 	elements: object[] = new Array();
 	imageData = new Map<string, object>();
@@ -32,8 +31,9 @@ export class BuildSpecComponent {
 	elementsRef: FirebaseListObservable<any[]>;
 	imagesRef: FirebaseListObservable<any[]>;
 
-	currentFilter = 'standard';
+	currentFilter = 'mine';
 	options = [
+		{value: 'all', viewValue: 'All Elements'},
 		{value: 'mine', viewValue: 'My Uploads'},
 		{value: 'standard', viewValue: 'Standard'},
 		{value: 'toggable', viewValue: 'Toggable'},
@@ -140,6 +140,7 @@ export class BuildSpecComponent {
 						element['name'] = img['name'];
 						this.elements.push(element);
 						this.elementData.set(data.key, element);
+
 						this.elementImageIndex.set(data.key, {
 							'current': 0,
 							'max': (element.images.length - 1),
@@ -152,18 +153,17 @@ export class BuildSpecComponent {
 
 	updateSpec(data) {
 		console.log('updating pieces');
-		console.log(data);
-		console.log(this.piecesMap);
+		console.log(this.pieces)
 
 		for(let newPiece of data[0]) {
 			
-			let curPiece = this.piecesMap.get(newPiece.index);
+			let curPiece = this.pieces[newPiece.index];
 			let xPos = newPiece.attrs['x'];
 			let yPos = newPiece.attrs['y'];
 
 			/* Handling Toggling */
 			if(data[1] !== undefined && data[1] === newPiece.index) {
-				let key = this.piecesMap.get(data[1])['el_key'];
+				let key = this.pieces[data[1] + 1]['el_key'];
 				let index = this.getImageIndex(key);
 				let images = this.elementData.get(key)['images'];
 
@@ -178,24 +178,12 @@ export class BuildSpecComponent {
 			console.log("final: " + xPos + " " + yPos);
 
 			curPiece['xPos'] = xPos; curPiece['yPos'] = yPos;
+
 			
-			/*
-			//TODO : toggle deck images
-			let piece = {
-	    		"el_key": data["key"],
-	    		"url": data["url"],
-	    		"xPos": xPos,
-	    		"yPos": yPos,
-	    		"zPos": this.zPos,
-	    		"index": this.elementImageIndex.get(data["key"])["current"],
-	    		"deckIndex": deckIndex || -1
-	    	}
-	    	*/
     	}
 
-		//this.piecesMap.set(this.uniqueID++, piece);
-		console.log(this.piecesMap);
-        this.onPiecesSet.emit(this.piecesMap);
+		console.log(this.pieces);
+        this.onPiecesSet.emit(this.pieces);
 
 	}
 
@@ -211,7 +199,7 @@ export class BuildSpecComponent {
 			return;
 		}
 
-		console.log("outer dragstart");
+		console.log("component dragstart");
 		this.dragged = true;
 		
         //event.target.classList.add('currentlyDragged');
@@ -237,18 +225,6 @@ export class BuildSpecComponent {
 		console.log("drag enter");
 	}
 
-	/*
-	@HostListener('dragover', ['$event'])
-	onDragOver(event) {
-
-		if(event.preventDefault) {
-    		console.log("prevent dragover!");
-    		event.preventDefault();
-    	}
-    	console.log(event.clientX + " " + event.clientY);
-	}
-	*/
-
 	@HostListener('dragleave', ['$event'])
 	onDragLeave(event) {
 		console.log("drag leave");
@@ -256,131 +232,135 @@ export class BuildSpecComponent {
 
   	@HostListener('drop', ['$event'])
 	onDrop(event) {
-		console.log(event.target);
-		console.log("drop");
-		
-		let elem, xPos, yPos, width, height, deckIndex;
-
-		let data = event.dataTransfer.getData("data");
-        data = JSON.parse(data);
-        let elementID = event.dataTransfer.getData("text");
+		console.log("component drop");
 
 		if(event.preventDefault)
 			event.preventDefault();
         if(event.stopPropagation)
         	event.stopPropagation();
+		
+		let elem, xPos, yPos, width, height, deckIndex, type;
 
-        /*
-        if(event.target.id !== this.container) {
-        	let parent = event.target.parentElement;
-
-        	if(event.target.id === 'trash-can') {
-				console.log('deleting piece');
-				this.deleteElement(data, elementID);
-				return
-        	}
-			else if(parent.id !== this.container) {
-				console.log('abandoning drop')
-				return
-			}
-		}
-		*/
+		let data = event.dataTransfer.getData("data");
+        data = JSON.parse(data);
+        //let elementID = event.dataTransfer.getData("text");
+        elem = this.elementData.get(data['key']);
+        type = elem['elementKind'];
 
         [xPos, yPos] = this.calculatePosition(event);
+        [width, height] = this.resizeImage(elem);
 
-        /*
-      	if(this.fromSource(elementID)) {
-      		elem = this.copyElement(data, elementID);
-      		elementID = (elem as HTMLElement).id;
-      		resize = true;
+		if(type === 'piecesDeck' || type === 'cardsDeck') {
+			let deckX, deckY;
+			[deckX, deckY] = this.scaleCoord(xPos, yPos);
+			let piece = {
+	            "el_key": data["key"],
+	            "url": data["url"],
+	            "xPos": deckX,
+	            "yPos": deckY,
+	            "zPos": this.zPos++,
+	            "index": this.elementImageIndex.get(data["key"])["current"],
+	            "deckIndex": -1 //non deck-pieces only
+	        }
 
-      	}
-      	else
-      		elem = document.getElementById(elementID);
-		*/
-		elem = document.getElementById(elementID);
-		[width, height] = this.resizeImage(elem);
+	        //add deck to spec
+        	this.pieces.push(piece);
 
-		/*
-		** Add piece to Konva canvas
-		*/
-		let imageObj = {
-        	'xPos': xPos,
-        	'yPos': yPos,
-        	'src': data['url'], 
-        	'width': width,
-        	'height': height
-        }
-        this.konva.onDrop(imageObj);
+        	let deckPieceIndex = this.pieces.length - 1;
+			let deckElements = this.getDeck(data['key']);
+			let resized = this.resizeDeck(deckElements)
+			
+			// Add deck elements to Konva canvas
+			if(type === 'cardsDeck') {
+				this.konva.onCardDeckDrop(resized, xPos, yPos);
+				[xPos, yPos] = this.scaleCoord(xPos, yPos);
 
+				// cards are stacked on top of each other
+				for(let el of deckElements) {
+					let piece = {
+			    		"el_key": el["_key"],
+			    		"url": el["downloadURL"],
+			    		"xPos": xPos,
+			    		"yPos": yPos,
+			    		"zPos": this.zPos++,
+			    		"index": this.elementImageIndex.get(data["key"])["current"],
+			    		"deckIndex": deckPieceIndex
+		    		}
+					this.pieces.push(piece);
+				}
+			}
+			else {
+				this.konva.onPiecesDeckDrop(resized, xPos, yPos);
+				[xPos, yPos] = this.scaleCoord(xPos, yPos);
 
-        //scale coordinates for range (0,0)
-		[xPos, yPos] = this.scaleCoord(xPos, yPos);
-		console.log("final: " + xPos + " " + yPos);
-		
-		//TODO : toggle deck images
-		let piece = {
-    		"el_key": data["key"],
-    		"url": data["url"],
-    		"xPos": xPos,
-    		"yPos": yPos,
-    		"zPos": this.zPos,
-    		"index": this.elementImageIndex.get(data["key"])["current"],
-    		"deckIndex": deckIndex || -1
-    	}
-
-		this.piecesMap.set(this.uniqueID++, piece);
-		console.log(this.piecesMap);
-        this.onPiecesSet.emit(this.piecesMap);
-
-        
-
-        /*
-        if (event.target.nodeName !== "IMG") {
-        	console.log('ok to drop here.')
-    		event.target.appendChild(elem);
+				// pieces are layered on top of each other
+				for(let el of deckElements) {
+					let piece = {
+			    		"el_key": el["_key"],
+			    		"url": el["downloadURL"],
+			    		"xPos": (xPos += 2),
+			    		"yPos": (yPos += 2),
+			    		"zPos": this.zPos++,
+			    		"index": this.elementImageIndex.get(data["key"])["current"],
+			    		"deckIndex": deckPieceIndex
+		    		}
+					this.pieces.push(piece);
+				}
+			}
 		}
-		else {
-			console.log('dropping in parent');
-			event.target.parentNode.appendChild(elem);
-		}
-		*/
 
+		else { //add non-deck pieces to canvas
 
+			let imageObj = {
+	        	'xPos': xPos,
+	        	'yPos': yPos,
+	        	'src': data['url'], 
+	        	'width': width,
+	        	'height': height
+	        }
+	        this.konva.onDrop(imageObj);
+	        [xPos, yPos] = this.scaleCoord(xPos, yPos);
+
+	    	let piece = {
+	            "el_key": data["key"],
+	            "url": data["url"],
+	            "xPos": xPos,
+	            "yPos": yPos,
+	            "zPos": this.zPos++,
+	            "index": this.elementImageIndex.get(data["key"])["current"],
+	            "deckIndex": -1 //non deck-pieces only
+	        }
+	        this.pieces.push(piece);
+	    }
+
+	    console.log(this.pieces);
+	    this.onPiecesSet.emit(this.pieces);
 	}
 
 	@HostListener('click', ['$event'])
 	onClick(event) {
 		console.log('component click handler');
-		/*
-		if(this.dragged) {
-			this.dragged = false;
-			return;
+	}
+
+	getDeck(key) {
+		let deckElements = new Array();
+		let deck = this.elementData.get(key);
+		for(let el of deck['deckElements']) {
+			let deckElement = this.elementData.get(el['deckMemberElementId']);
+			deckElements.push(deckElement);
 		}
-		
-		if(event.target.id.indexOf('piece') === -1 ) {
-			console.log("can't click here");
-			return;
+		return deckElements;
+	}
+
+	resizeDeck(deckElements) {
+		let resized = new Array();
+		for(let el of deckElements) {
+			let el2 = Object.create(el);
+			[el2['width'], el2['height']] = this.resizeImage(el);
+			resized.push(el2);
 		}
 
-		console.log(event.target);
-
-		console.log('toggling!');
-		let element = document.getElementById(event.target.id);
-		let key = element.getAttribute('alt');
-		let index = this.getImageIndex(key);
-		let images = this.elementData.get(key)['images'];
-		element.setAttribute(
-			'src',
-			this.imageData.get(images[index]['imageId'])['downloadURL']
-		);
-
-		let piece = this.piecesMap.get(event.target.id);
-		piece['index'] = this.elementImageIndex.get(key)["current"];
-		this.piecesMap.set(event.target.id, piece);
-		// console.log(this.piecesMap);
-        this.onPiecesSet.emit(this.piecesMap);
-		*/
+		return resized;
 	}
 
 	getImageIndex(key) {
@@ -426,20 +406,19 @@ export class BuildSpecComponent {
 	}
 
 	resizeImage(elem) {
-		let width = Number((elem as HTMLImageElement).width);
-		let height = Number((elem as HTMLImageElement).height);
-
-		width = width / 2;
-		height = height / 2;
+		let width = elem['width'] / 2;
+		let height = elem['height'] / 2;
 		return [width, height];
 
 	}
 
+	/*  DEPRECATED
 	fromSource(id) {
 		return (id.indexOf('copy') > -1) ? false : true;
 	}
+	*/
 
-	/*
+	/*  DEPRECATED
 	copyElement(data, id) {
 		let elem = document.getElementById(id).cloneNode(true);
 		(elem as HTMLElement).id = (elem as HTMLElement).id + 'copy' + this.uniqueID;
@@ -449,7 +428,8 @@ export class BuildSpecComponent {
 
         return elem;
 	}
-
+	*/
+	/* DEPRECATED
 	deleteElement(data, id) {
 		if(this.fromSource(id))
 			return
@@ -464,11 +444,15 @@ export class BuildSpecComponent {
 	*/
 
 	buildQuery() {
-		if(this.currentFilter === 'mine')
+		if(this.currentFilter === 'mine') {
 			return {
 				orderByChild: 'uploaderUid',
 				equalTo: this.auth.currentUserId,
 			}
+		} 
+		else if(this.currentFilter === 'all') {
+			return {}
+		}
 		else {
 			return {
 				orderByChild: 'elementKind',
@@ -477,10 +461,12 @@ export class BuildSpecComponent {
 		}
 	}
 
+	/* DEPRECATED
 	deleteWarning(piece) {
     	this.snackBar.open("Removed " + piece['key'] + " from spec",
     		'Close', { duration: 1000 }
     	);
 	}
+	*/
 
 }
