@@ -6,15 +6,19 @@
   </md-select>
 </div>
 
+<div class="searchByName">
+  <md-input-container *ngIf="searchByName">
+    <input mdInput type="text" placeholder="Image name" [(ngModel)]="searchTerm"
+        (ngModelChange)="onSearchTermChange($event)"/>
+  </md-input-container>
+</div>
+
 <md-grid-list cols="2" rowHeight="135px">
-  <md-grid-tile
-      *ngFor="let image of images"
-      	[colspan]="1"
-      	[rowspan]="2">
-      	<input class="board-image" type="image" src="{{image.downloadURL}}" alt="could not find image" id="selected-board" value="{{image.name}}" (click)="selectBoard(image)"/>
+  <md-grid-tile *ngFor="let image of imagesRef | async" [colspan]="1" [rowspan]="2">
+      	<input class="board-image" type="image" src="{{image?.downloadURL}}" alt="could not find image" id="selected-board" value="{{image?.name}}" (click)="selectBoard(image)"/>
 	    <div class="overlay">
 	      	<div class="overlay-text">
-	      		{{image.name}}
+	      		{{image?.name}}
 	      	</div>
 	    </div>
   </md-grid-tile>

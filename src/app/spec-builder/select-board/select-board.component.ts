@@ -2,6 +2,7 @@ import { Component, EventEmitter, Output, ElementRef  } from '@angular/core';
 import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
 import { Observable } from 'rxjs/Observable';
 import { AuthService } from '../../auth/auth.service';
+import { ImageSelectionService } from '../../image-select/imageSelection.service'
 import * as firebase from 'firebase/app';
 import constants from '../../../constants.js'
 
@@ -12,11 +13,12 @@ import constants from '../../../constants.js'
   styleUrls: ['./select-board.component.css']
 })
 export class SelectBoardComponent {
-	imagesRef: FirebaseListObservable<any[]>;
+	imagesRef: any;
 	images: object[] = new Array();
 	all_images: object[] = new Array();
 	my_images: object[] = new Array();
 	selected: boolean;
+	searchByName: boolean;
 	selectedBoardUrl: string;
 	selectedBoardKey: string;
 	selectedBoardName: string;
@@ -26,55 +28,47 @@ export class SelectBoardComponent {
 	options = [
 		{value: 'all', viewValue: 'All Boards'},
 		{value: 'mine', viewValue: 'My Boards'},
+		{value: 'recent', viewValue: 'Most Recent'},
+		{value: 'search', viewValue: 'Search By Name'},
 	]
 
 	constructor(
 		private db: AngularFireDatabase,
 		private auth: AuthService,
+		private select: ImageSelectionService,
 	) {
 
 		if(this.auth.authenticated) {
-			this.imagesRef = db.list(constants.IMAGES_PATH, {
-				query: {
-					orderByChild: "isBoardImage",
-					equalTo: true,
-				},
-				preserveSnapshot: true,
-			});
-
-			this.imagesRef.subscribe(snapshot => {
-				console.log('creating image array');
-				snapshot.forEach(data => {
-					let board = data.val();
-					board['key'] = data.key;
-					this.all_images.push(board);
-					if(board['uploaderUid'] == this.auth.currentUserId)
-						this.my_images.push(board);
-				});
-			});
-
-			this.images = this.all_images;
+			this.imagesRef = select.getBoardImages();
 		}
 	}
 
 	onChange(value){
+		this.searchByName = false;
 		this.currentFilter = value;
 		console.log("current filter: " + this.currentFilter);
 
 		if(value == "mine")
-			this.images = this.my_images;
+			this.imagesRef = this.select.getMyBoardImageUploads(this.auth.currentUserId);
+		else if(value == "recent")
+			this.imagesRef = this.select.getMostRecentBoardImages();
+		else if(value == "all")
+			this.imagesRef = this.select.getBoardImages();
 		else
-			this.images = this.all_images;
+			this.searchByName = true;
+	}
 
-
+	onSearchTermChange(value) {
+    	this.imagesRef = value == "" ? this.select.getBoardImages() : 
+    	this.select.getBoardImagesByName(value);
 	}
 
 	selectBoard(board) {
 		console.log("sending board...")
-		// console.log(board)
+		console.log(board)
 		this.onSelected.emit(
 			{
-				'key': board.key,
+				'key': board.$key,
 				'name': board.name,
 				'url': board.downloadURL
 			}

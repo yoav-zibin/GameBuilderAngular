@@ -7,8 +7,10 @@ import { AngularFireDatabaseModule } from 'angularfire2/database';
 import { AngularFireAuthModule } from 'angularfire2/auth';
 import { RouterModule, Routes } from '@angular/router';
 import { provideRoutes } from '@angular/router';
-import {AppRoutingModule} from './app-routing.module';
-import {AuthService} from './auth/auth.service';
+import { AppRoutingModule } from './app-routing.module';
+import { AuthService } from './auth/auth.service';
+import { KonvaService } from './konva/konva.service';
+import { ImageSelectionService } from './image-select/imageSelection.service'
 //import firebaseConfig from '../config.js';
 //import * as firebase from 'firebase/app';
 
@@ -44,6 +46,7 @@ import { SpecViewerComponent } from './spec-viewer/spec-viewer.component';
 import { SpecSelectorComponent } from './spec-viewer/spec-selector/spec-selector.component';
 import { ViewSpecComponent } from './spec-viewer/view-spec/view-spec.component';
 import { UploadSpecComponent } from './spec-viewer/upload-spec/upload-spec.component';
+
 
 /*
 //OLD SPEC CONFIG
@@ -120,7 +123,7 @@ export const appRoutes: Routes = [
     MdSnackBarModule,
     BrowserAnimationsModule,
   ],
-  providers: [AuthService],
+  providers: [AuthService, KonvaService, ImageSelectionService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

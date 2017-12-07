@@ -24,7 +24,7 @@ export class SpecBuilderComponent implements OnInit {
 	secondFormGroup: FormGroup;
 	thirdFormGroup: FormGroup;
 	selectedBoard: object = {};
-	pieces: Map<string, object> = new Map<string, object>();
+	pieces: object[] = new Array();
   blocked: boolean;
 
 	constructor(
@@ -58,9 +58,9 @@ export class SpecBuilderComponent implements OnInit {
   		console.log("receiving board");
   	}
 
-  	onPiecesSet(pieces: Map<string, object>) {
+  	onPiecesSet(pieces: object[]) {
   		this.pieces = pieces;
-      if(this.pieces.size > 0) {
+      if(this.pieces.length > 0) {
         this.secondFormGroup = this._formBuilder.group({
           secondCtrl: ['validated', Validators.required]
         });
@@ -90,7 +90,7 @@ export class SpecBuilderComponent implements OnInit {
   }
 
   secondWarning() {
-    if(this.pieces.size == 0) {
+    if(this.pieces.length === 0) {
       this.snackBar.open("You must place at least one element.", 'Close', {
         duration: 1000,
       });

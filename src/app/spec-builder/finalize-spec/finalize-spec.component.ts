@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { AuthService } from '../../auth/auth.service';
 import { Router } from '@angular/router';
 import { MdSnackBar } from '@angular/material';
@@ -12,11 +12,10 @@ import * as firebase from 'firebase/app';
   templateUrl: './finalize-spec.component.html',
   styleUrls: ['./finalize-spec.component.css']
 })
-export class FinalizeSpecComponent implements OnChanges {
+export class FinalizeSpecComponent{
 	@Input() selectedBoard: object;
-	@Input() piecesMap: Map<string, object>;
+	@Input() pieces: object[] = new Array();
   @Input() piecesSet: boolean;
-  pieces: object[] = new Array<object>();
   specsRef: FirebaseListObservable<any[]>;
   count:number = 0;
   unique:boolean;
@@ -45,17 +44,6 @@ export class FinalizeSpecComponent implements OnChanges {
   	private router: Router,
     private snackBar: MdSnackBar
   ) { }
-
-  ngOnChanges() {
-    this.convertPiecesMapToArray();
-  }
-
-  convertPiecesMapToArray() {
-    if(this.piecesSet) {
-      console.log('creating piece array!');
-      this.pieces = Array.from(this.piecesMap.values());
-    }  
-  }
 
   createGameSpec() {
     this.userID = this.auth.currentUserId;
@@ -107,7 +95,7 @@ export class FinalizeSpecComponent implements OnChanges {
   			'cardVisibilitiy': [],
   			'drawing': [],
   		},
-  		'deckPieceIndex': (piece['deckIndex'] || -1),
+  		'deckPieceIndex': piece['deckIndex'],
   	};
   	return pieceSpec
   }

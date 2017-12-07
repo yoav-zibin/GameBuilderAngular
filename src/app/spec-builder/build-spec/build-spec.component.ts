@@ -3,6 +3,7 @@ import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/databa
 import { AuthService } from '../../auth/auth.service';
 import { MdSnackBar } from '@angular/material';
 import { Observable } from 'rxjs/Observable';
+import { KonvaService } from '../../konva/konva.service'
 import * as firebase from 'firebase/app';
 import constants from '../../../constants.js';
 import 'rxjs/add/observable/forkJoin';
@@ -14,13 +15,14 @@ import 'rxjs/add/observable/forkJoin';
 })
 export class BuildSpecComponent {
 	@Input() selectedBoard: object;
-	@Output() onPiecesSet = new EventEmitter<Map<string, object>>();
+	@Output() onPiecesSet = new EventEmitter<object[]>();
 
 	zPos:number = 2;
-	uniqueID: number = 0;
+	container:string = 'board-overlay';
+	newStage: boolean = true;
 	dragged: boolean = false;
-	piecesMap = new Map<string, object>();
-	pieces: object[] = new Array();
+	piecesMap = new Map<number, object>();
+	pieces: object[] = new Array()
 	images: object[] = new Array();
 	elements: object[] = new Array();
 	imageData = new Map<string, object>();
@@ -29,8 +31,9 @@ export class BuildSpecComponent {
 	elementsRef: FirebaseListObservable<any[]>;
 	imagesRef: FirebaseListObservable<any[]>;
 
-	currentFilter = 'standard';
+	currentFilter = 'all';
 	options = [
+		{value: 'all', viewValue: 'All Elements'},
 		{value: 'mine', viewValue: 'My Uploads'},
 		{value: 'standard', viewValue: 'Standard'},
 		{value: 'toggable', viewValue: 'Toggable'},
@@ -43,10 +46,14 @@ export class BuildSpecComponent {
 	constructor(
 		private auth: AuthService, 
 		private db: AngularFireDatabase,
-		private snackBar: MdSnackBar
+		private snackBar: MdSnackBar,
+		private konva: KonvaService
 	) {
   		if(this.auth.authenticated) {
-  			console.log('got here');
+
+  			konva.specUpdateObs$.subscribe( data => {
+  				this.updateSpec(data);
+  			});
 
   			let p = new Promise( (resolve, reject) => {
 
@@ -71,8 +78,6 @@ export class BuildSpecComponent {
 					})
 				})
 			});
-
-			
 
 			p.then( (msg) => {
 				console.log(msg);
@@ -109,7 +114,6 @@ export class BuildSpecComponent {
 		}
 	}
 
-
 	onChange(value){
 		this.currentFilter = value;
 		console.log("current filter: " + this.currentFilter);
@@ -126,33 +130,79 @@ export class BuildSpecComponent {
 			this.elementsRef.subscribe(snapshot => {
 				console.log('updating element array');
 				snapshot.forEach(data => {
-						let element = data.val();
-						element['_key'] = data.key;
-						let key = element.images[0]['imageId'];
-						let img = this.imageData.get(key);
-						
-						if(img !== undefined) {
-							element['downloadURL'] = img['downloadURL'];
-							element['name'] = img['name'];
-							this.elements.push(element);
-							this.elementData.set(data.key, element);
-							this.elementImageIndex.set(data.key, {
-								'current': 0,
-								'max': (element.images.length - 1),
-							});
-						}
-					})
-				// console.log(this.elements);
+					let element = data.val();
+					element['_key'] = data.key;
+					let key = element.images[0]['imageId'];
+					let img = this.imageData.get(key);
+					
+					if(img !== undefined) {
+						element['downloadURL'] = img['downloadURL'];
+						element['name'] = img['name'];
+						this.elements.push(element);
+						this.elementData.set(data.key, element);
+
+						this.elementImageIndex.set(data.key, {
+							'current': 0,
+							'max': (element.images.length - 1),
+						});
+					}
+				})
 			});
 		})
 	}
 
+	updateSpec(data) {
+		console.log('updating pieces');
+		console.log(this.pieces)
+
+		for(let newPiece of data[0]) {
+			
+			let curPiece = this.pieces[newPiece.index];
+			let xPos = newPiece.attrs['x'];
+			let yPos = newPiece.attrs['y'];
+
+			/* Handling Toggling */
+			if(data[1] !== undefined && data[1] === newPiece.index) {
+				let key = this.pieces[data[1] + 1]['el_key'];
+				let index = this.getImageIndex(key);
+				let images = this.elementData.get(key)['images'];
+
+				let newURL = this.imageData.get(images[index]['imageId'])['downloadURL'];
+				curPiece['url'] = newURL;
+				curPiece['index'] = this.elementImageIndex.get(key)["current"];
+
+				this.konva.updateImage(newPiece.index, newURL);
+			}
+
+			[xPos, yPos] = this.scaleCoord(xPos, yPos);
+			console.log("final: " + xPos + " " + yPos);
+
+			curPiece['xPos'] = xPos; curPiece['yPos'] = yPos;
+
+			
+    	}
+
+		console.log(this.pieces);
+        this.onPiecesSet.emit(this.pieces);
+
+	}
+
 	@HostListener('dragstart', ['$event'])
 	onDragStart(event) {
-		console.log("hello");
+		if(this.newStage) {
+			this.newStage = false;
+			this.konva.buildStage(this.container);
+		}
+
+		if(event.target.parentElement.parentElement.id !== 'source') {
+			this.konva.onDragStart(event);
+			return;
+		}
+
+		console.log("component dragstart");
 		this.dragged = true;
 		
-        event.target.classList.add('currentlyDragged');
+        //event.target.classList.add('currentlyDragged');
         let url = event.target.getAttribute('src');
         let key = event.target.getAttribute('alt');
 
@@ -164,28 +214,15 @@ export class BuildSpecComponent {
 
 	@HostListener('dragend', ['$event'])
     onDragEnd(event) {
+    	console.log(event);
+    	//this.konva.onDragEnd(event);
     	console.log("dragend");
-        event.target.classList.remove('currentlyDragged');
+        //event.target.classList.remove('currentlyDragged');
 	}
 
 	@HostListener('dragenter', ['$event'])
 	onDragEnter(event) {
 		console.log("drag enter");
-	}
-
-	@HostListener('dragover', ['$event'])
-	onDragOver(event) {
-		if(event.preventDefault) {
-    		console.log("prevent dragover!");
-    		event.preventDefault();
-    	}
-    	console.log(event.clientX + " " + event.clientY);
-
-        if(this.fromSource(event.dataTransfer.getData("text")))
-			event.dataTransfer.dropEffect = "copy";
-		else
-			event.dataTransfer.dropEffect = "move";
-
 	}
 
 	@HostListener('dragleave', ['$event'])
@@ -195,113 +232,145 @@ export class BuildSpecComponent {
 
   	@HostListener('drop', ['$event'])
 	onDrop(event) {
-		console.log("drop");
-		
-		let elem, xPos, yPos, styleString;
-		let resize = false;
-
-		let data = event.dataTransfer.getData("data");
-        data = JSON.parse(data);
-        let elementID = event.dataTransfer.getData("text");
+		console.log("component drop");
 
 		if(event.preventDefault)
 			event.preventDefault();
         if(event.stopPropagation)
         	event.stopPropagation();
+		
+		let elem, xPos, yPos, width, height, deckIndex, type;
 
-        if(event.target.id !== 'board-overlay') {
-        	let parent = event.target.parentElement;
+		let data = event.dataTransfer.getData("data");
+        data = JSON.parse(data);
+        //let elementID = event.dataTransfer.getData("text");
+        elem = this.elementData.get(data['key']);
+        type = elem['elementKind'];
 
-        	if(event.target.id === 'trash-can') {
-				console.log('deleting piece');
-				this.deleteElement(data, elementID);
-				return
-        	}
-			else if(parent.id !== 'board-overlay') {
-				console.log('abandoning drop')
-				return
+        console.log(elem);
+
+        [xPos, yPos] = this.calculatePosition(event);
+        [width, height] = this.resizeImage(elem);
+
+        console.log(elem);
+
+		if(type === 'piecesDeck' || type === 'cardsDeck') {
+			let deckX, deckY;
+			[deckX, deckY] = this.scaleCoord(xPos, yPos);
+			let piece = {
+	            "el_key": data["key"],
+	            "url": data["url"],
+	            "xPos": deckX,
+	            "yPos": deckY,
+	            "zPos": this.zPos++,
+	            "index": this.elementImageIndex.get(data["key"])["current"],
+	            "deckIndex": -1 //non deck-pieces only
+	        }
+
+	        //add deck to spec
+        	this.pieces.push(piece);
+
+        	let deckPieceIndex = this.pieces.length - 1;
+			let deckElements = this.getDeck(data['key']);
+			let resized = this.resizeDeck(deckElements)
+			
+			// Add deck elements to Konva canvas
+			if(type === 'cardsDeck') {
+				this.konva.onCardDeckDrop(resized, xPos, yPos);
+				[xPos, yPos] = this.scaleCoord(xPos, yPos);
+
+				// cards are stacked on top of each other
+				for(let el of deckElements) {
+					let piece = {
+			    		"el_key": el["_key"],
+			    		"url": el["downloadURL"],
+			    		"xPos": xPos,
+			    		"yPos": yPos,
+			    		"zPos": this.zPos++,
+			    		"index": this.elementImageIndex.get(data["key"])["current"],
+			    		"deckIndex": deckPieceIndex
+		    		}
+					this.pieces.push(piece);
+				}
+			}
+			else {
+				this.konva.onPiecesDeckDrop(resized, xPos, yPos);
+				[xPos, yPos] = this.scaleCoord(xPos, yPos);
+
+				// pieces are layered on top of each other
+				for(let el of deckElements) {
+					let piece = {
+			    		"el_key": el["_key"],
+			    		"url": el["downloadURL"],
+			    		"xPos": xPos++,
+			    		"yPos": yPos++,
+			    		"zPos": this.zPos++,
+			    		"index": this.elementImageIndex.get(data["key"])["current"],
+			    		"deckIndex": deckPieceIndex
+		    		}
+					this.pieces.push(piece);
+				}
 			}
 		}
 
-        // console.log('data: ' + data);
-        // console.log('id:' + elementID);
+		else { //add non-deck pieces to canvas
 
-        [xPos, yPos] = this.calculatePosition(event);
-        // console.log('x:' + xPos);
-        // console.log('y:' + yPos);
+			let imageObj = {
+	        	'xPos': xPos,
+	        	'yPos': yPos,
+	        	'src': data['url'], 
+	        	'width': width,
+	        	'height': height
+	        }
+	        this.konva.onDrop(imageObj);
+	        [xPos, yPos] = this.scaleCoord(xPos, yPos);
 
+	    	let piece = {
+	            "el_key": data["key"],
+	            "url": data["url"],
+	            "xPos": xPos,
+	            "yPos": yPos,
+	            "zPos": this.zPos++,
+	            "index": this.elementImageIndex.get(data["key"])["current"],
+	            "deckIndex": -1 //non deck-pieces only
+	        }
+	        this.pieces.push(piece);
+	    }
 
-      	if(this.fromSource(elementID)) {
-      		elem = this.copyElement(data, elementID);
-      		elementID = (elem as HTMLElement).id;
-      		resize = true;
-
-      	}
-      	else
-      		elem = document.getElementById(elementID);
-
-		elem = this.updateStyle(elem, xPos, yPos, resize);
-
-		//scale coordinates for range (0,0)
-		[xPos, yPos] = this.scaleCoord(xPos, yPos);
-		console.log("final: " + xPos + " " + yPos);
-
-		//TODO : toggle deck images
-		let piece = {
-    		"el_key": data["key"],
-    		"url": data["url"],
-    		"xPos": xPos,
-    		"yPos": yPos,
-    		"zPos": this.zPos,
-    		"index": this.elementImageIndex.get(data["key"])["current"],
-    		"deckIndex": null
-    	}
-
-		this.piecesMap.set(elementID, piece);
-		// console.log(this.piecesMap);
-        this.onPiecesSet.emit(this.piecesMap);
-
-        if (event.target.nodeName !== "IMG") {
-        	console.log('ok to drop here.')
-    		event.target.appendChild(elem);
-		}
-		else {
-			console.log('dropping in parent');
-			event.target.parentNode.appendChild(elem);
-		}
-        
+	    console.log(this.pieces);
+	    this.onPiecesSet.emit(this.pieces);
 	}
 
 	@HostListener('click', ['$event'])
 	onClick(event) {
-		if(this.dragged) {
-			this.dragged = false;
-			return;
-		}
-
-		if(event.target.id.indexOf('piece') === -1 ) {
-			console.log("can't click here");
-			return;
-		}
-
-		console.log('toggling!');
-		let element = document.getElementById(event.target.id);
-		let key = element.getAttribute('alt');
-		let index = this.getImageIndex(key);
-		let images = this.elementData.get(key)['images'];
-		element.setAttribute(
-			'src',
-			this.imageData.get(images[index]['imageId'])['downloadURL']
-		);
-
-		let piece = this.piecesMap.get(event.target.id);
-		piece['index'] = this.elementImageIndex.get(key)["current"];
-		this.piecesMap.set(event.target.id, piece);
-		// console.log(this.piecesMap);
-        this.onPiecesSet.emit(this.piecesMap);
-
+		console.log('component click handler');
 	}
 
+	getDeck(key) {
+		let deckElements = new Array();
+		let deck = this.elementData.get(key);
+		console.log('get deck');
+		for(let el of deck['deckElements']) {
+			let deckElement = this.elementData.get(el['deckMemberElementId']);
+			console.log(deckElement);
+			deckElements.push(deckElement);
+		}
+		return deckElements;
+	}
+
+	resizeDeck(deckElements) {
+		let resized = new Array();
+		console.log('HERE!');
+		console.log(deckElements);
+		for(let el of deckElements) {
+			console.log(el);
+			let el2 = Object.create(el);
+			[el2['width'], el2['height']] = this.resizeImage(el);
+			resized.push(el2);
+		}
+
+		return resized;
+	}
 
 	getImageIndex(key) {
 		console.log(key);
@@ -345,41 +414,31 @@ export class BuildSpecComponent {
 		return [xPos, yPos];
 	}
 
-	updateStyle(elem, xPos, yPos, resize) {
-		let width = Number((elem as HTMLImageElement).width);
-		let height = Number((elem as HTMLImageElement).height);
-		if(resize) {
-			width = width / 2;
-			height = height / 2;
-		}
-		console.log("width: " + width + " height:" + height);
-		let styleString = "position:absolute;"
-			+ "top:" + yPos + "px;"
-			+ "left:" + xPos + "px;"
-			+ "width:" +  width + "px;" 
-			+ "height:" + height + "px;"
-			+ "z-index:" + (++this.zPos);
-		console.log('zpos=' + this.zPos);
-		(elem as HTMLElement).setAttribute('style', styleString);
+	resizeImage(elem) {
+		let width = elem['width'] / 2;
+		let height = elem['height'] / 2;
+		return [width, height];
 
-		return elem;
 	}
 
+	/*  DEPRECATED
 	fromSource(id) {
 		return (id.indexOf('copy') > -1) ? false : true;
 	}
+	*/
 
+	/*  DEPRECATED
 	copyElement(data, id) {
 		let elem = document.getElementById(id).cloneNode(true);
 		(elem as HTMLElement).id = (elem as HTMLElement).id + 'copy' + this.uniqueID;
         (elem as HTMLElement).setAttribute("src", data["url"]);
         (elem as HTMLElement).setAttribute("alt", data["key"]);
-        (elem as HTMLElement).classList.remove('currentlyDragged');
         this.uniqueID++;
 
         return elem;
 	}
-
+	*/
+	/* DEPRECATED
 	deleteElement(data, id) {
 		if(this.fromSource(id))
 			return
@@ -387,17 +446,22 @@ export class BuildSpecComponent {
 		this.piecesMap.delete(id);
 		console.log(this.piecesMap);
         this.onPiecesSet.emit(this.piecesMap);
-        document.getElementById('board-overlay').removeChild(
+        document.getElementById(this.container).removeChild(
         	document.getElementById(id));
         this.deleteWarning(data);
 	}
+	*/
 
 	buildQuery() {
-		if(this.currentFilter === 'mine')
+		if(this.currentFilter === 'mine') {
 			return {
 				orderByChild: 'uploaderUid',
 				equalTo: this.auth.currentUserId,
 			}
+		} 
+		else if(this.currentFilter === 'all') {
+			return {}
+		}
 		else {
 			return {
 				orderByChild: 'elementKind',
@@ -406,10 +470,12 @@ export class BuildSpecComponent {
 		}
 	}
 
+	/* DEPRECATED
 	deleteWarning(piece) {
     	this.snackBar.open("Removed " + piece['key'] + " from spec",
     		'Close', { duration: 1000 }
     	);
 	}
+	*/
 
 }
