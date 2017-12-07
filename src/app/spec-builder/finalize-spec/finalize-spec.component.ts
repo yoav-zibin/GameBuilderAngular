@@ -102,7 +102,7 @@ export class FinalizeSpecComponent{
 
   uploadGameSpec() {
     if(!this.unique) {
-      this.submitWarning("This game name already exists. Please choose another.");
+      this.raiseSnackBar("This game name already exists. Please choose another.");
       return;
     }
   	console.log("uploading...")
@@ -110,7 +110,7 @@ export class FinalizeSpecComponent{
   		.then(result => {
   			console.log("this worked!")
   			this.router.navigate(['/']).then(result => {
-  				alert("Uploaded Spec!");
+  				this.raiseSnackBar("Successfully uploaded spec!");
   			})
   		})
   		.catch(error => {
@@ -123,7 +123,7 @@ export class FinalizeSpecComponent{
     this.gameName =
       (<HTMLInputElement>document.getElementById("gameName")).value;
     if(this.gameName === "") {
-      this.submitWarning("Game name must contain at least one character.");
+      this.raiseSnackBar("Game name must contain at least one character.");
       valid = false;
     }
     
@@ -151,7 +151,7 @@ export class FinalizeSpecComponent{
 
   }
 
-  submitWarning(message) {
+  raiseSnackBar(message) {
       this.snackBar.open(message, 'Close', { duration: 1000 });
   }
 
