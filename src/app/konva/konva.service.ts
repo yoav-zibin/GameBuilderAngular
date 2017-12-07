@@ -49,9 +49,7 @@ export class KonvaService {
     updateImage(index, url) {
       let img = this.stage.children[0].children[index];
       let image = img.attrs.image;
-      image['src'] = url
-      console.log(image);
-      console.log(url);
+      image['src'] = url;
       this.stage.draw();
     }
 
@@ -97,8 +95,6 @@ export class KonvaService {
     onCardDeckDrop(deck, x, y) {
         let count = deck.length;
         for(let el of deck) {
-            // don't add 'deck' to board
-            console.log(el);
 
             let imageObj = {
                 'xPos': x,
@@ -107,8 +103,6 @@ export class KonvaService {
                 'width': el['width'],
                 'height': el['height']
             }
-            console.log('DECK DROP');
-            console.log(imageObj);
             this._onDrop(imageObj);
             this.stage.draw();
         }
@@ -125,8 +119,6 @@ export class KonvaService {
                 'width': el['width'],
                 'height': el['height']
             }
-            console.log('DECK DROP');
-            console.log(imageObj);
             this._onDrop(imageObj);
             this.stage.draw();
         }

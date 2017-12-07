@@ -23,6 +23,7 @@ export class BuildSpecComponent {
 	dragged: boolean = false;
 	piecesMap = new Map<number, object>();
 	pieces: object[] = new Array()
+	nonDeckPieces: object[] = new Array();
 	images: object[] = new Array();
 	elements: object[] = new Array();
 	imageData = new Map<string, object>();
@@ -162,8 +163,9 @@ export class BuildSpecComponent {
 			let yPos = newPiece.attrs['y'];
 
 			/* Handling Toggling */
+			console.log(this.pieces);
 			if(data[1] !== undefined && data[1] === newPiece.index) {
-				let key = this.pieces[data[1] + 1]['el_key'];
+				let key = this.nonDeckPieces[data[1]]['el_key'];
 				let index = this.getImageIndex(key);
 				let images = this.elementData.get(key)['images'];
 
@@ -291,6 +293,7 @@ export class BuildSpecComponent {
 			    		"deckIndex": deckPieceIndex
 		    		}
 					this.pieces.push(piece);
+					this.nonDeckPieces.push(piece);
 				}
 			}
 			else {
@@ -309,6 +312,7 @@ export class BuildSpecComponent {
 			    		"deckIndex": deckPieceIndex
 		    		}
 					this.pieces.push(piece);
+					this.nonDeckPieces.push(piece);
 				}
 			}
 		}
@@ -335,6 +339,7 @@ export class BuildSpecComponent {
 	            "deckIndex": -1 //non deck-pieces only
 	        }
 	        this.pieces.push(piece);
+	        this.nonDeckPieces.push(piece);
 	    }
 
 	    console.log(this.pieces);
@@ -349,10 +354,8 @@ export class BuildSpecComponent {
 	getDeck(key) {
 		let deckElements = new Array();
 		let deck = this.elementData.get(key);
-		console.log('get deck');
 		for(let el of deck['deckElements']) {
 			let deckElement = this.elementData.get(el['deckMemberElementId']);
-			console.log(deckElement);
 			deckElements.push(deckElement);
 		}
 		return deckElements;
@@ -360,10 +363,8 @@ export class BuildSpecComponent {
 
 	resizeDeck(deckElements) {
 		let resized = new Array();
-		console.log('HERE!');
-		console.log(deckElements);
+
 		for(let el of deckElements) {
-			console.log(el);
 			let el2 = Object.create(el);
 			[el2['width'], el2['height']] = this.resizeImage(el);
 			resized.push(el2);
@@ -373,9 +374,7 @@ export class BuildSpecComponent {
 	}
 
 	getImageIndex(key) {
-		console.log(key);
 		let indexData = this.elementImageIndex.get(key);
-		console.log(indexData);
 		let cur = indexData['current'];
 		let max = indexData['max'];
 
