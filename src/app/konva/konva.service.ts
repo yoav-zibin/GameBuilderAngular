@@ -22,6 +22,7 @@ export class KonvaService {
     private dragLayer;
     private specUpdateSubj = new Subject<any>();
     private elements;
+    private images: any[];
 
     specUpdateObs$ = this.specUpdateSubj.asObservable();
 
@@ -52,10 +53,15 @@ export class KonvaService {
       return img;
     }
 
-    updateImage(index, url) {
-      let img = this.stage.children[0].children[index];
-      let image = img.attrs.image;
-      image['src'] = url;
+    updateImage(id, url) {
+      let images = this.stage.children[0].children;
+      for(let image of images) {
+          if(image._id === id) {
+              let img = image.attrs.image;
+              img['src'] = url;
+              break;
+          }
+      }
       this.stage.draw();
     }
 
@@ -144,7 +150,7 @@ export class KonvaService {
 
     onDragEnd(event, img) {
       console.log('konva dragend');
-      this.sendUpdatedPieceSet(img.index, 'dragged');
+      this.sendUpdatedPieceSet(this.getIndex(img), 'dragged');
 
       /*
       event.target.moveTo(this.layer);
@@ -154,13 +160,19 @@ export class KonvaService {
     }
 
     onClick(event, img) {
-      this.sendUpdatedPieceSet(img.index, 'toggled');
+      this.sendUpdatedPieceSet(this.getIndex(img), 'toggled');
     }
 
     sendUpdatedPieceSet(id, message) {
       let pieces = this.stage.children[0].children;
       let pkg = [ pieces, id, message];
       this.specUpdateSubj.next(pkg);
+    }
+
+    getIndex(img) {
+        // get zero-based index from image._id
+        // stage and layer have _ids 1 and 2
+        return img._id - 3;
     }
 
 }

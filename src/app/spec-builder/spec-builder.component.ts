@@ -58,8 +58,8 @@ export class SpecBuilderComponent implements OnInit {
   		console.log("receiving board");
   	}
 
-  	onPiecesSet(pieces: object[]) {
-  		this.pieces = pieces;
+  	onPiecesSet(piecesObj: object) {
+  		this.pieces = piecesObj['nonDeck'].concat(piecesObj['deck']);
       if(this.pieces.length > 0) {
         this.secondFormGroup = this._formBuilder.group({
           secondCtrl: ['validated', Validators.required]

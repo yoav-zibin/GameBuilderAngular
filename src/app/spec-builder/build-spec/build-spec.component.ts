@@ -15,15 +15,15 @@ import 'rxjs/add/observable/forkJoin';
 })
 export class BuildSpecComponent {
 	@Input() selectedBoard: object;
-	@Output() onPiecesSet = new EventEmitter<object[]>();
+	@Output() onPiecesSet = new EventEmitter<object>();
 
 	zPos:number = 2;
 	container:string = 'board-overlay';
 	newStage: boolean = true;
 	dragged: boolean = false;
-	piecesMap = new Map<number, object>();
-	pieces: object[] = new Array()
-	nonDeckPieces: object[] = new Array();
+	allPieces: object;
+	deckElementPieces: object[] = new Array()
+	nonDeckElementPieces: object[] = new Array();
 	images: object[] = new Array();
 	elements: object[] = new Array();
 	imageData = new Map<string, object>();
@@ -154,40 +154,56 @@ export class BuildSpecComponent {
 
 	updateSpec(data) {
 		console.log('updating pieces');
-		console.log(this.pieces)
+		
+		let konvaImages = data[0];
+		let imageIndex = data[1];
+		let action = data[2];
+		let konvaImg, konvaImgId = this.getIdFromIndex(imageIndex);
 
-		for(let newPiece of data[0]) {
-			
-			let curPiece = this.pieces[newPiece.index];
-			let xPos = newPiece.attrs['x'];
-			let yPos = newPiece.attrs['y'];
-
-			/* Handling Toggling */
-			if(data[2] === 'toggled') {
-				let key = this.nonDeckPieces[data[1]]['el_key'];
-				let index = this.getImageIndex(key);
-				let images = this.elementData.get(key)['images'];
-
-				let newURL = this.imageData.get(images[index]['imageId'])['downloadURL'];
-				curPiece['url'] = newURL;
-				curPiece['index'] = this.elementImageIndex.get(key)["current"];
-
-				this.konva.updateImage(newPiece.index, newURL);
+		for(let tempImg of konvaImages) {
+			if(tempImg._id === konvaImgId) {
+				konvaImg = tempImg;
+				break;
 			}
-			else { // data[2] === 'dragged'
-				curPiece['zPos'] = this.zPos++;
-			}
+		}
 
-			[xPos, yPos] = this.scaleCoord(xPos, yPos);
-			console.log("final: " + xPos + " " + yPos);
+		let xPos = konvaImg.attrs['x'];
+		let yPos = konvaImg.attrs['y'];
 
-			curPiece['xPos'] = xPos; curPiece['yPos'] = yPos;
+		let curPiece = this.nonDeckElementPieces[imageIndex];
+		let key = curPiece['el_key'];
+		let elem = this.elementData.get(key);
 
-			
-    	}
+		curPiece['zPos'] = this.zPos++;
 
-		console.log(this.pieces);
-        this.onPiecesSet.emit(this.pieces);
+		if(elem['elementKind'] === 'standard' || 
+		   elem['elementKind'].endsWith('Deck')) {
+			console.log('do nothing here');
+		}
+		/* Handling Toggling */
+		else if(action === 'toggled') {
+
+			let altIndex = this.getImageIndex(key);
+			let images = elem['images'];
+
+			let newURL = this.imageData.get(images[altIndex]['imageId'])['downloadURL'];
+			curPiece['url'] = newURL;
+			curPiece['index'] = this.elementImageIndex.get(key)["current"];
+
+			this.konva.updateImage(konvaImgId, newURL);
+		}
+
+		//update piece
+		[xPos, yPos] = this.scaleCoord(xPos, yPos);
+		console.log("final: " + xPos + " " + yPos);
+		curPiece['xPos'] = xPos; curPiece['yPos'] = yPos;
+		this.nonDeckElementPieces[imageIndex] = curPiece;
+
+		this.allPieces = new Object({
+			'nonDeck': this.nonDeckElementPieces,
+			'deck': this.deckElementPieces
+		})
+        this.onPiecesSet.emit(this.allPieces);
 
 	}
 
@@ -211,6 +227,7 @@ export class BuildSpecComponent {
         );
 	}
 
+	/*
 	@HostListener('dragend', ['$event'])
     onDragEnd(event) {
     	console.log("dragend");
@@ -226,6 +243,7 @@ export class BuildSpecComponent {
 	onDragLeave(event) {
 		console.log("drag leave");
 	}
+	*/
 
   	@HostListener('drop', ['$event'])
 	onDrop(event) {
@@ -243,12 +261,10 @@ export class BuildSpecComponent {
         elem = this.elementData.get(data['key']);
         type = elem['elementKind'];
 
-        console.log(elem);
 
         [xPos, yPos] = this.calculatePosition(event);
         [width, height] = this.resizeImage(elem);
 
-        console.log(elem);
 
 		if(type === 'piecesDeck' || type === 'cardsDeck') {
 			let deckX, deckY;
@@ -263,16 +279,27 @@ export class BuildSpecComponent {
 	            "deckIndex": -1 //non deck-pieces only
 	        }
 
-	        //add deck to spec
-        	this.pieces.push(piece);
+	        //add deck to Konva canvas
+	        let imageObj = {
+	        	'xPos': xPos,
+	        	'yPos': yPos,
+	        	'src': data['url'], 
+	        	'width': width,
+	        	'height': height
+	        }
+	        this.konva.onDrop(imageObj);
+	        
+	        //add deck to peices array
+        	this.nonDeckElementPieces.push(piece);
 
-        	let deckPieceIndex = this.pieces.length - 1;
+        	let deckPieceIndex = this.nonDeckElementPieces.length - 1;
 			let deckElements = this.getDeck(data['key']);
 			let resized = this.resizeDeck(deckElements)
 			
 			// Add deck elements to Konva canvas
 			if(type === 'cardsDeck') {
-				this.konva.onCardDeckDrop(resized, xPos, yPos);
+				/* uncomment to place deckElements directly on board */
+				//this.konva.onCardDeckDrop(resized, xPos, yPos);
 				[xPos, yPos] = this.scaleCoord(xPos, yPos);
 
 				// cards are stacked on top of each other
@@ -286,12 +313,12 @@ export class BuildSpecComponent {
 			    		"index": this.elementImageIndex.get(data["key"])["current"],
 			    		"deckIndex": deckPieceIndex
 		    		}
-					this.pieces.push(piece);
-					this.nonDeckPieces.push(piece);
+					this.deckElementPieces.push(piece);
 				}
 			}
 			else {
-				this.konva.onPiecesDeckDrop(resized, xPos, yPos);
+				/* uncomment to place deckElements directly on board */
+				//this.konva.onPiecesDeckDrop(resized, xPos, yPos);
 				[xPos, yPos] = this.scaleCoord(xPos, yPos);
 
 				// pieces are layered on top of each other
@@ -305,8 +332,7 @@ export class BuildSpecComponent {
 			    		"index": this.elementImageIndex.get(data["key"])["current"],
 			    		"deckIndex": deckPieceIndex
 		    		}
-					this.pieces.push(piece);
-					this.nonDeckPieces.push(piece);
+					this.deckElementPieces.push(piece);
 				}
 			}
 		}
@@ -332,17 +358,13 @@ export class BuildSpecComponent {
 	            "index": this.elementImageIndex.get(data["key"])["current"],
 	            "deckIndex": -1 //non deck-pieces only
 	        }
-	        this.pieces.push(piece);
-	        this.nonDeckPieces.push(piece);
+	        this.nonDeckElementPieces.push(piece);
 	    }
-
-	    console.log(this.pieces);
-	    this.onPiecesSet.emit(this.pieces);
-	}
-
-	@HostListener('click', ['$event'])
-	onClick(event) {
-		console.log('component click handler');
+	    this.allPieces = new Object({
+			'nonDeck': this.nonDeckElementPieces,
+			'deck': this.deckElementPieces
+		})
+        this.onPiecesSet.emit(this.allPieces);
 	}
 
 	getDeck(key) {
@@ -461,6 +483,10 @@ export class BuildSpecComponent {
 				equalTo: this.currentFilter,
 			}
 		}
+	}
+
+	getIdFromIndex(index) {
+		return index + 3;
 	}
 
 	/* DEPRECATED
