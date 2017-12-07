@@ -170,14 +170,18 @@ export class BuildSpecComponent {
 		let xPos = konvaImg.attrs['x'];
 		let yPos = konvaImg.attrs['y'];
 
+
 		let curPiece = this.nonDeckElementPieces[imageIndex];
+		console.log(this.nonDeckElementPieces);
+		console.log(imageIndex);
+		console.log(curPiece);
 		let key = curPiece['el_key'];
 		let elem = this.elementData.get(key);
+		let type = elem['elementKind'];
 
 		curPiece['zPos'] = this.zPos++;
 
-		if(elem['elementKind'] === 'standard' || 
-		   elem['elementKind'].endsWith('Deck')) {
+		if(type === 'standard' || type.endsWith('Deck')) {
 			console.log('do nothing here');
 		}
 		/* Handling Toggling */
@@ -197,7 +201,27 @@ export class BuildSpecComponent {
 		[xPos, yPos] = this.scaleCoord(xPos, yPos);
 		console.log("final: " + xPos + " " + yPos);
 		curPiece['xPos'] = xPos; curPiece['yPos'] = yPos;
+		if(type.endsWith('Deck')) {
+			if(type === 'cardsDeck') {
+				for(let el of this.deckElementPieces) {
+					if(el['deckIndex'] === imageIndex) {
+						el['xPos'] = xPos;
+						el['yPos'] = yPos;
+					}
+				}
+			}
+			else { //type === 'piecesDeck'
+				for(let el of this.deckElementPieces) {
+					if(el['deckIndex'] === imageIndex) {
+						el['xPos'] = xPos;
+						el['yPos'] = yPos;
+					}
+				}
+			}
+		}
 		this.nonDeckElementPieces[imageIndex] = curPiece;
+
+
 
 		this.allPieces = new Object({
 			'nonDeck': this.nonDeckElementPieces,
@@ -326,8 +350,8 @@ export class BuildSpecComponent {
 					let piece = {
 			    		"el_key": el["_key"],
 			    		"url": el["downloadURL"],
-			    		"xPos": xPos++,
-			    		"yPos": yPos++,
+			    		"xPos": xPos,
+			    		"yPos": yPos,
 			    		"zPos": this.zPos++,
 			    		"index": this.elementImageIndex.get(data["key"])["current"],
 			    		"deckIndex": deckPieceIndex

@@ -170,6 +170,8 @@ export class KonvaService {
     }
 
     getIndex(img) {
+        console.log('check id here');
+        console.log(img);
         // get zero-based index from image._id
         // stage and layer have _ids 1 and 2
         return img._id - 3;
