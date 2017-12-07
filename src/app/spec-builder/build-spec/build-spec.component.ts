@@ -31,7 +31,7 @@ export class BuildSpecComponent {
 	elementsRef: FirebaseListObservable<any[]>;
 	imagesRef: FirebaseListObservable<any[]>;
 
-	currentFilter = 'mine';
+	currentFilter = 'all';
 	options = [
 		{value: 'all', viewValue: 'All Elements'},
 		{value: 'mine', viewValue: 'My Uploads'},
@@ -247,8 +247,12 @@ export class BuildSpecComponent {
         elem = this.elementData.get(data['key']);
         type = elem['elementKind'];
 
+        console.log(elem);
+
         [xPos, yPos] = this.calculatePosition(event);
         [width, height] = this.resizeImage(elem);
+
+        console.log(elem);
 
 		if(type === 'piecesDeck' || type === 'cardsDeck') {
 			let deckX, deckY;
@@ -298,8 +302,8 @@ export class BuildSpecComponent {
 					let piece = {
 			    		"el_key": el["_key"],
 			    		"url": el["downloadURL"],
-			    		"xPos": (xPos += 2),
-			    		"yPos": (yPos += 2),
+			    		"xPos": xPos++,
+			    		"yPos": yPos++,
 			    		"zPos": this.zPos++,
 			    		"index": this.elementImageIndex.get(data["key"])["current"],
 			    		"deckIndex": deckPieceIndex
@@ -345,8 +349,10 @@ export class BuildSpecComponent {
 	getDeck(key) {
 		let deckElements = new Array();
 		let deck = this.elementData.get(key);
+		console.log('get deck');
 		for(let el of deck['deckElements']) {
 			let deckElement = this.elementData.get(el['deckMemberElementId']);
+			console.log(deckElement);
 			deckElements.push(deckElement);
 		}
 		return deckElements;
@@ -354,7 +360,10 @@ export class BuildSpecComponent {
 
 	resizeDeck(deckElements) {
 		let resized = new Array();
+		console.log('HERE!');
+		console.log(deckElements);
 		for(let el of deckElements) {
+			console.log(el);
 			let el2 = Object.create(el);
 			[el2['width'], el2['height']] = this.resizeImage(el);
 			resized.push(el2);
