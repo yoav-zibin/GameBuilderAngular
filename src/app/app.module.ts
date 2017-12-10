@@ -46,6 +46,8 @@ import { SpecViewerComponent } from './spec-viewer/spec-viewer.component';
 import { SpecSelectorComponent } from './spec-viewer/spec-selector/spec-selector.component';
 import { ViewSpecComponent } from './spec-viewer/view-spec/view-spec.component';
 import { UploadSpecComponent } from './spec-viewer/upload-spec/upload-spec.component';
+import { SpecEditorComponent } from './spec-editor/spec-editor.component';
+import { SelectSpecComponent } from './spec-editor/select-spec/select-spec.component';
 
 
 /*
@@ -80,6 +82,7 @@ export const appRoutes: Routes = [
   {path: 'uploadImage', component: UploadImageComponent},
   {path: 'user', component: UserInfoComponent},
   {path: 'viewSpec', component: SpecViewerComponent},
+  {path: 'editSpec', component: SpecEditorComponent},
 ];
 
 @NgModule({
@@ -99,6 +102,8 @@ export const appRoutes: Routes = [
     SpecSelectorComponent,
     ViewSpecComponent,
     UploadSpecComponent,
+    SpecEditorComponent,
+    SelectSpecComponent,
   ],
   imports: [
     AngularFireModule.initializeApp(firebaseConfig),

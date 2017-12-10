@@ -1,0 +1,50 @@
+<div [hidden]="blocked" style="text-align: center">
+  <md-horizontal-stepper [linear]="isLinear">
+    <md-step [stepControl]="firstFormGroup">
+      <form [formGroup]="firstFormGroup">
+        <ng-template mdStepLabel>Select a spec</ng-template>
+          <div *ngIf="selected">Selected {{selectedSpec['gameName']}}</div>
+        <div id="spec-selector">
+          <app-select-spec (onSelected)="onSelected($event)"></app-select-spec>
+        </div>
+        <div id="nav-button">
+          <button md-button mdStepperNext (click)="firstWarning()">Next</button>
+        </div>
+      </form>
+    </md-step>
+    <md-step [stepControl]="secondFormGroup">
+      <form [formGroup]="secondFormGroup">
+        <ng-template mdStepLabel>Build game spec</ng-template>
+        <div id="build-container">
+          <app-build-spec
+            [selectedBoard]=getSelectedBoard()
+            (onPiecesSet)="onPiecesSet($event)">
+          </app-build-spec>
+        </div>
+        <div id="nav-button">
+          <button md-button mdStepperPrevious>Back</button>
+          <button md-button mdStepperNext (click)="secondWarning()">Next</button>
+        </div>
+      </form>
+    </md-step>
+    <md-step [stepControl]="thirdFormGroup">
+      <form [formGroup]="thirdFormGroup">
+        <ng-template mdStepLabel>Confirm spec</ng-template>
+          <app-finalize-spec
+            [selectedBoard]=getSelectedBoard()
+            [pieces]=getPieces()
+            [piecesSet]=getPiecesSet()>
+          </app-finalize-spec>
+        <div id="nav-button">
+          <button md-button mdStepperPrevious>Back</button>
+          <!-- <button md-button mdStepperNext>Finish</button> -->
+        </div>
+      </form>
+    </md-step>
+  </md-horizontal-stepper>
+</div>
+
+
+<div [hidden]="!blocked" style="text-align:center">
+    Please login with Google, phone, or email to use this function.
+</div>

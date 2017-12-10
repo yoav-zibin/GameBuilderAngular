@@ -8,6 +8,7 @@ export class ImageSelectionService {
 
     private IMAGES_PATH: string = "gameBuilder/images";
     private ELEMENTS_PATH: string = "gameBuilder/elements";
+    private SPECS_PATH: string = "gameBuilder/gameSpecs";
 
     getAllImages() {
         let query = {
@@ -117,5 +118,36 @@ export class ImageSelectionService {
         }
         return this.db.list(this.IMAGES_PATH, {query})
                 .map(images => images.filter(image => image.name.toLowerCase().indexOf(searchTerm.toLowerCase()) != -1));
+    }
+
+    getMySpecs(uid: string) {
+        let query = {
+            orderByChild: "uploaderUid",
+            equalTo: uid
+        };
+        return this.db.list(this.SPECS_PATH, {query});
+    }
+    
+    getMostRecentSpecs() {
+        let query = {
+            orderByChild: "createdOn"
+        };
+        return this.db.list(this.SPECS_PATH, {query})
+            .map(specs => specs.reverse());
+    }
+    
+    getAllSpecs() {
+        let query = {
+            orderByKey: true,
+        };
+        return this.db.list(this.SPECS_PATH, {query}); 
+    }
+
+    getSpecsByName(searchTerm: string) {
+        let query = {
+            orderByKey: true,
+        }
+        return this.db.list(this.SPECS_PATH, {query})
+            .map(specs => specs.filter(spec => spec.gameName.toLowerCase().indexOf(searchTerm.toLowerCase()) != -1));
     }
 }

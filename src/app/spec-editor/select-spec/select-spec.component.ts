@@ -8,15 +8,12 @@ import constants from '../../../constants.js'
 
 
 @Component({
-  selector: 'app-select-board',
-  templateUrl: './select-board.component.html',
-  styleUrls: ['./select-board.component.css']
+  selector: 'app-select-spec',
+  templateUrl: './select-spec.component.html',
+  styleUrls: ['./select-spec.component.css']
 })
-export class SelectBoardComponent {
-	imagesRef: any;
-	images: object[] = new Array();
-	all_images: object[] = new Array();
-	my_images: object[] = new Array();
+export class SelectSpecComponent {
+	specsRef: any;
 	selected: boolean;
 	searchByName: boolean;
 	selectedBoardUrl: string;
@@ -26,8 +23,8 @@ export class SelectBoardComponent {
 
 	currentFilter = 'all';
 	options = [
-		{value: 'all', viewValue: 'All Boards'},
-		{value: 'mine', viewValue: 'My Boards'},
+		{value: 'all', viewValue: 'All Specs'},
+		{value: 'mine', viewValue: 'My Specs'},
 		{value: 'recent', viewValue: 'Most Recent'},
 		{value: 'search', viewValue: 'Search By Name'},
 	]
@@ -39,7 +36,7 @@ export class SelectBoardComponent {
 	) {
 
 		if(this.auth.authenticated) {
-			this.imagesRef = select.getBoardImages();
+			this.specsRef = select.getAllSpecs();
 		}
 	}
 
@@ -49,29 +46,23 @@ export class SelectBoardComponent {
 		console.log("current filter: " + this.currentFilter);
 
 		if(value == "mine")
-			this.imagesRef = this.select.getMyBoardImageUploads(this.auth.currentUserId);
+			this.specsRef = this.select.getMySpecs(this.auth.currentUserId);
 		else if(value == "recent")
-			this.imagesRef = this.select.getMostRecentBoardImages();
+			this.specsRef = this.select.getMostRecentSpecs();
 		else if(value == "all")
-			this.imagesRef = this.select.getBoardImages();
+			this.specsRef = this.select.getAllSpecs();
 		else
 			this.searchByName = true;
 	}
 
 	onSearchTermChange(value) {
-    	this.imagesRef = value == "" ? this.select.getBoardImages() : 
-    		this.select.getBoardImagesByName(value);
+    	this.specsRef = value == "" ? this.select.getAllSpecs() : 
+    		this.select.getSpecsByName(value);
 	}
 
-	selectBoard(board) {
-		console.log("sending board...")
-		console.log(board)
-		this.onSelected.emit(
-			{
-				'key': board.$key,
-				'name': board.name,
-				'url': board.downloadURL
-			}
-		);
+	selectSpec(spec) {
+		console.log("sending spec...")
+		console.log(spec)
+		this.onSelected.emit(spec);
 	}
 }

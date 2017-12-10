@@ -47,6 +47,7 @@ export class KonvaService {
       img.on('dragend', function(event) {
         eventHandler('dragend', event, this);
       });
+
       // this doesn't work with cross-origin image sources
       //img.cache();
       //img.drawHitFromCache(0);
@@ -79,15 +80,6 @@ export class KonvaService {
         this.stage.add(this.layer);
         //this.stage.add(this.layer, this.dragLayer);
 
-        /*
-        this.stage.on('dragstart', function(event) {
-            eventHandler('dragstart', event);
-        });
-
-        this.stage.on('dragend', function(event) {
-            eventHandler('dragend', event);
-        });
-        */
     }
 
     onDrop(img) {
@@ -100,8 +92,10 @@ export class KonvaService {
         
         let imageObj = new Image(img['width'], img['height']);
         imageObj.src = img['src'];
+        //imageObj.crossOrigin = "Anonymous";
         
         let image = this.buildImage(imageObj, img['xPos'], img['yPos']);
+        console.log(image);
         image.moveTo(this.layer)
     }
 

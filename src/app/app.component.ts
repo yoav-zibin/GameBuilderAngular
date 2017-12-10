@@ -28,6 +28,10 @@ export class AppComponent {
 	viewSpec(){
 		this.router.navigate(['/viewSpec']);
 	}
+
+	editSpec() {
+		this.router.navigate(['/editSpec']);
+	}
 	
 	build() {
 		this.router.navigate(['/build']);
