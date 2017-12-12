@@ -1,4 +1,4 @@
-import { Component, Input, Output, HostListener, EventEmitter } from '@angular/core';
+import { Component, Input, Output, HostListener, EventEmitter, OnChanges } from '@angular/core';
 import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
 import { AuthService } from '../../auth/auth.service';
 import { MdSnackBar } from '@angular/material';
@@ -6,15 +6,16 @@ import { Observable } from 'rxjs/Observable';
 import { KonvaService } from '../../konva/konva.service'
 import * as firebase from 'firebase/app';
 import constants from '../../../constants.js';
-import 'rxjs/add/observable/forkJoin';
 
 @Component({
   selector: 'app-build-spec',
   templateUrl: './build-spec.component.html',
   styleUrls: ['./build-spec.component.css']
 })
-export class BuildSpecComponent {
+export class BuildSpecComponent implements OnChanges {
 	@Input() selectedBoard: object;
+	@Input() selectedSpec: object;
+	@Input() pieces = new Array();
 	@Output() onPiecesSet = new EventEmitter<object>();
 
 	zPos:number = 2;
@@ -48,8 +49,9 @@ export class BuildSpecComponent {
 		private auth: AuthService, 
 		private db: AngularFireDatabase,
 		private snackBar: MdSnackBar,
-		private konva: KonvaService
+		private konva: KonvaService,
 	) {
+
   		if(this.auth.authenticated) {
 
   			konva.specUpdateObs$.subscribe( data => {
@@ -107,11 +109,20 @@ export class BuildSpecComponent {
 							});
 						}
 					})
-					console.log(this.elements);
 				});
 			}).catch( (error) => {
 				console.log("something went wrong... " + error);
 			})
+		}
+	}
+
+	ngOnChanges() {
+		console.log('on changes');
+
+		if(this.pieces.length !== 0 && this.newStage) {
+			this.newStage = false;
+			let tempPieces = this.formatPieces();
+			this.konva.buildStageWithPieces(this.container, tempPieces);
 		}
 	}
 
@@ -141,7 +152,6 @@ export class BuildSpecComponent {
 						element['name'] = img['name'];
 						this.elements.push(element);
 						this.elementData.set(data.key, element);
-
 						this.elementImageIndex.set(data.key, {
 							'current': 0,
 							'max': (element.images.length - 1),
@@ -152,9 +162,55 @@ export class BuildSpecComponent {
 		})
 	}
 
+	formatPieces() {
+		console.log('formatting');
+		let tempPieces = new Array();
+		for(let piece of this.pieces) {
+			let elem = this.elementData.get(piece['pieceElementId']);
+			let formattedPiece = {
+	            "el_key": elem["_key"],
+	            "url": elem["downloadURL"],
+	            "xPos": piece['initialState']['x'],
+	            "yPos": piece['initialState']['y'],
+	            "zPos": piece['initialState']['zDepth'],
+	            "index": this.elementImageIndex.get(elem["_key"])["current"],
+	            "deckIndex": piece['deckPieceIndex']
+	        }
+
+			if(piece['deckPieceIndex'] === -1) {
+				let width, height, xPos, yPos, tempPiece = {};
+				this.nonDeckElementPieces.push(formattedPiece);
+
+				[width, height] = this.resizeImage(elem);
+				[xPos, yPos] = this.descaleCoord(
+					piece['initialState']['x'],
+					piece['initialState']['y']
+				);
+				tempPiece['xPos'] = xPos;
+				tempPiece['yPos'] = yPos;
+				tempPiece['width'] = width;
+				tempPiece['height'] = height;
+				tempPiece['src'] = elem['downloadURL'];
+				tempPieces.push(tempPiece);
+
+			}
+			else {
+				this.deckElementPieces.push(formattedPiece);
+			}
+		}
+		
+		this.allPieces = new Object({
+			'nonDeck': this.nonDeckElementPieces,
+			'deck': this.deckElementPieces
+		})
+        this.onPiecesSet.emit(this.allPieces);
+
+		return tempPieces;
+	}
+
 	updateSpec(data) {
 		console.log('updating pieces');
-		
+		console.log(data);
 		let konvaImages = data[0];
 		let imageIndex = data[1];
 		let action = data[2];
@@ -170,11 +226,7 @@ export class BuildSpecComponent {
 		let xPos = konvaImg.attrs['x'];
 		let yPos = konvaImg.attrs['y'];
 
-
 		let curPiece = this.nonDeckElementPieces[imageIndex];
-		console.log(this.nonDeckElementPieces);
-		console.log(imageIndex);
-		console.log(curPiece);
 		let key = curPiece['el_key'];
 		let elem = this.elementData.get(key);
 		let type = elem['elementKind'];
@@ -184,7 +236,7 @@ export class BuildSpecComponent {
 		if(type === 'standard' || type.endsWith('Deck')) {
 			console.log('do nothing here');
 		}
-		/* Handling Toggling */
+		/* Handle Toggling */
 		else if(action === 'toggled') {
 
 			let altIndex = this.getImageIndex(key);
@@ -211,6 +263,10 @@ export class BuildSpecComponent {
 				}
 			}
 			else { //type === 'piecesDeck'
+				/*
+				** should there be special handling of placement
+				** for pieceElement vs cardElement ?
+				*/
 				for(let el of this.deckElementPieces) {
 					if(el['deckIndex'] === imageIndex) {
 						el['xPos'] = xPos;
@@ -220,8 +276,6 @@ export class BuildSpecComponent {
 			}
 		}
 		this.nonDeckElementPieces[imageIndex] = curPiece;
-
-
 
 		this.allPieces = new Object({
 			'nonDeck': this.nonDeckElementPieces,
@@ -433,6 +487,12 @@ export class BuildSpecComponent {
 		yPos = (yPos * 100) / 512;
 		return [xPos, yPos];
 	}
+
+	descaleCoord(xPos, yPos) {
+		xPos = (xPos / 100) * 512;
+		yPos = (yPos / 100) * 512;
+		return [xPos, yPos];
+  }
 
 	calculatePosition(event) {
 		let xPos = event.clientX;

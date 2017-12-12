@@ -17,6 +17,6 @@
   color: white;
 }
 
-.board-image:active{
-	opacity: .75;
+.spec-item:hover {
+	background-color: #3F51B5
 }

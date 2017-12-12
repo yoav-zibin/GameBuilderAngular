@@ -1,5 +1,12 @@
 
-<form id="user-input">
+<form id="user-input" *ngIf="selectedSpec">
+	<input type="text" id="gameName" value="{{selectedSpec['gameName']}}" ngRequired>
+	<input type="text" id="wikiURL" value="{{selectedSpec['wikipediaUrl']}}">
+	<input type="text" id="youtubeURL" value="{{selectedSpec['tutorialYoutubeVideo']}}">
+	<input type="submit" value="Generate Spec" (click)="isValid() && createGameSpec()">
+</form>
+
+<form id="user-input" *ngIf="!selectedSpec">
 	<input type="text" id="gameName" placeholder="Enter your game name" ngRequired>
 	<input type="text" id="wikiURL" placeholder="Link to game wiki">
 	<input type="text" id="youtubeURL" placeholder="Link to youtube tutorial">
@@ -7,6 +14,12 @@
 </form>
 
 <div *ngIf="generated">
-	<pre style="text-align: left">{{ gameSpec | json }}</pre>
-	<button (click)=uploadGameSpec()>Upload Spec</button>
+	<div *ngIf="!selectedSpec">
+		<pre style="text-align: left">{{ gameSpec | json }}</pre>
+		<button (click)=uploadGameSpec()>Upload Spec</button>
+	</div>
+	<div *ngIf="selectedSpec">
+		<pre style="text-align: left">{{ gameSpec | json }}</pre>
+		<button (click)=updateGameSpec()>Update Spec</button>
+	</div>
 </div>

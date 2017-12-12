@@ -47,6 +47,7 @@ export class KonvaService {
       img.on('dragend', function(event) {
         eventHandler('dragend', event, this);
       });
+
       // this doesn't work with cross-origin image sources
       //img.cache();
       //img.drawHitFromCache(0);
@@ -79,15 +80,13 @@ export class KonvaService {
         this.stage.add(this.layer);
         //this.stage.add(this.layer, this.dragLayer);
 
-        /*
-        this.stage.on('dragstart', function(event) {
-            eventHandler('dragstart', event);
-        });
+    }
 
-        this.stage.on('dragend', function(event) {
-            eventHandler('dragend', event);
-        });
-        */
+    buildStageWithPieces(container, pieces) {
+        this.buildStage(container);
+        for(let piece of pieces) {
+            this.onDrop(piece);
+        }
     }
 
     onDrop(img) {
@@ -100,6 +99,7 @@ export class KonvaService {
         
         let imageObj = new Image(img['width'], img['height']);
         imageObj.src = img['src'];
+        //imageObj.crossOrigin = "Anonymous";
         
         let image = this.buildImage(imageObj, img['xPos'], img['yPos']);
         image.moveTo(this.layer)
@@ -125,6 +125,7 @@ export class KonvaService {
         let count = deck.length;
         for(let el of deck) {
 
+            //should pieceElements be layered like this?
             let imageObj = {
                 'xPos': (x += 2),
                 'yPos': (y += 2),
@@ -135,7 +136,6 @@ export class KonvaService {
             this._onDrop(imageObj);
             this.stage.draw();
         }
-
     }
 
     onDragStart(event, img) {
@@ -170,8 +170,6 @@ export class KonvaService {
     }
 
     getIndex(img) {
-        console.log('check id here');
-        console.log(img);
         // get zero-based index from image._id
         // stage and layer have _ids 1 and 2
         return img._id - 3;
