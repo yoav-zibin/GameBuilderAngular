@@ -3,6 +3,7 @@ import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/databa
 import { Observable } from 'rxjs/Observable';
 import { AuthService } from '../../auth/auth.service';
 import { ImageSelectionService } from '../../image-select/imageSelection.service'
+import { MdSnackBar } from '@angular/material';
 import * as firebase from 'firebase/app';
 import constants from '../../../constants.js'
 
@@ -36,6 +37,7 @@ export class SelectBoardComponent {
 		private db: AngularFireDatabase,
 		private auth: AuthService,
 		private select: ImageSelectionService,
+		private snackBar: MdSnackBar
 	) {
 
 		if(this.auth.authenticated) {
@@ -73,5 +75,12 @@ export class SelectBoardComponent {
 				'url': board.downloadURL
 			}
 		);
+		this.selectedBoardMessage(board.name);
+	}
+
+	selectedBoardMessage(name) {
+    	this.snackBar.open("Selected " + name, 'Close', { 
+			duration: 1000,
+        });
 	}
 }

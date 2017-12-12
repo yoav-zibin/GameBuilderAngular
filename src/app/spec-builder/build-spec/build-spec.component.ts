@@ -6,7 +6,6 @@ import { Observable } from 'rxjs/Observable';
 import { KonvaService } from '../../konva/konva.service'
 import * as firebase from 'firebase/app';
 import constants from '../../../constants.js';
-import 'rxjs/add/observable/forkJoin';
 
 @Component({
   selector: 'app-build-spec',
@@ -15,6 +14,7 @@ import 'rxjs/add/observable/forkJoin';
 })
 export class BuildSpecComponent {
 	@Input() selectedBoard: object;
+	@Input() pieces: object[]; //for use in spec-editor
 	@Output() onPiecesSet = new EventEmitter<object>();
 
 	zPos:number = 2;
@@ -48,8 +48,9 @@ export class BuildSpecComponent {
 		private auth: AuthService, 
 		private db: AngularFireDatabase,
 		private snackBar: MdSnackBar,
-		private konva: KonvaService
+		private konva: KonvaService,
 	) {
+
   		if(this.auth.authenticated) {
 
   			konva.specUpdateObs$.subscribe( data => {
@@ -172,9 +173,6 @@ export class BuildSpecComponent {
 
 
 		let curPiece = this.nonDeckElementPieces[imageIndex];
-		console.log(this.nonDeckElementPieces);
-		console.log(imageIndex);
-		console.log(curPiece);
 		let key = curPiece['el_key'];
 		let elem = this.elementData.get(key);
 		let type = elem['elementKind'];
@@ -184,7 +182,7 @@ export class BuildSpecComponent {
 		if(type === 'standard' || type.endsWith('Deck')) {
 			console.log('do nothing here');
 		}
-		/* Handling Toggling */
+		/* Handle Toggling */
 		else if(action === 'toggled') {
 
 			let altIndex = this.getImageIndex(key);
@@ -211,6 +209,10 @@ export class BuildSpecComponent {
 				}
 			}
 			else { //type === 'piecesDeck'
+				/*
+				** should there be special handling of placement
+				** for pieceElement vs cardElement ?
+				*/
 				for(let el of this.deckElementPieces) {
 					if(el['deckIndex'] === imageIndex) {
 						el['xPos'] = xPos;

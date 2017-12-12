@@ -5,7 +5,10 @@
         <ng-template mdStepLabel>Select a spec</ng-template>
           <div *ngIf="selected">Selected {{selectedSpec['gameName']}}</div>
         <div id="spec-selector">
-          <app-select-spec (onSelected)="onSelected($event)"></app-select-spec>
+          <app-select-spec
+            (onSpecSelected)="onSpecSelected($event)"
+            (onBoardSelected)="onBoardSelected($event)">
+          </app-select-spec>
         </div>
         <div id="nav-button">
           <button md-button mdStepperNext (click)="firstWarning()">Next</button>

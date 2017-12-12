@@ -3,7 +3,7 @@
     <md-step [stepControl]="firstFormGroup">
       <form [formGroup]="firstFormGroup">
         <ng-template mdStepLabel>Select a board</ng-template>
-          <div *ngIf="selected">Selected {{selectedBoard['name']}}</div>
+          <!-- <div *ngIf="selected">Selected {{selectedBoard['name']}}</div> -->
         <div id="board-selector">
           <app-select-board (onSelected)="onSelected($event)"></app-select-board>
         </div>

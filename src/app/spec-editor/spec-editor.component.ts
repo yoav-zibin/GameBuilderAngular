@@ -9,8 +9,6 @@ import constants from '../../constants.js'
 
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 
-
-
 @Component({
   selector: 'app-spec-editor',
   templateUrl: './spec-editor.component.html',
@@ -18,8 +16,8 @@ import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 })
 export class SpecEditorComponent implements OnInit {
 	isLinear = true;
-  selected = false;
-  piecesSet = false;
+    selected = false;
+    piecesSet = false;
 	firstFormGroup: FormGroup;
 	secondFormGroup: FormGroup;
 	thirdFormGroup: FormGroup;
@@ -32,7 +30,7 @@ export class SpecEditorComponent implements OnInit {
 		private auth: AuthService,
 		private _formBuilder: FormBuilder,
 		private db: AngularFireDatabase,
-    	private snackBar: MdSnackBar
+    private snackBar: MdSnackBar
 	) {	}
 
 	ngOnInit() {
@@ -48,16 +46,21 @@ export class SpecEditorComponent implements OnInit {
     });
   }
 
-  	onSelected(spec: object) {
-    	this.selected = true;
-    	this.selectedSpec = spec;
-		//this.selectedBoard = board;
-		console.log(this.selectedSpec);
-		this.firstFormGroup = this._formBuilder.group({
-        	firstCtrl: ['validated', Validators.required]
-     	});
-  		console.log("receiving spec");
+  	onSpecSelected(spec: object) {
+        this.selected = true;
+        this.selectedSpec = spec;
+	    //console.log(this.selectedSpec);
+	    this.firstFormGroup = this._formBuilder.group({
+            firstCtrl: ['validated', Validators.required]
+        });
+  	    console.log("receiving spec");
   	}
+
+    onBoardSelected(board: object) {
+        this.selectedBoard = board;
+        console.log("receiving board");
+        console.log(board);
+      }
 
   	onPiecesSet(piecesObj: object) {
 		this.pieces = piecesObj['nonDeck'].concat(piecesObj['deck']);
@@ -70,7 +73,6 @@ export class SpecEditorComponent implements OnInit {
   	}
 
   	getSelectedBoard() {
-			
   		return this.selectedBoard;
   	}
 
@@ -82,12 +84,12 @@ export class SpecEditorComponent implements OnInit {
     	return this.piecesSet;
    	}
 
-   	firstWarning() {
-    	if(this.isEmptyObject(this.selectedBoard)) {
-        	this.snackBar.open("You must select a board.", 'Close', { 
+    firstWarning() {
+    	if(this.isEmptyObject(this.selectedSpec)) {
+        	this.snackBar.open("You must select a spec.", 'Close', { 
         		duration: 1000,
         	});
-		}
+        }
 	}
 
 	secondWarning() {

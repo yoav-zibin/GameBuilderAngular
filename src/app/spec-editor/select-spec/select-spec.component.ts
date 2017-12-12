@@ -2,6 +2,7 @@ import { Component, EventEmitter, Output, ElementRef  } from '@angular/core';
 import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
 import { Observable } from 'rxjs/Observable';
 import { AuthService } from '../../auth/auth.service';
+import { MdSnackBar } from '@angular/material';
 import { ImageSelectionService } from '../../image-select/imageSelection.service'
 import * as firebase from 'firebase/app';
 import constants from '../../../constants.js'
@@ -19,7 +20,9 @@ export class SelectSpecComponent {
 	selectedBoardUrl: string;
 	selectedBoardKey: string;
 	selectedBoardName: string;
-	@Output() onSelected = new EventEmitter<object>();
+	boardURL: string;
+	@Output() onSpecSelected = new EventEmitter<object>();
+	@Output() onBoardSelected = new EventEmitter<object>();
 
 	currentFilter = 'all';
 	options = [
@@ -33,6 +36,7 @@ export class SelectSpecComponent {
 		private db: AngularFireDatabase,
 		private auth: AuthService,
 		private select: ImageSelectionService,
+		private snackBar: MdSnackBar
 	) {
 
 		if(this.auth.authenticated) {
@@ -63,6 +67,30 @@ export class SelectSpecComponent {
 	selectSpec(spec) {
 		console.log("sending spec...")
 		console.log(spec)
-		this.onSelected.emit(spec);
+		this.onSpecSelected.emit(spec);
+		this.selectedSpecMessage(spec['gameName']);
+		let board = spec['board'];
+		this.getBoardURL(board['imageId'])
+		
+	}
+
+	selectedSpecMessage(name) {
+    	this.snackBar.open("Selected " + name, 'Close', { 
+			duration: 1000,
+        });
+	}
+
+	getBoardURL(imageId) {
+		let url;
+		let boardRef = this.db.object(constants.IMAGES_PATH + '/' + imageId);
+		let sub = boardRef.subscribe(board => {
+			this.onBoardSelected.emit(
+				{
+					'key': board.$key,
+					'name': board.name,
+					'url': board.downloadURL
+				}
+			);
+		});
 	}
 }

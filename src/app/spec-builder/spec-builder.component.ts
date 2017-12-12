@@ -69,7 +69,6 @@ export class SpecBuilderComponent implements OnInit {
   	}
 
   	getSelectedBoard() {
-			
   		return this.selectedBoard;
   	}
 
