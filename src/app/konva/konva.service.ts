@@ -82,7 +82,16 @@ export class KonvaService {
 
     }
 
+    buildStageWithPieces(container, pieces) {
+        this.buildStage(container);
+        for(let piece of pieces) {
+            //let img = this.formatPiece(piece);
+            this.onDrop(piece);
+        }
+    }
+
     onDrop(img) {
+        console.log(img);
         this._onDrop(img);
         this.stage.draw();
     }
@@ -95,7 +104,6 @@ export class KonvaService {
         //imageObj.crossOrigin = "Anonymous";
         
         let image = this.buildImage(imageObj, img['xPos'], img['yPos']);
-        console.log(image);
         image.moveTo(this.layer)
     }
 
@@ -119,6 +127,7 @@ export class KonvaService {
         let count = deck.length;
         for(let el of deck) {
 
+            //should pieceElements be layered like this?
             let imageObj = {
                 'xPos': (x += 2),
                 'yPos': (y += 2),
@@ -129,7 +138,6 @@ export class KonvaService {
             this._onDrop(imageObj);
             this.stage.draw();
         }
-
     }
 
     onDragStart(event, img) {

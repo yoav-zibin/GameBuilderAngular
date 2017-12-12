@@ -7,7 +7,8 @@
         <div id="spec-selector">
           <app-select-spec
             (onSpecSelected)="onSpecSelected($event)"
-            (onBoardSelected)="onBoardSelected($event)">
+            (onBoardSelected)="onBoardSelected($event)"
+            (onPiecesSelected)="onPiecesSelected($event)">
           </app-select-spec>
         </div>
         <div id="nav-button">
@@ -21,6 +22,8 @@
         <div id="build-container">
           <app-build-spec
             [selectedBoard]=getSelectedBoard()
+            [selectedSpec]=getSelectedSpec()
+            [pieces]=getPieces()
             (onPiecesSet)="onPiecesSet($event)">
           </app-build-spec>
         </div>

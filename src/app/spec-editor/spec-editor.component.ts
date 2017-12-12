@@ -30,7 +30,7 @@ export class SpecEditorComponent implements OnInit {
 		private auth: AuthService,
 		private _formBuilder: FormBuilder,
 		private db: AngularFireDatabase,
-    private snackBar: MdSnackBar
+        private snackBar: MdSnackBar
 	) {	}
 
 	ngOnInit() {
@@ -59,8 +59,13 @@ export class SpecEditorComponent implements OnInit {
     onBoardSelected(board: object) {
         this.selectedBoard = board;
         console.log("receiving board");
-        console.log(board);
-      }
+    }
+
+    onPiecesSelected(pieces: object[]) {
+        this.pieces = pieces;
+        console.log(pieces);
+        console.log('receiving pieces');
+    }
 
   	onPiecesSet(piecesObj: object) {
 		this.pieces = piecesObj['nonDeck'].concat(piecesObj['deck']);
@@ -75,6 +80,10 @@ export class SpecEditorComponent implements OnInit {
   	getSelectedBoard() {
   		return this.selectedBoard;
   	}
+
+    getSelectedSpec() {
+        return this.selectedSpec;
+    }
 
   	getPieces() {
   		return this.pieces;
@@ -98,9 +107,13 @@ export class SpecEditorComponent implements OnInit {
         		duration: 1000,
       		});
     	}
-    	else
+    	else {
+            console.log('pieces?');
+            console.log(this.pieces);
       		this.piecesSet = true;
+        }
   	}
+
 
   /*
   ** https://stackoverflow.com/questions/44337856/check-if-specific-object-is-empty-in-typescript

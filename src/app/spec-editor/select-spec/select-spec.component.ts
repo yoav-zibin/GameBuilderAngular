@@ -23,6 +23,7 @@ export class SelectSpecComponent {
 	boardURL: string;
 	@Output() onSpecSelected = new EventEmitter<object>();
 	@Output() onBoardSelected = new EventEmitter<object>();
+	@Output() onPiecesSelected = new EventEmitter<object[]>();
 
 	currentFilter = 'all';
 	options = [
@@ -70,6 +71,7 @@ export class SelectSpecComponent {
 		this.onSpecSelected.emit(spec);
 		this.selectedSpecMessage(spec['gameName']);
 		let board = spec['board'];
+		this.onPiecesSelected.emit(spec['pieces']);
 		this.getBoardURL(board['imageId'])
 		
 	}
