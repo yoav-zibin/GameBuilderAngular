@@ -68,8 +68,10 @@ export class SpecEditorComponent implements OnInit {
     }
 
   	onPiecesSet(piecesObj: object) {
+        let uid = this.selectedSpec['uploaderUid'];
 		this.pieces = piecesObj['nonDeck'].concat(piecesObj['deck']);
-		if(this.pieces.length > 0) {
+
+		if(this.pieces.length > 0 && uid === this.auth.currentUserId) {
         	this.secondFormGroup = this._formBuilder.group({
         		secondCtrl: ['validated', Validators.required]
         	});
@@ -102,7 +104,13 @@ export class SpecEditorComponent implements OnInit {
 	}
 
 	secondWarning() {
-		if(this.pieces.length === 0) {
+        let uid = this.selectedSpec['uploaderUid'];
+        if(uid !== this.auth.currentUserId) {
+		    this.snackBar.open("You may only modify your own specs.", 'Close', {
+                duration: 1000,
+            });
+        }
+        else if(this.pieces.length === 0) {
       		this.snackBar.open("You must place at least one element.", 'Close', {
         		duration: 1000,
       		});

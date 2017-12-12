@@ -227,7 +227,6 @@ export class BuildSpecComponent implements OnChanges {
 		let xPos = konvaImg.attrs['x'];
 		let yPos = konvaImg.attrs['y'];
 
-
 		let curPiece = this.nonDeckElementPieces[imageIndex];
 		let key = curPiece['el_key'];
 		let elem = this.elementData.get(key);
