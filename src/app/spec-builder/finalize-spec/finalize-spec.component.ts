@@ -18,7 +18,6 @@ export class FinalizeSpecComponent{
 	@Input() pieces: object[] = new Array();
   @Input() piecesSet: boolean;
   specsRef: FirebaseListObservable<any[]>;
-  count:number = 0;
   unique:boolean;
 	generated: boolean = false;
 	gameSpec: object;
@@ -122,7 +121,6 @@ export class FinalizeSpecComponent{
   updateGameSpec() {
     console.log("updating...");
     let specID = this.selectedSpec['$key'];
-    console.log(specID);
     this.db.database.ref(constants.SPECS_PATH + '/' + specID).set(this.gameSpec)
       .then(result => {
         this.router.navigate(['/']).then(result => {
