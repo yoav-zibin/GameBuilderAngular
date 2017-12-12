@@ -85,13 +85,11 @@ export class KonvaService {
     buildStageWithPieces(container, pieces) {
         this.buildStage(container);
         for(let piece of pieces) {
-            //let img = this.formatPiece(piece);
             this.onDrop(piece);
         }
     }
 
     onDrop(img) {
-        console.log(img);
         this._onDrop(img);
         this.stage.draw();
     }
@@ -172,8 +170,6 @@ export class KonvaService {
     }
 
     getIndex(img) {
-        console.log('check id here');
-        console.log(img);
         // get zero-based index from image._id
         // stage and layer have _ids 1 and 2
         return img._id - 3;

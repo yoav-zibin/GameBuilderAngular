@@ -63,7 +63,6 @@ export class SpecEditorComponent implements OnInit {
 
     onPiecesSelected(pieces: object[]) {
         this.pieces = pieces;
-        console.log(pieces);
         console.log('receiving pieces');
     }
 

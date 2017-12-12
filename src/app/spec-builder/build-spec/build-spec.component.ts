@@ -109,7 +109,6 @@ export class BuildSpecComponent implements OnChanges {
 							});
 						}
 					})
-					console.log(this.elements);
 				});
 			}).catch( (error) => {
 				console.log("something went wrong... " + error);

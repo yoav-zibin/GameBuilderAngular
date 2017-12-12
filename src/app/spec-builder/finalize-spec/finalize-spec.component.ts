@@ -14,6 +14,7 @@ import * as firebase from 'firebase/app';
 })
 export class FinalizeSpecComponent{
 	@Input() selectedBoard: object;
+  @Input() selectedSpec: object;
 	@Input() pieces: object[] = new Array();
   @Input() piecesSet: boolean;
   specsRef: FirebaseListObservable<any[]>;
@@ -46,6 +47,7 @@ export class FinalizeSpecComponent{
   ) { }
 
   createGameSpec() {
+    console.log(this.selectedSpec);
     this.userID = this.auth.currentUserId;
     this.userEmail = this.auth.currentUserName;
     this.wiki =
@@ -108,7 +110,6 @@ export class FinalizeSpecComponent{
   	console.log("uploading...")
   	this.db.database.ref(constants.SPECS_PATH).push(this.gameSpec)
   		.then(result => {
-  			console.log("this worked!")
   			this.router.navigate(['/']).then(result => {
   				this.raiseSnackBar("Successfully uploaded spec!");
   			})
@@ -116,6 +117,21 @@ export class FinalizeSpecComponent{
   		.catch(error => {
   			console.log(error.message);
   		})
+  }
+
+  updateGameSpec() {
+    console.log("updating...");
+    let specID = this.selectedSpec['$key'];
+    console.log(specID);
+    this.db.database.ref(constants.SPECS_PATH + '/' + specID).set(this.gameSpec)
+      .then(result => {
+        this.router.navigate(['/']).then(result => {
+          this.raiseSnackBar("Successfully updated spec!");
+        })
+      })
+      .catch(error => {
+        console.log(error.message);
+      })
   }
 
   isValid() {
@@ -154,7 +170,5 @@ export class FinalizeSpecComponent{
   raiseSnackBar(message) {
       this.snackBar.open(message, 'Close', { duration: 1000 });
   }
-
-
 
 }
