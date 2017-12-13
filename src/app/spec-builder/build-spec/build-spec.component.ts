@@ -58,10 +58,6 @@ export class BuildSpecComponent implements OnChanges {
 
   		if(this.auth.authenticated) {
 
-  			konva.specUpdateObs$.subscribe( data => {
-  				this.updateSpec(data);
-  			});
-
   			let p = new Promise( (resolve, reject) => {
 
 	  			this.imagesRef = db.list(constants.IMAGES_PATH, {
@@ -126,6 +122,9 @@ export class BuildSpecComponent implements OnChanges {
 		if(this.pieces.length !== 0 && this._newStage) {
 			this._newStage = false;
 			this.konva = new KonvaService();
+			this.konva.specUpdateObs$.subscribe( data => {
+  				this.updateSpec(data);
+  			});
 			let tempPieces = this.formatPieces();
 			this.konva.buildStageWithPieces(this.container, tempPieces);
 		}
