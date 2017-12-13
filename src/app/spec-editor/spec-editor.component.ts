@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { BuildSpecComponent } from '../spec-builder/build-spec/build-spec.component';
 import { MdSnackBar } from '@angular/material';
 import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
 import { AngularFireAuth } from 'angularfire2/auth';
@@ -15,9 +16,10 @@ import {FormBuilder, FormGroup, Validators} from '@angular/forms';
   styleUrls: ['./spec-editor.component.css']
 })
 export class SpecEditorComponent implements OnInit {
-	isLinear = true;
-    selected = false;
-    piecesSet = false;
+	isLinear: boolean = true;
+    selected: boolean = false;
+    piecesSet: boolean = false;
+    newStage: boolean = false;
 	firstFormGroup: FormGroup;
 	secondFormGroup: FormGroup;
 	thirdFormGroup: FormGroup;
@@ -25,6 +27,8 @@ export class SpecEditorComponent implements OnInit {
 	selectedBoard: object = {};
 	pieces: object[] = new Array();
 	blocked: boolean;
+
+    @ViewChild(BuildSpecComponent) build: BuildSpecComponent;
 
 	constructor(
 		private auth: AuthService,
@@ -46,15 +50,23 @@ export class SpecEditorComponent implements OnInit {
     });
   }
 
+    test() { console.log("test"); }
+    
   	onSpecSelected(spec: object) {
         this.selected = true;
+        this.newStage = true;
         this.selectedSpec = spec;
 	    //console.log(this.selectedSpec);
-	    this.firstFormGroup = this._formBuilder.group({
+	      this.firstFormGroup = this._formBuilder.group({
             firstCtrl: ['validated', Validators.required]
         });
   	    console.log("receiving spec");
   	}
+
+    onNewStage(stage: boolean) {
+        console.log('stage is ' + stage);
+        this.newStage = stage;
+    }
 
     onBoardSelected(board: object) {
         this.selectedBoard = board;
@@ -68,31 +80,25 @@ export class SpecEditorComponent implements OnInit {
 
   	onPiecesSet(piecesObj: object) {
         let uid = this.selectedSpec['uploaderUid'];
-		this.pieces = piecesObj['nonDeck'].concat(piecesObj['deck']);
+    		this.pieces = piecesObj['nonDeck'].concat(piecesObj['deck']);
 
-		if(this.pieces.length > 0 && uid === this.auth.currentUserId) {
-        	this.secondFormGroup = this._formBuilder.group({
-        		secondCtrl: ['validated', Validators.required]
-        	});
+    		if(this.pieces.length > 0 && uid === this.auth.currentUserId) {
+            	this.secondFormGroup = this._formBuilder.group({
+            		secondCtrl: ['validated', Validators.required]
+            	});
+          	}
+      		console.log("updating pieces");
       	}
-  		console.log("updating pieces");
-  	}
 
-  	getSelectedBoard() {
-  		return this.selectedBoard;
-  	}
-
-    getSelectedSpec() {
-        return this.selectedSpec;
+    resetStage() {
+        this.newStage = !this.newStage;
+        this.pieces = new Array();
+        console.log('resetting');
     }
 
-  	getPieces() {
-  		return this.pieces;
-  	}
-
-	getPiecesSet() {
-    	return this.piecesSet;
-   	}
+    updatePieces() {
+        this.build.emitUpdates();
+    }
 
     firstWarning() {
     	if(this.isEmptyObject(this.selectedSpec)) {

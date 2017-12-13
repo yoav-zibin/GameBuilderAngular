@@ -20,6 +20,7 @@ export class SpecBuilderComponent implements OnInit {
 	isLinear = true;
   selected = false;
   piecesSet = false;
+  newStage = true;
 	firstFormGroup: FormGroup;
 	secondFormGroup: FormGroup;
 	thirdFormGroup: FormGroup;
@@ -65,18 +66,6 @@ export class SpecBuilderComponent implements OnInit {
       }
   		console.log("updating pieces");
   	}
-
-  	getSelectedBoard() {
-  		return this.selectedBoard;
-  	}
-
-  	getPieces() {
-  		return this.pieces;
-  	}
-
-   getPiecesSet() {
-     return this.piecesSet;
-   }
 
    firstWarning() {
      if(this.isEmptyObject(this.selectedBoard)) {
