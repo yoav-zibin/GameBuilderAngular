@@ -3,12 +3,12 @@
     <md-step [stepControl]="firstFormGroup">
       <form [formGroup]="firstFormGroup">
         <ng-template mdStepLabel>Select a spec</ng-template>
-          <div *ngIf="selected">Selected {{selectedSpec['gameName']}}</div>
         <div id="spec-selector">
           <app-select-spec
             (onSpecSelected)="onSpecSelected($event)"
             (onBoardSelected)="onBoardSelected($event)"
-            (onPiecesSelected)="onPiecesSelected($event)">
+            (onPiecesSelected)="onPiecesSelected($event)"
+            (onNewStage)="onNewStage($event)">
           </app-select-spec>
         </div>
         <div id="nav-button">
@@ -21,15 +21,19 @@
         <ng-template mdStepLabel>Build game spec</ng-template>
         <div id="build-container">
           <app-build-spec
-            [selectedBoard]=getSelectedBoard()
-            [selectedSpec]=getSelectedSpec()
-            [pieces]=getPieces()
+            [selectedBoard]=selectedBoard
+            [selectedSpec]=selectedSpec
+            [pieces]=pieces
+            [newStage]=newStage
             (onPiecesSet)="onPiecesSet($event)">
           </app-build-spec>
         </div>
         <div id="nav-button">
-          <button md-button mdStepperPrevious>Back</button>
-          <button md-button mdStepperNext (click)="secondWarning()">Next</button>
+          <button md-button mdStepperPrevious (click)="resetStage()">Back</button>
+          <button md-button mdStepperNext
+            (click)="updatePieces()"
+            (click)="secondWarning()">Next
+          </button>
         </div>
       </form>
     </md-step>
@@ -37,10 +41,9 @@
       <form [formGroup]="thirdFormGroup">
         <ng-template mdStepLabel>Confirm spec</ng-template>
           <app-finalize-spec
-            [selectedBoard]=getSelectedBoard()
-            [selectedSpec]=getSelectedSpec()
-            [pieces]=getPieces()
-            [piecesSet]=getPiecesSet()>
+            [selectedBoard]=selectedBoard
+            [selectedSpec]=selectedSpec
+            [pieces]=pieces>
           </app-finalize-spec>
         <div id="nav-button">
           <button md-button mdStepperPrevious>Back</button>

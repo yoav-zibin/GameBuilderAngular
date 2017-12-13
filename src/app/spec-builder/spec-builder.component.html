@@ -17,7 +17,8 @@
         <ng-template mdStepLabel>Build game spec</ng-template>
         <div id="build-container">
           <app-build-spec
-            [selectedBoard]=getSelectedBoard()
+            [selectedBoard]=selectedBoard
+            [newStage]=newStage
             (onPiecesSet)="onPiecesSet($event)">
           </app-build-spec>
         </div>
@@ -31,9 +32,8 @@
       <form [formGroup]="thirdFormGroup">
         <ng-template mdStepLabel>Confirm spec</ng-template>
           <app-finalize-spec
-            [selectedBoard]=getSelectedBoard()
-            [pieces]=getPieces()
-            [piecesSet]=getPiecesSet()>
+            [selectedBoard]=selectedBoard
+            [pieces]=pieces>
           </app-finalize-spec>
         <div id="nav-button">
           <button md-button mdStepperPrevious>Back</button>

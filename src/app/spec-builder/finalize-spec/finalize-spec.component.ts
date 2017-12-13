@@ -16,7 +16,6 @@ export class FinalizeSpecComponent{
 	@Input() selectedBoard: object;
   @Input() selectedSpec: object;
 	@Input() pieces: object[] = new Array();
-  @Input() piecesSet: boolean;
   specsRef: FirebaseListObservable<any[]>;
   unique:boolean;
 	generated: boolean = false;
@@ -46,7 +45,6 @@ export class FinalizeSpecComponent{
   ) { }
 
   createGameSpec() {
-    console.log(this.selectedSpec);
     this.userID = this.auth.currentUserId;
     this.userEmail = this.auth.currentUserName;
     this.wiki =

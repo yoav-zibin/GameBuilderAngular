@@ -16,11 +16,15 @@ export class BuildSpecComponent implements OnChanges {
 	@Input() selectedBoard: object;
 	@Input() selectedSpec: object;
 	@Input() pieces = new Array();
+	@Input('newStage') set in(value: boolean) {
+		console.log('setting stage to ' + value);
+		this._newStage = value;
+	}
 	@Output() onPiecesSet = new EventEmitter<object>();
 
+	_newStage: boolean;
 	zPos:number = 2;
 	container:string = 'board-overlay';
-	newStage: boolean = true;
 	dragged: boolean = false;
 	allPieces: object;
 	deckElementPieces: object[] = new Array()
@@ -119,8 +123,9 @@ export class BuildSpecComponent implements OnChanges {
 	ngOnChanges() {
 		console.log('on changes');
 
-		if(this.pieces.length !== 0 && this.newStage) {
-			this.newStage = false;
+		if(this.pieces.length !== 0 && this._newStage) {
+			this._newStage = false;
+			this.konva = new KonvaService();
 			let tempPieces = this.formatPieces();
 			this.konva.buildStageWithPieces(this.container, tempPieces);
 		}
@@ -165,6 +170,8 @@ export class BuildSpecComponent implements OnChanges {
 	formatPieces() {
 		console.log('formatting');
 		let tempPieces = new Array();
+		this.deckElementPieces = new Array()
+		this.nonDeckElementPieces = new Array();
 		for(let piece of this.pieces) {
 			let elem = this.elementData.get(piece['pieceElementId']);
 			let formattedPiece = {
@@ -198,14 +205,16 @@ export class BuildSpecComponent implements OnChanges {
 				this.deckElementPieces.push(formattedPiece);
 			}
 		}
-		
+
+		return tempPieces;
+	}
+
+	emitUpdates() {
 		this.allPieces = new Object({
 			'nonDeck': this.nonDeckElementPieces,
 			'deck': this.deckElementPieces
 		})
         this.onPiecesSet.emit(this.allPieces);
-
-		return tempPieces;
 	}
 
 	updateSpec(data) {
@@ -277,18 +286,12 @@ export class BuildSpecComponent implements OnChanges {
 		}
 		this.nonDeckElementPieces[imageIndex] = curPiece;
 
-		this.allPieces = new Object({
-			'nonDeck': this.nonDeckElementPieces,
-			'deck': this.deckElementPieces
-		})
-        this.onPiecesSet.emit(this.allPieces);
-
 	}
 
 	@HostListener('dragstart', ['$event'])
 	onDragStart(event) {
-		if(this.newStage) {
-			this.newStage = false;
+		if(this._newStage) {
+			this._newStage = false;
 			this.konva.buildStage(this.container);
 		}
 
@@ -304,24 +307,6 @@ export class BuildSpecComponent implements OnChanges {
         	"data", JSON.stringify({'key': key, 'url': url})
         );
 	}
-
-	/*
-	@HostListener('dragend', ['$event'])
-    onDragEnd(event) {
-    	console.log("dragend");
-
-	}
-
-	@HostListener('dragenter', ['$event'])
-	onDragEnter(event) {
-		console.log("drag enter");
-	}
-
-	@HostListener('dragleave', ['$event'])
-	onDragLeave(event) {
-		console.log("drag leave");
-	}
-	*/
 
   	@HostListener('drop', ['$event'])
 	onDrop(event) {
