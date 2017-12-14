@@ -1,0 +1,22 @@
+.overlay {
+	position: absolute;
+	background-color: gray;
+	width: 100%;
+	top: 85%;
+	left: 0;
+	bottom: 0;
+	opacity: 0.85;
+}
+
+.overlay-text {
+  position: relative;
+  text-align: center;
+  top: 20%;
+  font-size: 18px;
+  font-family: "Sans Serif";
+  color: white;
+}
+
+.spec-item:hover {
+	background-color: #3F51B5
+}

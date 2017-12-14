@@ -30,14 +30,15 @@ export class KonvaService {
       instance = this;
     }
 
-    buildImage(imageObj, xPos, yPos) {
+    buildImage(imageObj, xPos, yPos, pos) {
+        console.log(pos)
       let img = new Konva.Image({
           x: xPos,
           y: yPos,
           image: imageObj,
           draggable: true,
       });
-
+      img.name = pos
       img.on('click', function(event) {
         eventHandler('click', event, this);
       });
@@ -56,14 +57,61 @@ export class KonvaService {
 
     updateImage(id, url) {
       let images = this.stage.children[0].children;
+      console.log(url)
       for(let image of images) {
-          if(image._id === id) {
-              let img = image.attrs.image;
-              img['src'] = url;
+          if(image.name == id) {
+              image.attrs.image['src'] = url;
+              console.log(url)
+              image.moveTo(this.layer)
+              image.show()
+              image.draw()
+              
+              this.layer.draw()
               break;
           }
       }
+      
+    //   this.layer.draw()
       this.stage.draw();
+    }
+
+    shuffle(deckElemIndexMap, deckPosMap){
+        let images = this.stage.children[0].children
+        //key: deck index
+        console.log(deckElemIndexMap)
+        console.log(deckPosMap)
+        for(let key of Array.from(deckElemIndexMap.keys())) {
+            let cardIndexArr = deckElemIndexMap.get(key)
+            let offset = 0
+            cardIndexArr.forEach(index => {
+                for(let image of images) {
+                    // console.log(image.name)
+                    // console.log(image['name'])
+                    if(image.name == index) {
+                        // console.log(image)
+                        // console.log(offset)
+                        image.attrs.z = offset
+                        // image.setZIndex(image.getAbsoluteZIndex() + 1)
+                        
+                        // image.setZIndex()
+                        var tween = new Konva.Tween({
+                            node: image,
+                            duration: 0,
+                            x: deckPosMap.get(key)[0] + offset * 0.1 / 100 * 512,
+                            y: deckPosMap.get(key)[1] + offset * 0.1 / 100 * 512,
+                            // z: image.getAbsoluteZIndex() + 1
+                        });
+                        tween.play()
+                        image.moveToTop()
+                        this.layer.draw()
+                        offset++
+                        break;
+                    }
+                }
+                
+            });
+        }
+        
     }
 
     buildStage(container) {
@@ -83,10 +131,18 @@ export class KonvaService {
     }
 
     buildStageWithPieces(container, pieces) {
+        // console.log(pieces)
         this.buildStage(container);
         for(let piece of pieces) {
+            // console.log(piece)
             this.onDrop(piece);
         }
+    }
+
+    buildWithPieces(container, pieces) {
+        this.stage.clear()
+        this.stage.clearCache()
+        this.buildStageWithPieces(container, pieces)
     }
 
     onDrop(img) {
@@ -99,9 +155,11 @@ export class KonvaService {
         
         let imageObj = new Image(img['width'], img['height']);
         imageObj.src = img['src'];
+        let pos = img['pos']
         //imageObj.crossOrigin = "Anonymous";
         
-        let image = this.buildImage(imageObj, img['xPos'], img['yPos']);
+        let image = this.buildImage(imageObj, img['xPos'], img['yPos'], pos);
+        console.log(image)
         image.moveTo(this.layer)
     }
 
@@ -140,7 +198,8 @@ export class KonvaService {
 
     onDragStart(event, img) {
       console.log("konva dragstart");
-      img.setZIndex(img.getAbsoluteZIndex() + 1);
+    //   img.setZIndex(img.getAbsoluteZIndex() + 1);
+    // img.moveToTop();
       /*
       // moving to another layer will improve dragging performance ??
       event.target.moveTo(this.dragLayer)
@@ -150,7 +209,8 @@ export class KonvaService {
 
     onDragEnd(event, img) {
       console.log('konva dragend');
-      this.sendUpdatedPieceSet(this.getIndex(img), 'dragged');
+    //   this.sendUpdatedPieceSet(this.getIndex(img), 'dragged');
+      this.sendUpdatedPieceSet(img.name, 'dragged');
 
       /*
       event.target.moveTo(this.layer);
@@ -160,7 +220,10 @@ export class KonvaService {
     }
 
     onClick(event, img) {
-      this.sendUpdatedPieceSet(this.getIndex(img), 'toggled');
+    //   this.sendUpdatedPieceSet(this.getIndex(img), 'toggled');
+        console.log(img.name)
+        // img.setZIndex(img.getAbsoluteZIndex() + 1);
+        this.sendUpdatedPieceSet(img.name, 'toggled');
     }
 
     sendUpdatedPieceSet(id, message) {

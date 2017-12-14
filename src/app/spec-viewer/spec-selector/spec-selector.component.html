@@ -1,7 +1,33 @@
-<div id="spec-selector">
-    <md-select placeholder="Select game spec"  [(ngModel)]="currentSpec" (ngModelChange)="onChange($event)">
-      <md-option *ngFor="let spec of specs | async" value={{spec.$key}}>
-        {{ spec.gameName }}
-      </md-option>
-    </md-select>
-  </div>
+<div id="filter-specs">
+  <md-select placeholder="Filter specs" [(ngModel)]="currentFilter" name="opt" (ngModelChange)="onChange($event)">
+    <md-option *ngFor="let opt of options" [value]="opt.value">
+      {{ opt.viewValue }}
+    </md-option>
+  </md-select>
+</div>
+
+<div class="searchByName">
+  <md-input-container *ngIf="searchByName">
+    <input mdInput type="text" placeholder="Spec name" [(ngModel)]="searchTerm"
+        (ngModelChange)="onSearchTermChange($event)"/>
+  </md-input-container>
+</div>
+
+<div class="spec-list">
+	<md-list dense>
+		<md-list-item class="spec-item" *ngFor="let spec of specsRef | async" (click)="selectSpec(spec)">
+			{{spec?.gameName}}
+		</md-list-item>
+	</md-list>
+
+</div>
+
+<!--
+<md-grid-list cols="1" rowHeight="50px">
+  <md-grid-tile *ngFor="let spec of specsRef | async" [colspan]="1" [rowspan]="2">
+      	<li value="{{spec?.gameName}}" (click)="selectSpec(spec)">
+      		{{spec?.gameName}}
+      	</li>
+  </md-grid-tile>
+</md-grid-list>
+-->

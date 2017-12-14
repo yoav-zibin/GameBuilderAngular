@@ -1,0 +1,17 @@
+#board-selector {
+    margin: auto;
+    width: 50%;
+    padding: 25px;
+    height: 400px;
+    overflow: auto;
+}
+
+#nav-button {
+    text-align: center;
+    padding: 10px;
+}
+
+#build-container {
+    position: relative;
+    height: 100%;
+}
