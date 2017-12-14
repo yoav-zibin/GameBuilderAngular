@@ -6,13 +6,14 @@
           <div *ngIf="selected">Selected {{selectedBoard['name']}}</div>
         <div id="board-selector">
 					<app-spec-selector #child
-					(onPiecesSet)="onPiecesSet($event)"
-					(onSelected)="onSelected($event)"
-					(onInfo)="onInfo($event)">
+					(onSpecSelected)="onSpecSelected($event)"
+          (onBoardSelected)="onBoardSelected($event)"
+          (onPiecesSelected)="onPiecesSelected($event)"
+          (onDeckSelected)="onDeckSelected($event)">
 					</app-spec-selector>
         </div>
         <div id="nav-button">
-          <button md-button mdStepperNext (click)="child.addPieces()">Next</button>
+          <button md-button mdStepperNext (click)="firstWarning()">Next</button>
         </div>
       </form>
     </md-step>
@@ -21,19 +22,24 @@
         <ng-template mdStepLabel>View game spec</ng-template>
         <div id="build-container">
           <app-view-spec #child
-						[selectedBoard]=getSelectedBoard()
-						[piecesMap]=getPieces()
-            (onPiecesSet)="onPiecesSet($event)">
+          [selectedBoard]=getSelectedBoard()
+          [selectedSpec]=getSelectedSpec()
+          [pieces]=getPieces()
+          [deckSet]=getDeckSet()
+          (onPiecesSet)="onPiecesSet($event)">
           </app-view-spec>
         </div>
         <div id="nav-button">
-					<button md-button mdStepperPrevious (click)="child.reset()">Back</button>
+          <button md-button mdStepperPrevious (click)="child.reset()">Back</button>
+          <!-- <button md-button mdStepperPrevious (click)="child.reset()">Back</button> -->
 					<!-- <button md-button mdStepperPrevious>Back</button> -->
-          <button md-button mdStepperNext (click)="toFinalStage()">Next</button>
+          <!-- <button md-button mdStepperNext (click)="toFinalStage()">Next</button> -->
+          <!-- <button md-button mdStepperNext (click)="secondWarning()">Next</button> -->
+          <button md-button (click)="child.shuffle()">Shuffle</button>
         </div>
       </form>
     </md-step>
-    <md-step [stepControl]="thirdFormGroup">
+    <!-- <md-step [stepControl]="thirdFormGroup">
       <form [formGroup]="thirdFormGroup">
         <ng-template mdStepLabel>Upload spec</ng-template>
           <app-upload-spec
@@ -45,10 +51,9 @@
           </app-upload-spec>
         <div id="nav-button">
           <button md-button mdStepperPrevious>Back</button>
-          <!-- <button md-button mdStepperNext>Finish</button> -->
         </div>
       </form>
-    </md-step>
+    </md-step> -->
   </md-horizontal-stepper>
 </div>
 

@@ -2,6 +2,7 @@ import { Component, Input, Output, EventEmitter, OnInit, ViewChild } from '@angu
 import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
 import { AuthService } from '../auth/auth.service';
 import { Observable } from 'rxjs/Observable';
+import { MdSnackBar } from '@angular/material';
 import * as firebase from 'firebase/app';
 import constants from '../../constants.js';
 import {ViewSpecComponent} from './view-spec/view-spec.component';
@@ -15,102 +16,139 @@ import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 })
 export class SpecViewerComponent implements OnInit {
 	isLinear = true;
-	selected = false;
-	piecesSet = false;
+    selected = false;
+    piecesSet = false;
 	firstFormGroup: FormGroup;
 	secondFormGroup: FormGroup;
 	thirdFormGroup: FormGroup;
-	selectedBoard: object = new Object();
-	pieces: Map<string, object>;
+	selectedSpec: object = {};
+	selectedBoard: object = {};
+	pieces: object[] = new Array();
+	deckSet = new Set<string>();
 	blocked: boolean;
+	@ViewChild(ViewSpecComponent) child: ViewSpecComponent;
 
-	@ViewChild('viewSpec')
-	viewSpec: ViewSpecComponent;
+	constructor(
+		private auth: AuthService,
+		private _formBuilder: FormBuilder,
+		private db: AngularFireDatabase,
+        private snackBar: MdSnackBar
+	) {	}
 
-	specs: FirebaseListObservable<any[]>;
-	spec: Object;
-	currentSpec: string;
-
-	board: Object;
-	pieceSet: Object;
-	piecesArray: Array<Object>;
-
-	pieceSpec: Object[] = new Array();
-
-	info: Map<string, string>;
-  
-	  constructor(
-		  private auth: AuthService,
-		  private _formBuilder: FormBuilder,
-		  public db: AngularFireDatabase
-	  ) {	
-		this.specs = db.list(constants.SPECS_PATH);
-		// console.log(this.specs)
-	  }
-  
-	  ngOnInit() {
-		this.blocked = this.auth.isAnonymous || !this.auth.authenticated;
-			this.firstFormGroup = this._formBuilder.group({
-				firstCtrl: ['', Validators.required]
-			});
-			this.secondFormGroup = this._formBuilder.group({
-			secondCtrl: ['', Validators.required]
-			});
-			this.thirdFormGroup = this._formBuilder.group({
-				thirdCtrl: ['', Validators.required]
-			});
-		}
-
-		Select(piecesArr: Array<Object>){
-			this.piecesArray = piecesArr;
-		}
-  
-		onSelected(board: object) {
-			this.selected = true;
-			this.selectedBoard = board;
-			this.firstFormGroup = this._formBuilder.group({
-				firstCtrl: ['validated', Validators.required]
+	ngOnInit() {
+    this.blocked = this.auth.isAnonymous || !this.auth.authenticated;
+		this.firstFormGroup = this._formBuilder.group({
+			firstCtrl: ['', Validators.required]
 		});
-			console.log("receiving board");
-		}
-  
-		onPiecesSet(pieces: Map<string, object>) {
-			this.pieces = pieces;
-			this.secondFormGroup = this._formBuilder.group({
-		  		secondCtrl: ['validated', Validators.required]
-		});
-			console.log("updating pieces");
-		}
-  
-		getSelectedBoard() {
-			return this.selectedBoard;
-		}
-  
-		getPieces() {
-			return this.pieces;
-		}
-  
-		getPiecesSet() {
-		return this.piecesSet;
-		}
-  
-		toFinalStage() {
-			this.piecesSet = true;
-		}
+		this.secondFormGroup = this._formBuilder.group({
+      secondCtrl: ['', Validators.required]
+    });
+    this.thirdFormGroup = this._formBuilder.group({
+      thirdCtrl: ['', Validators.required]
+    });
+  }
 
-		clean(){
-			// this.pieces = new Map<string, object>();
-			// console.log(this.pieces)
-			this.viewSpec.reset()
-		}
-
-		onInfo(inf: Map<string, string>){
-			this.info = inf
-		}
+  	onSpecSelected(spec: object) {
+		this.child.reset()
+        this.selected = true;
+        this.selectedSpec = spec;
+	    //console.log(this.selectedSpec);
+	    this.firstFormGroup = this._formBuilder.group({
+            firstCtrl: ['validated', Validators.required]
+        });
+		  console.log("receiving spec");
 		
-		getInfo(){
-			// console.log('info')
-			// console.log(this.info)
-			return this.info
-		}
+  	}
+
+    onBoardSelected(board: object) {
+        this.selectedBoard = board;
+        console.log("receiving board");
+    }
+
+    onPiecesSelected(pieces: object[]) {
+        this.pieces = pieces;
+        console.log('receiving pieces');
+	}
+	
+	onDeckSelected(deckSet: Set<string>){
+		this.deckSet = deckSet
+		console.log('received deck set')
+	}
+
+  	onPiecesSet(piecesObj: object) {
+        let uid = this.selectedSpec['uploaderUid'];
+		this.pieces = piecesObj['nonDeck'].concat(piecesObj['deck']);
+
+		if(this.pieces.length > 0 && uid === this.auth.currentUserId) {
+        	this.secondFormGroup = this._formBuilder.group({
+        		secondCtrl: ['validated', Validators.required]
+        	});
+      	}
+  		console.log("updating pieces");
+  	}
+
+  	getSelectedBoard() {
+  		return this.selectedBoard;
+  	}
+
+    getSelectedSpec() {
+        return this.selectedSpec;
+    }
+
+  	getPieces() {
+  		return this.pieces;
+  	}
+
+	getPiecesSet() {
+    	return this.piecesSet;
+   	}
+
+	getDeckSet(){
+		return this.deckSet
+	}
+	
+    firstWarning() {
+    	if(this.isEmptyObject(this.selectedSpec)) {
+        	this.snackBar.open("You must select a spec.", 'Close', { 
+        		duration: 1000,
+        	});
+        }
+	}
+
+	secondWarning() {
+        let uid = this.selectedSpec['uploaderUid'];
+        if(uid !== this.auth.currentUserId) {
+		    this.snackBar.open("You may only modify your own specs.", 'Close', {
+                duration: 1000,
+            });
+        }
+        else if(this.pieces.length === 0) {
+      		this.snackBar.open("You must place at least one element.", 'Close', {
+        		duration: 1000,
+      		});
+    	}
+    	else {
+            console.log('pieces?');
+            console.log(this.pieces);
+      		this.piecesSet = true;
+        }
+  	}
+
+	reset() {
+		this.pieces = new Array();
+		console.log('resetting');
+	}
+
+  /*
+  ** https://stackoverflow.com/questions/44337856/check-if-specific-object-is-empty-in-typescript
+  */
+  	isEmptyObject(obj) {
+    	for(var prop in obj) {
+       		if (obj.hasOwnProperty(prop)) {
+          		return false;
+       		}
+    	}
+    	return true;
+	}
+
 }
