@@ -22,7 +22,7 @@ export class BuildSpecComponent implements OnChanges {
 	}
 	@Output() onPiecesSet = new EventEmitter<object>();
 
-	_newStage: boolean;
+	_newStage: boolean = true;
 	zPos:number = 2;
 	container:string = 'board-overlay';
 	dragged: boolean = false;
@@ -57,6 +57,10 @@ export class BuildSpecComponent implements OnChanges {
 	) {
 
   		if(this.auth.authenticated) {
+
+  			this.konva.specUpdateObs$.subscribe( data => {
+  				this.updateSpec(data);
+  			});
 
   			let p = new Promise( (resolve, reject) => {
 
@@ -118,8 +122,9 @@ export class BuildSpecComponent implements OnChanges {
 
 	ngOnChanges() {
 		console.log('on changes');
-
+		console.log(this._newStage);
 		if(this.pieces.length !== 0 && this._newStage) {
+			console.log('inside');
 			this._newStage = false;
 			this.konva = new KonvaService();
 			this.konva.specUpdateObs$.subscribe( data => {
@@ -218,7 +223,6 @@ export class BuildSpecComponent implements OnChanges {
 
 	updateSpec(data) {
 		console.log('updating pieces');
-		console.log(data);
 		let konvaImages = data[0];
 		let imageIndex = data[1];
 		let action = data[2];
@@ -422,11 +426,6 @@ export class BuildSpecComponent implements OnChanges {
 	        }
 	        this.nonDeckElementPieces.push(piece);
 	    }
-	    this.allPieces = new Object({
-			'nonDeck': this.nonDeckElementPieces,
-			'deck': this.deckElementPieces
-		})
-        this.onPiecesSet.emit(this.allPieces);
 	}
 
 	getDeck(key) {

@@ -16,7 +16,7 @@ import {FormBuilder, FormGroup, Validators} from '@angular/forms';
   styleUrls: ['./spec-editor.component.css']
 })
 export class SpecEditorComponent implements OnInit {
-	isLinear: boolean = true;
+    isLinear: boolean = true;
     selected: boolean = false;
     piecesSet: boolean = false;
     newStage: boolean = false;

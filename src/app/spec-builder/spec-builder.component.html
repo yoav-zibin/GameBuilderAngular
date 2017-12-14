@@ -18,13 +18,14 @@
         <div id="build-container">
           <app-build-spec
             [selectedBoard]=selectedBoard
-            [newStage]=newStage
             (onPiecesSet)="onPiecesSet($event)">
           </app-build-spec>
         </div>
         <div id="nav-button">
           <button md-button mdStepperPrevious>Back</button>
-          <button md-button mdStepperNext (click)="secondWarning()">Next</button>
+          <button md-button mdStepperNext 
+            (click)="updatePieces()"
+            (click)="secondWarning()">Next</button>
         </div>
       </form>
     </md-step>
