@@ -31,7 +31,7 @@ export class KonvaService {
     }
 
     buildImage(imageObj, xPos, yPos, pos) {
-        console.log(pos)
+      //console.log(pos)
       let img = new Konva.Image({
           x: xPos,
           y: yPos,
@@ -50,8 +50,8 @@ export class KonvaService {
       });
 
       // this doesn't work with cross-origin image sources
-      //img.cache();
-      //img.drawHitFromCache(0);
+      img.cache();
+      img.drawHitFromCache(0);
       return img;
     }
 
@@ -156,7 +156,8 @@ export class KonvaService {
         let imageObj = new Image(img['width'], img['height']);
         imageObj.src = img['src'];
         let pos = img['pos']
-        //imageObj.crossOrigin = "Anonymous";
+
+        imageObj.crossOrigin = "Anonymous";
         
         let image = this.buildImage(imageObj, img['xPos'], img['yPos'], pos);
         console.log(image)
