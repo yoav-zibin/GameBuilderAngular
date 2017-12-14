@@ -202,6 +202,7 @@ export class BuildSpecComponent implements OnChanges {
 				tempPiece['width'] = width;
 				tempPiece['height'] = height;
 				tempPiece['src'] = elem['downloadURL'];
+				tempPiece['pos'] = this.nonDeckElementPieces.length - 1
 				tempPieces.push(tempPiece);
 
 			}
@@ -226,8 +227,8 @@ export class BuildSpecComponent implements OnChanges {
 		let konvaImages = data[0];
 		let imageIndex = data[1];
 		let action = data[2];
-		let konvaImg, konvaImgId = this.getIdFromIndex(imageIndex);
-
+		// let konvaImg, konvaImgId = this.getIdFromIndex(imageIndex);
+		let konvaImg, konvaImgId = imageIndex;
 		for(let tempImg of konvaImages) {
 			if(tempImg._id === konvaImgId) {
 				konvaImg = tempImg;
