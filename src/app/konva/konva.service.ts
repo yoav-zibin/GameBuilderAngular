@@ -32,7 +32,7 @@ export class KonvaService {
 
     buildImage(imageObj, xPos, yPos, pos) {
       //console.log(pos)
-      let img = new Konva.Image({
+      let img:any = new Konva.Image({
           x: xPos,
           y: yPos,
           image: imageObj,
@@ -49,9 +49,9 @@ export class KonvaService {
         eventHandler('dragend', event, this);
       });
 
-      // this doesn't work with cross-origin image sources
-      img.cache();
-      img.drawHitFromCache(0);
+      // works now
+      //img.cache();
+      //img.drawHitFromCache();
       return img;
     }
 
@@ -154,10 +154,11 @@ export class KonvaService {
         console.log('konva drop!');
         
         let imageObj = new Image(img['width'], img['height']);
+        imageObj.crossOrigin = "Anonymous";
         imageObj.src = img['src'];
         let pos = img['pos']
 
-        imageObj.crossOrigin = "Anonymous";
+        
         
         let image = this.buildImage(imageObj, img['xPos'], img['yPos'], pos);
         console.log(image)
