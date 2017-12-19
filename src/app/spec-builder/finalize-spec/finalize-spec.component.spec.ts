@@ -1,5 +1,5 @@
 import { async, inject, ComponentFixture, TestBed } from '@angular/core/testing';
-import { MdGridListModule, MdSelectModule } from '@angular/material';
+import { MdGridListModule, MdSelectModule, MdSnackBarModule } from '@angular/material';
 import { FormsModule } from '@angular/forms';
 import { AngularFireModule} from 'angularfire2';
 import { AngularFireDatabaseModule } from 'angularfire2/database';
@@ -21,6 +21,7 @@ describe('FinalizeSpecComponent', () => {
         AngularFireModule.initializeApp(firebaseConfig),
         AngularFireDatabaseModule,
         AngularFireAuthModule,
+        MdSnackBarModule,
         //MdGridListModule,
         //MdSelectModule,
         //FormsModule,
