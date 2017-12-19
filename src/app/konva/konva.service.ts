@@ -30,15 +30,15 @@ export class KonvaService {
       instance = this;
     }
 
-    buildImage(imageObj, xPos, yPos, pos) {
-      //console.log(pos)
+    buildImage(imageObj, xPos, yPos, pos, type) {
       let img:any = new Konva.Image({
           x: xPos,
           y: yPos,
           image: imageObj,
-          draggable: true,
+          draggable: true
       });
-      img.name = pos
+      img.name = pos;
+      img.type = type;
       img.on('click', function(event) {
         eventHandler('click', event, this);
       });
@@ -49,7 +49,7 @@ export class KonvaService {
         eventHandler('dragend', event, this);
       });
 
-      // works now
+      // works now, but very slow
       //img.cache();
       //img.drawHitFromCache();
       return img;
@@ -57,11 +57,9 @@ export class KonvaService {
 
     updateImage(id, url) {
       let images = this.stage.children[0].children;
-      console.log(url)
       for(let image of images) {
           if(image.name == id) {
               image.attrs.image['src'] = url;
-              console.log(url)
               image.moveTo(this.layer)
               image.show()
               image.draw()
@@ -78,8 +76,8 @@ export class KonvaService {
     shuffle(deckElemIndexMap, deckPosMap){
         let images = this.stage.children[0].children
         //key: deck index
-        console.log(deckElemIndexMap)
-        console.log(deckPosMap)
+        //console.log(deckElemIndexMap)
+        //console.log(deckPosMap)
         for(let key of Array.from(deckElemIndexMap.keys())) {
             let cardIndexArr = deckElemIndexMap.get(key)
             let offset = 0
@@ -115,7 +113,6 @@ export class KonvaService {
     }
 
     buildStage(container) {
-
         this.stage = new Konva.Stage({
             container: container,
             width: 512,
@@ -131,10 +128,8 @@ export class KonvaService {
     }
 
     buildStageWithPieces(container, pieces) {
-        // console.log(pieces)
         this.buildStage(container);
         for(let piece of pieces) {
-            // console.log(piece)
             this.onDrop(piece);
         }
     }
@@ -154,14 +149,11 @@ export class KonvaService {
         console.log('konva drop!');
         
         let imageObj = new Image(img['width'], img['height']);
-        imageObj.crossOrigin = "Anonymous";
+        //imageObj.crossOrigin = "Anonymous";
         imageObj.src = img['src'];
-        let pos = img['pos']
-
         
-        
-        let image = this.buildImage(imageObj, img['xPos'], img['yPos'], pos);
-        console.log(image)
+        let image = this.buildImage(
+          imageObj, img['xPos'], img['yPos'], img['pos'], img['type']);
         image.moveTo(this.layer)
     }
 
@@ -200,8 +192,7 @@ export class KonvaService {
 
     onDragStart(event, img) {
       console.log("konva dragstart");
-    //   img.setZIndex(img.getAbsoluteZIndex() + 1);
-    // img.moveToTop();
+
       /*
       // moving to another layer will improve dragging performance ??
       event.target.moveTo(this.dragLayer)
@@ -211,7 +202,7 @@ export class KonvaService {
 
     onDragEnd(event, img) {
       console.log('konva dragend');
-    //   this.sendUpdatedPieceSet(this.getIndex(img), 'dragged');
+      console.log(img);
       this.sendUpdatedPieceSet(img.name, 'dragged');
 
       /*
@@ -222,10 +213,15 @@ export class KonvaService {
     }
 
     onClick(event, img) {
-    //   this.sendUpdatedPieceSet(this.getIndex(img), 'toggled');
-        console.log(img.name)
-        // img.setZIndex(img.getAbsoluteZIndex() + 1);
-        this.sendUpdatedPieceSet(img.name, 'toggled');
+        if(event.evt.altKey) {
+            console.log('deleting image');
+            img.destroy();
+            this.stage.draw();
+            this.sendUpdatedPieceSet(img.name, 'deleted');
+        }
+        else {
+            this.sendUpdatedPieceSet(img.name, 'toggled');
+        }
     }
 
     sendUpdatedPieceSet(id, message) {
@@ -234,10 +230,5 @@ export class KonvaService {
       this.specUpdateSubj.next(pkg);
     }
 
-    getIndex(img) {
-        // get zero-based index from image._id
-        // stage and layer have _ids 1 and 2
-        return img._id - 3;
-    }
 
 }

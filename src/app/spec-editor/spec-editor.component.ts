@@ -80,7 +80,8 @@ export class SpecEditorComponent implements OnInit {
 
   	onPiecesSet(piecesObj: object) {
         let uid = this.selectedSpec['uploaderUid'];
-    		this.pieces = piecesObj['nonDeck'].concat(piecesObj['deck']);
+        let updatedDeck = this.updateDeckPieceIndices(piecesObj);
+        this.pieces = piecesObj['nonDeck'].concat(updatedDeck);
 
     		if(this.pieces.length > 0 && uid === this.auth.currentUserId) {
             	this.secondFormGroup = this._formBuilder.group({
@@ -89,6 +90,31 @@ export class SpecEditorComponent implements OnInit {
           	}
       		console.log("updating pieces");
       	}
+
+    updateDeckPieceIndices(piecesObj: object) {
+        let nonDeck = piecesObj['nonDeck'];
+        let deck = piecesObj['deck'];
+
+        let i = nonDeck.length;
+        //remove 'undefined' pieces
+        while(i--) {
+            if(!nonDeck[i])
+                nonDeck.splice(i, 1);
+        }
+
+        nonDeck.forEach((piece, index) => {
+            if(piece['type'].endsWith('Deck')) {
+              deck.forEach((el) => {
+                  if(el['deckIndex'] !== index)
+                      el['deckIndex'] = index;
+                  else
+                    return;
+              });
+            }
+        });
+
+        return deck;
+    }
 
     resetStage() {
         this.newStage = !this.newStage;

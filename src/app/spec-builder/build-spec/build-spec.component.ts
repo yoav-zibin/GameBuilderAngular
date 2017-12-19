@@ -27,6 +27,7 @@ export class BuildSpecComponent implements OnChanges {
 	container:string = 'board-overlay';
 	dragged: boolean = false;
 	allPieces: object;
+	globalIndex: number = 0;
 	deckElementPieces: object[] = new Array()
 	nonDeckElementPieces: object[] = new Array();
 	images: object[] = new Array();
@@ -124,13 +125,19 @@ export class BuildSpecComponent implements OnChanges {
 		console.log('on changes');
 		console.log(this._newStage);
 		if(this.pieces.length !== 0 && this._newStage) {
-			console.log('inside');
 			this._newStage = false;
 			this.konva = new KonvaService();
 			this.konva.specUpdateObs$.subscribe( data => {
   				this.updateSpec(data);
   			});
 			let tempPieces = this.formatPieces();
+
+			/*
+	        ** sets globalIndex so pieces can be added and order preserved
+	        */
+	        if(this.globalIndex === 0)
+	        	this.globalIndex = tempPieces.length;
+
 			this.konva.buildStageWithPieces(this.container, tempPieces);
 		}
 	}
@@ -180,7 +187,8 @@ export class BuildSpecComponent implements OnChanges {
 			let elem = this.elementData.get(piece['pieceElementId']);
 			let formattedPiece = {
 	            "el_key": elem["_key"],
-	            "url": elem["downloadURL"],
+	            "type": elem['elementKind'],
+	            "url": elem['downloadURL'],
 	            "xPos": piece['initialState']['x'],
 	            "yPos": piece['initialState']['y'],
 	            "zPos": piece['initialState']['zDepth'],
@@ -189,7 +197,7 @@ export class BuildSpecComponent implements OnChanges {
 	        }
 
 			if(piece['deckPieceIndex'] === -1) {
-				let width, height, xPos, yPos, tempPiece = {};
+				let width, height, xPos, yPos;
 				this.nonDeckElementPieces.push(formattedPiece);
 
 				[width, height] = this.resizeImage(elem);
@@ -197,12 +205,15 @@ export class BuildSpecComponent implements OnChanges {
 					piece['initialState']['x'],
 					piece['initialState']['y']
 				);
-				tempPiece['xPos'] = xPos;
-				tempPiece['yPos'] = yPos;
-				tempPiece['width'] = width;
-				tempPiece['height'] = height;
-				tempPiece['src'] = elem['downloadURL'];
-				tempPiece['pos'] = this.nonDeckElementPieces.length - 1
+				let tempPiece = {
+					'type': elem['elementKind'],
+					'xPos': xPos,
+					'yPos': yPos,
+					'width': width,
+					'height': height,
+					'src': elem['downloadURL'],
+					'pos': this.nonDeckElementPieces.length - 1,
+				};
 				tempPieces.push(tempPiece);
 
 			}
@@ -224,13 +235,28 @@ export class BuildSpecComponent implements OnChanges {
 
 	updateSpec(data) {
 		console.log('updating pieces');
+		console.log(data);
 		let konvaImages = data[0];
 		let imageIndex = data[1];
 		let action = data[2];
-		// let konvaImg, konvaImgId = this.getIdFromIndex(imageIndex);
-		let konvaImg, konvaImgId = imageIndex;
+
+
+		if(action === 'deleted') {
+			//pass
+			let deleted = this.nonDeckElementPieces[imageIndex];
+			if(deleted['type'].endsWith('Deck'))
+				this.deleteDeckPieces(imageIndex);
+			
+			delete this.nonDeckElementPieces[imageIndex];		
+			this.deleteWarning(deleted);
+
+
+			return;
+		}
+
+		let konvaImg;
 		for(let tempImg of konvaImages) {
-			if(tempImg._id === konvaImgId) {
+			if(tempImg.name === imageIndex) {
 				konvaImg = tempImg;
 				break;
 			}
@@ -259,7 +285,7 @@ export class BuildSpecComponent implements OnChanges {
 			curPiece['url'] = newURL;
 			curPiece['index'] = this.elementImageIndex.get(key)["current"];
 
-			this.konva.updateImage(konvaImgId, newURL);
+			this.konva.updateImage(imageIndex, newURL);
 		}
 
 		//update piece
@@ -290,6 +316,15 @@ export class BuildSpecComponent implements OnChanges {
 		}
 		this.nonDeckElementPieces[imageIndex] = curPiece;
 
+	}
+
+	deleteDeckPieces(deckIndex) {
+		let tempArr = new Array();
+			for(let piece of this.deckElementPieces) {
+				if(piece['deckIndex'] !== deckIndex)
+					tempArr.push(piece);
+			}
+			this.deckElementPieces = tempArr;
 	}
 
 	@HostListener('dragstart', ['$event'])
@@ -332,12 +367,12 @@ export class BuildSpecComponent implements OnChanges {
         [xPos, yPos] = this.calculatePosition(event);
         [width, height] = this.resizeImage(elem);
 
-
 		if(type === 'piecesDeck' || type === 'cardsDeck') {
 			let deckX, deckY;
 			[deckX, deckY] = this.scaleCoord(xPos, yPos);
 			let piece = {
 	            "el_key": data["key"],
+	            "type": type,
 	            "url": data["url"],
 	            "xPos": deckX,
 	            "yPos": deckY,
@@ -348,11 +383,13 @@ export class BuildSpecComponent implements OnChanges {
 
 	        //add deck to Konva canvas
 	        let imageObj = {
+	        	'type': type,
 	        	'xPos': xPos,
 	        	'yPos': yPos,
 	        	'src': data['url'], 
 	        	'width': width,
-	        	'height': height
+	        	'height': height,
+	        	'pos': this.globalIndex++,
 	        }
 	        this.konva.onDrop(imageObj);
 	        
@@ -363,7 +400,6 @@ export class BuildSpecComponent implements OnChanges {
 			let deckElements = this.getDeck(data['key']);
 			let resized = this.resizeDeck(deckElements)
 			
-			// Add deck elements to Konva canvas
 			if(type === 'cardsDeck') {
 				/* uncomment to place deckElements directly on board */
 				//this.konva.onCardDeckDrop(resized, xPos, yPos);
@@ -373,6 +409,7 @@ export class BuildSpecComponent implements OnChanges {
 				for(let el of deckElements) {
 					let piece = {
 			    		"el_key": el["_key"],
+			    		"type": type,
 			    		"url": el["downloadURL"],
 			    		"xPos": xPos,
 			    		"yPos": yPos,
@@ -392,6 +429,7 @@ export class BuildSpecComponent implements OnChanges {
 				for(let el of deckElements) {
 					let piece = {
 			    		"el_key": el["_key"],
+			    		"type": type,
 			    		"url": el["downloadURL"],
 			    		"xPos": xPos,
 			    		"yPos": yPos,
@@ -407,17 +445,20 @@ export class BuildSpecComponent implements OnChanges {
 		else { //add non-deck pieces to canvas
 
 			let imageObj = {
+				'type': type,
 	        	'xPos': xPos,
 	        	'yPos': yPos,
 	        	'src': data['url'], 
 	        	'width': width,
-	        	'height': height
+	        	'height': height,
+	        	'pos': this.globalIndex++,
 	        }
 	        this.konva.onDrop(imageObj);
 	        [xPos, yPos] = this.scaleCoord(xPos, yPos);
 
 	    	let piece = {
 	            "el_key": data["key"],
+	            "type": type,
 	            "url": data["url"],
 	            "xPos": xPos,
 	            "yPos": yPos,
@@ -504,37 +545,6 @@ export class BuildSpecComponent implements OnChanges {
 
 	}
 
-	/*  DEPRECATED
-	fromSource(id) {
-		return (id.indexOf('copy') > -1) ? false : true;
-	}
-	*/
-
-	/*  DEPRECATED
-	copyElement(data, id) {
-		let elem = document.getElementById(id).cloneNode(true);
-		(elem as HTMLElement).id = (elem as HTMLElement).id + 'copy' + this.uniqueID;
-        (elem as HTMLElement).setAttribute("src", data["url"]);
-        (elem as HTMLElement).setAttribute("alt", data["key"]);
-        this.uniqueID++;
-
-        return elem;
-	}
-	*/
-	/* DEPRECATED
-	deleteElement(data, id) {
-		if(this.fromSource(id))
-			return
-		console.log(data);
-		this.piecesMap.delete(id);
-		console.log(this.piecesMap);
-        this.onPiecesSet.emit(this.piecesMap);
-        document.getElementById(this.container).removeChild(
-        	document.getElementById(id));
-        this.deleteWarning(data);
-	}
-	*/
-
 	buildQuery() {
 		if(this.currentFilter === 'mine') {
 			return {
@@ -553,16 +563,10 @@ export class BuildSpecComponent implements OnChanges {
 		}
 	}
 
-	getIdFromIndex(index) {
-		return index + 3;
-	}
-
-	/* DEPRECATED
 	deleteWarning(piece) {
-    	this.snackBar.open("Removed " + piece['key'] + " from spec",
+    	this.snackBar.open("Removed " + piece['el_key'] + " from spec",
     		'Close', { duration: 1000 }
     	);
 	}
-	*/
 
 }
