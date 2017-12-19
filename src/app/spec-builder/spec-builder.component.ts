@@ -58,9 +58,7 @@ export class SpecBuilderComponent implements OnInit {
   	}
 
   	onPiecesSet(piecesObj: object) {
-        console.log(piecesObj['deck']);
         let updatedDeck = this.updateDeckPieceIndices(piecesObj);
-        console.log(updatedDeck);
   	    this.pieces = piecesObj['nonDeck'].concat(updatedDeck);
         if(this.pieces.length > 0) {
             this.secondFormGroup = this._formBuilder.group({
@@ -83,10 +81,7 @@ export class SpecBuilderComponent implements OnInit {
 
         nonDeck.forEach((piece, index) => {
             if(piece['type'].endsWith('Deck')) {
-              console.log(piece);
-              console.log(index);
               deck.forEach((el) => {
-                  console.log(el);
                   if(el['deckIndex'] !== index)
                       el['deckIndex'] = index;
                   else

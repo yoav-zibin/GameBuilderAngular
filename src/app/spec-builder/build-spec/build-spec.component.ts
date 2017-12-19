@@ -255,9 +255,7 @@ export class BuildSpecComponent implements OnChanges {
 		}
 
 		let konvaImg;
-		console.log('index: ' + imageIndex);
 		for(let tempImg of konvaImages) {
-			console.log(tempImg);
 			if(tempImg.name === imageIndex) {
 				konvaImg = tempImg;
 				break;
@@ -546,37 +544,6 @@ export class BuildSpecComponent implements OnChanges {
 		return [width, height];
 
 	}
-
-	/*  DEPRECATED
-	fromSource(id) {
-		return (id.indexOf('copy') > -1) ? false : true;
-	}
-	*/
-
-	/*  DEPRECATED
-	copyElement(data, id) {
-		let elem = document.getElementById(id).cloneNode(true);
-		(elem as HTMLElement).id = (elem as HTMLElement).id + 'copy' + this.uniqueID;
-        (elem as HTMLElement).setAttribute("src", data["url"]);
-        (elem as HTMLElement).setAttribute("alt", data["key"]);
-        this.uniqueID++;
-
-        return elem;
-	}
-	*/
-	/* DEPRECATED
-	deleteElement(data, id) {
-		if(this.fromSource(id))
-			return
-		console.log(data);
-		this.piecesMap.delete(id);
-		console.log(this.piecesMap);
-        this.onPiecesSet.emit(this.piecesMap);
-        document.getElementById(this.container).removeChild(
-        	document.getElementById(id));
-        this.deleteWarning(data);
-	}
-	*/
 
 	buildQuery() {
 		if(this.currentFilter === 'mine') {
