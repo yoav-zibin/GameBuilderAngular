@@ -1,10 +1,11 @@
 import { async, inject, ComponentFixture, TestBed } from '@angular/core/testing';
-import { MdGridListModule, MdSelectModule } from '@angular/material';
+import { MdGridListModule, MdSelectModule, MdSnackBarModule } from '@angular/material';
 import { FormsModule } from '@angular/forms';
 import { AngularFireModule} from 'angularfire2';
 import { AngularFireDatabaseModule } from 'angularfire2/database';
 import { AngularFireAuthModule } from 'angularfire2/auth';
 import { AuthService } from '../../auth/auth.service';
+import { ImageSelectionService } from '../../image-select/imageSelection.service';
 import { RouterTestingModule } from '@angular/router/testing';
 import { Router } from '@angular/router';
 import { SelectBoardComponent } from './select-board.component';
@@ -26,11 +27,13 @@ describe('SelectBoardComponent', () => {
         AngularFireAuthModule,
         MdGridListModule,
         MdSelectModule,
+        MdSnackBarModule,
         FormsModule,
       ],
       providers: [
         AuthService,
-        { provide: Router, useClass: class { navigate = jasmine.createSpy("navigate"); }}
+        { provide: Router, useClass: class { navigate = jasmine.createSpy("navigate"); }},
+        ImageSelectionService,
       ]
     })
     .compileComponents();

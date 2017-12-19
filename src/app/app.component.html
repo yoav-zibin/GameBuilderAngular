@@ -15,21 +15,21 @@
       </div>
       <div id="navbar" class="navbar-collapse collapse">
         <ul class="nav navbar-nav">
-          <li><a href="javascript:void(0)" (click)="uploadImage()">Image Uploader</a></li>
-          <li><a href="javascript:void(0)" (click)="createElement()">Create Element</a></li>
-          <li><a href="javascript:void(0)" (click)="build()">Spec Builder</a></li>
-          <li><a href="javascript:void(0)" (click)="editSpec()">Spec Editor</a></li>
-          <li><a href="javascript:void(0)" (click)="viewSpec()">Spec Viewer</a></li>
+          <li><a id="upload-image" href="javascript:void(0)" (click)="uploadImage()">Image Uploader</a></li>
+          <li><a id="create-element" href="javascript:void(0)" (click)="createElement()">Create Element</a></li>
+          <li><a id="build-spec" href="javascript:void(0)" (click)="build()">Spec Builder</a></li>
+          <li><a id="edit-spec" href="javascript:void(0)" (click)="editSpec()">Spec Editor</a></li>
+          <li><a id="view-spec" href="javascript:void(0)" (click)="viewSpec()">Spec Viewer</a></li>
         </ul>
 
         <ul class="nav navbar-nav navbar-right">
           <li dropdown placement="bottom right" *ngIf="!(user | async)?.uid">
           	<a id="login" dropdownToggle type="button" href="javascript:void(0)">Login<span class="caret"></span></a>
           	<ul *dropdownMenu class="dropdown-menu dropdown-menu-right" role="menu">
-            <li role="menuitem"><a class="dropdown-item" href="javascript:void(0)" (click)="loginWithGoogle()">Google</a></li>
-            	<li role="menuitem"><a class="dropdown-item" href="javascript:void(0)" (click)="loginWithEmail()">E-mail</a></li>
-            	<li role="menuitem"><a class="dropdown-item" href="javascript:void(0)" (click)="loginWithPhoneNumber()">Phone</a></li>
-            	<li role="menuitem"><a class="dropdown-item" href="javascript:void(0)" (click)="loginAnonymously()">Anonymous</a></li>
+            <li id="google-login" role="menuitem"><a class="dropdown-item" href="javascript:void(0)" (click)="loginWithGoogle()">Google</a></li>
+            	<li id="email-login" role="menuitem"><a class="dropdown-item" href="javascript:void(0)" (click)="loginWithEmail()">E-mail</a></li>
+            	<li id="phone-login" role="menuitem"><a class="dropdown-item" href="javascript:void(0)" (click)="loginWithPhoneNumber()">Phone</a></li>
+            	<li id="anon-login" role="menuitem"><a class="dropdown-item" href="javascript:void(0)" (click)="loginAnonymously()">Anonymous</a></li>
           	</ul>
 		    	</li>
         	<li id="logout" *ngIf="(user | async)?.uid"><a href="javascript:void(0)" (click)="logout()">Logout</a></li>
