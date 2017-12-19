@@ -49,16 +49,19 @@ export class SpecBuilderComponent implements OnInit {
     }
 
   	onSelected(board: object) {
-        this.selected = true;
+      this.selected = true;
 	    this.selectedBoard = board;
-        this.firstFormGroup = this._formBuilder.group({
+      this.firstFormGroup = this._formBuilder.group({
             firstCtrl: ['validated', Validators.required]
-        });
+      });
   		console.log("receiving board");
   	}
 
   	onPiecesSet(piecesObj: object) {
-  	    this.pieces = piecesObj['nonDeck'].concat(piecesObj['deck']);
+        console.log(piecesObj['deck']);
+        let updatedDeck = this.updateDeckPieceIndices(piecesObj);
+        console.log(updatedDeck);
+  	    this.pieces = piecesObj['nonDeck'].concat(updatedDeck);
         if(this.pieces.length > 0) {
             this.secondFormGroup = this._formBuilder.group({
                 secondCtrl: ['validated', Validators.required]
@@ -66,6 +69,34 @@ export class SpecBuilderComponent implements OnInit {
         }
   		console.log("updating pieces");
   	}
+
+    updateDeckPieceIndices(piecesObj: object) {
+        let nonDeck = piecesObj['nonDeck'];
+        let deck = piecesObj['deck'];
+
+        let i = nonDeck.length;
+        //remove 'undefined' pieces
+        while(i--) {
+            if(!nonDeck[i])
+                nonDeck.splice(i, 1);
+        }
+
+        nonDeck.forEach((piece, index) => {
+            if(piece['type'].endsWith('Deck')) {
+              console.log(piece);
+              console.log(index);
+              deck.forEach((el) => {
+                  console.log(el);
+                  if(el['deckIndex'] !== index)
+                      el['deckIndex'] = index;
+                  else
+                    return;
+              });
+            }
+        });
+
+        return deck;
+    }
 
    updatePieces() {
         this.build.emitUpdates();

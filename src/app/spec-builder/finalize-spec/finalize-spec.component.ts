@@ -78,7 +78,7 @@ export class FinalizeSpecComponent{
   createPiecesSpecArray() {
   	let pieceList = [];
   	for(let piece of this.pieces) {
-  		pieceList.push(this.createPieceSpec(piece))
+        pieceList.push(this.createPieceSpec(piece))
   	}
   	return pieceList;
   }
