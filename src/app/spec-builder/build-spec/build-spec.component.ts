@@ -196,6 +196,9 @@ export class BuildSpecComponent implements OnChanges {
 	            "deckIndex": piece['deckPieceIndex']
 	        }
 
+	        if(elem['elementKind'].endsWith('Deck'))
+				formattedPiece['deckPieceCount'] = elem['deckElements'].length
+
 			if(piece['deckPieceIndex'] === -1) {
 				let width, height, xPos, yPos;
 				this.nonDeckElementPieces.push(formattedPiece);
@@ -214,6 +217,7 @@ export class BuildSpecComponent implements OnChanges {
 					'src': elem['downloadURL'],
 					'pos': this.nonDeckElementPieces.length - 1,
 				};
+
 				tempPieces.push(tempPiece);
 
 			}
@@ -243,6 +247,7 @@ export class BuildSpecComponent implements OnChanges {
 
 		if(action === 'deleted') {
 			//pass
+			console.log(this.nonDeckElementPieces);
 			let deleted = this.nonDeckElementPieces[imageIndex];
 			if(deleted['type'].endsWith('Deck'))
 				this.deleteDeckPieces(imageIndex);
@@ -378,7 +383,9 @@ export class BuildSpecComponent implements OnChanges {
 	            "yPos": deckY,
 	            "zPos": this.zPos++,
 	            "index": this.elementImageIndex.get(data["key"])["current"],
-	            "deckIndex": -1 //non deck-pieces only
+	            "deckIndex": -1, //non deck-pieces only
+	            "deckPieceCount": elem['deckElements'].length
+
 	        }
 
 	        //add deck to Konva canvas

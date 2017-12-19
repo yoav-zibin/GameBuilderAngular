@@ -13,6 +13,10 @@
 	<input type="submit" value="Generate Spec" (click)="isValid() && createGameSpec()">
 </form>
 
+<div>
+	<p>Note: You cannot go 'Back' to delete more elements from your board. Open your spec in Spec Editor again to delete additional pieces.</p>
+</div>
+
 <div *ngIf="generated">
 	<div *ngIf="!selectedSpec">
 		<pre style="text-align: left">{{ gameSpec | json }}</pre>

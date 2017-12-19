@@ -102,14 +102,16 @@ export class SpecEditorComponent implements OnInit {
                 nonDeck.splice(i, 1);
         }
 
+        let prevCount = 0;
+
         nonDeck.forEach((piece, index) => {
             if(piece['type'].endsWith('Deck')) {
-              deck.forEach((el) => {
-                  if(el['deckIndex'] !== index)
-                      el['deckIndex'] = index;
-                  else
-                    return;
-              });
+                for(let i = prevCount; i < (prevCount + piece['deckPieceCount']); i++) {
+                    if(deck[i]['deckIndex'] !== index)
+                        deck[i]['deckIndex'] = index; 
+                }
+
+                prevCount += piece['deckPieceCount'];
             }
         });
 
