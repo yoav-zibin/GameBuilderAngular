@@ -109,7 +109,8 @@
         [(ngModel)]="isDrawable">Drawable
       </md-checkbox>
       <br>
-      <md-input-container *ngIf="elementType=='standard'">
+      <md-input-container *ngIf="elementType=='standard' || elementType=='toggable'
+          || elementType=='card'">
         <input mdInput type="number" min="1" max="360" placeholder="Rotatable Degrees"
             [(ngModel)]="rotatableDegrees"/>
       </md-input-container>
